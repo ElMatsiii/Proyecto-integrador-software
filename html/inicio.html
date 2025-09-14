@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Proyección Académica</title>
+    <link rel="stylesheet" href="../Styles/inicio.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Página Principal</h1>
+            <div class="user-info">
+                <span>Usuario: <span id="username">Estudiante</span></span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="inicio">Inicio</button>
+            <button class="tab-btn" data-tab="malla">Mi Malla</button>
+            <button class="tab-btn" data-tab="resumen">Resumen</button>
+            <button class="tab-btn" data-tab="completacion">Completación</button>
+            <button class="tab-btn" data-tab="versiones">Versiones</button>
+            <button class="tab-btn" data-tab="perfil">Perfil</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tab Content: Inicio -->
+            <div id="inicio" class="tab-content active">
+                <div class="semester-info">
+                    <h2>Semestre Actual: 2024-2</h2>
+                    <p>Bienvenido al sistema de proyección académica</p>
+                </div>
+
+                <!-- Current Courses Section -->
+                <section class="current-courses">
+                    <h3>Cursos Inscritos</h3>
+                    <div class="courses-grid">
+                        <div class="course-card inscrito">
+                            <h4>Matemáticas I</h4>
+                            <div class="course-details">
+                                <span class="credits">6 créditos</span>
+                                <span class="schedule">Lun-Mie-Vie 08:00</span>
+                            </div>
+                        </div>
+                        <div class="course-card inscrito">
+                            <h4>Introducción a la Programación</h4>
+                            <div class="course-details">
+                                <span class="credits">8 créditos</span>
+                                <span class="schedule">Mar-Jue 10:00</span>
+                            </div>
+                        </div>
+                        <div class="course-card inscrito">
+                            <h4>Química General</h4>
+                            <div class="course-details">
+                                <span class="credits">6 créditos</span>
+                                <span class="schedule">Lun-Vie 14:00</span>
+                            </div>
+                        </div>
+                        <div class="course-card inscrito">
+                            <h4>Comunicación Efectiva</h4>
+                            <div class="course-details">
+                                <span class="credits">4 créditos</span>
+                                <span class="schedule">Mar-Jue 16:00</span>
+                            </div>
+                        </div>
+                        <div class="course-card inscrito">
+                            <h4>Historia Contemporánea</h4>
+                            <div class="course-details">
+                                <span class="credits">4 créditos</span>
+                                <span class="schedule">Vie 09:00</span>
+                            </div>
+                        </div>
+                        <div class="course-card inscrito">
+                            <h4>Educación Física</h4>
+                            <div class="course-details">
+                                <span class="credits">2 créditos</span>
+                                <span class="schedule">Mar 18:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Statistics Section -->
+                <section class="stats-section">
+                    <div class="stats-card">
+                        <h4>Créditos Totales</h4>
+                        <div class="stat-value">30/180</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 16.67%"></div>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <h4>Ramos Aprobados</h4>
+                        <div class="stat-value">8/45</div>
+                    </div>
+                    <div class="stats-card">
+                        <h4>Promedio Actual</h4>
+                        <div class="stat-value">5.8</div>
+                    </div>
+                    <div class="stats-card">
+                        <h4>% Avance</h4>
+                        <div class="stat-value">17%</div>
+                    </div>
+                </section>
+
+                <!-- Action Buttons -->
+                <section class="action-buttons">
+                    <button class="btn primary" onclick="openPlanner('cuatrimestral')">
+                        Planificación Cuatrimestral
+                    </button>
+                    <button class="btn secondary" onclick="openPlanner('anual')">
+                        Plan Académico Anual
+                    </button>
+                </section>
+            </div>
+
+            <!-- Other tab contents (placeholders for now) -->
+            <div id="malla" class="tab-content">
+                <h2>Mi Malla Curricular</h2>
+                <p>Aquí se mostrará la malla curricular interactiva...</p>
+            </div>
+
+            <div id="resumen" class="tab-content">
+                <h2>Resumen Académico</h2>
+                <p>Resumen de tu progreso académico...</p>
+            </div>
+
+            <div id="completacion" class="tab-content">
+                <h2>Porcentaje de Completación</h2>
+                <p>Progreso detallado de la carrera...</p>
+            </div>
+
+            <div id="versiones" class="tab-content">
+                <h2>Versiones de Malla</h2>
+                <p>Diferentes versiones de la malla curricular...</p>
+            </div>
+
+            <div id="perfil" class="tab-content">
+                <h2>Mi Perfil</h2>
+                <p>Información personal y configuración...</p>
+            </div>
+        </main>
+
+        <!-- Modal for Planners -->
+        <div id="plannerModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="plannerTitle">Planificador</h2>
+                <div id="plannerContent">
+                    <!-- Planner content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../Scripts/inicio.js"></script>
+</body>
+</html>
