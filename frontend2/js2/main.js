@@ -300,29 +300,67 @@ async function cargarMalla(carrera) {
 }
 
 // =============================
-// Avance (Resumen)
+// Avance (Resumen con tabla)
 // =============================
 async function mostrarAvance(usuario, carrera) {
-  const dash = document.querySelector(".dashboard");
+  const main = document.querySelector("main");
+  const dash = document.createElement("div");
+  dash.classList.add("dashboard");
 
   try {
     const url = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
     const response = await fetch(url);
     const data = await response.json();
 
+    if (!Array.isArray(data) || data.length === 0) {
+      main.innerHTML = "<p>No se encontraron registros de avance.</p>";
+      return;
+    }
+
+    // --- Cálculos del dashboard ---
     const total = data.length;
-    const aprobados = data.filter((r) => r.status === "APROBADO").length;
-    const reprobados = data.filter((r) => r.status === "REPROBADO").length;
+    const aprobados = data.filter(r => r.status === "APROBADO").length;
+    const reprobados = data.filter(r => r.status === "REPROBADO").length;
+    const enCurso = data.filter(r => r.status === "INSCRITO" || r.status === "EN_CURSO").length;
     const avance = total > 0 ? ((aprobados / total) * 100).toFixed(1) : 0;
 
+    // --- Dashboard superior ---
     dash.innerHTML = `
-      <p>Créditos aprobados: <strong>${aprobados} / ${total}</strong></p>
-      <p>Avance de carrera: <strong>${avance}%</strong></p>
+      <p>Créditos aprobados: <strong>${aprobados}</strong></p>
       <p>Ramos reprobados: <strong>${reprobados}</strong></p>
+      <p>Ramos inscritos/en curso: <strong>${enCurso}</strong></p>
+      <p>Avance de carrera: <strong>${avance}%</strong></p>
     `;
+
+    main.appendChild(dash);
+
+    // --- Tabla de detalle ---
+    const tabla = document.createElement("table");
+    tabla.classList.add("tabla-avance");
+    tabla.innerHTML = `
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Estado</th>
+          <th>Período</th>
+          <th>Tipo de Inscripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(r => `
+          <tr class="${r.status.toLowerCase()}">
+            <td>${r.course}</td>
+            <td>${r.status}</td>
+            <td>${r.period}</td>
+            <td>${r.inscriptionType}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    `;
+    main.appendChild(tabla);
+
   } catch (err) {
     console.error("Error cargando avance:", err);
-    dash.innerHTML = `<p style="color:red;">Error al conectar con el servidor.</p>`;
+    main.innerHTML = `<p style="color:red;">Error al conectar con el servidor.</p>`;
   }
 }
-
