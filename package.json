@@ -1,8 +1,7 @@
-{ 
+{
   "name": "proyecto-integrador-software",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node proxy.js",
@@ -25,4 +24,3 @@
     "node-fetch": "^3.3.2"
   }
 }
-

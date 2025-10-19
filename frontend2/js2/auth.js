@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Respuesta positiva
       if (data.rut && Array.isArray(data.carreras)) {
-        mensaje.textContent = "Inicio de sesión exitoso";
+      mensaje.textContent = "Inicio de sesión exitoso";
         mensaje.style.color = "green";
 
         // Guardar en localStorage

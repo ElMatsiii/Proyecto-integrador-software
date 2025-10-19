@@ -6,6 +6,28 @@
   <title>Mi Malla</title>
   <link rel="stylesheet" href="../css/inicio2.css">
 </head>
+
+<body>
+  <nav>
+    <ul>
+      <li><a href="../html2/malla.html" class="active">Mi Malla</a></li>
+      <li><a href="../html2/resumen.html">Resumen</a></li>
+      <li><a href="../html2/comparacion.html">Comparación</a></li>
+      <li><a href="../html2/versiones.html">Versiones</a></li>
+      <li><a href="../html2/perfil.html">Perfil</a></li>
+      <li><a href="../html2/index.html" class="logout">Salir</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h2>Bienvenido, <span id="usuarioNombre"></span></h2>
+    <p>RUT: <span id="usuarioRut"></span></p>
+  </main>
+
+  <footer>
+    <p>© 2025 Universidad del Norte</p>
+  </footer>
+
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const rut = localStorage.getItem("rut");
@@ -15,54 +37,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   mensaje.style.marginTop = "15px";
   document.querySelector("main").appendChild(mensaje);
 
-  // Verificar login
   if (!rut || carreras.length === 0) {
     alert("Por favor, inicia sesión nuevamente.");
     window.location.href = "index.html";
     return;
   }
 
-  // Mostrar datos básicos del estudiante
   const user = localStorage.getItem("usuario");
   document.getElementById("usuarioNombre").textContent = user;
   document.getElementById("usuarioRut").textContent = rut;
-
-  // Tomar la primera carrera (por ahora)
   const carrera = carreras[0];
   mensaje.innerHTML = `<p><strong>Cargando malla de ${carrera.nombre} (${carrera.codigo})...</strong></p>`;
 
-  const url = `http://localhost:3000/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
-
-
-  const headers = new Headers();
-  headers.append('X-HAWAII-AUTH', 'jf400fejof13f');
-
-  const requestOptions = {
-    method: 'GET',
-    headers: headers,
-    redirect: 'follow'
-  };
-
   try {
-    const response = await fetch(`http://localhost:3000/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`);
+    const response = await fetch(`http://localhost:3000/malla`, {
+      method: "GET"
+    });
+
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
-    const rawText = await response.text();
-    console.log("Respuesta cruda de malla:", rawText);
-
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch (err) {
-      throw new Error("Error al parsear la respuesta JSON.");
-    }
+    const data = await response.json();
+    console.log("Datos de malla:", data);
 
     if (!Array.isArray(data) || data.length === 0) {
       mensaje.innerHTML = "<p>No se encontró información de malla para esta carrera.</p>";
       return;
     }
 
-    // Crear tabla
     const table = document.createElement("table");
     table.innerHTML = `
       <thead>
@@ -94,7 +95,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       el.style.padding = "8px";
     });
 
-    // Mostrar la tabla
     mensaje.innerHTML = `<h3>Malla de ${carrera.nombre}</h3>`;
     mensaje.appendChild(table);
 
@@ -104,28 +104,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 </script>
-<body>
-  <nav>
-    <ul>
-      <li><a href="../html2/malla.html" class="active">Mi Malla</a></li>
-      <li><a href="../html2/resumen.html">Resumen</a></li>
-      <li><a href="../html2/comparacion.html">Comparación</a></li>
-      <li><a href="../html2/versiones.html">Versiones</a></li>
-      <li><a href="../html2/perfil.html">Perfil</a></li>
-      <li><a href="../html2/index.html" class="logout">Salir</a></li>
-    </ul>
-  </nav>
-  <main>
-    <h2>Bienvenido, <span id="usuarioNombre"></span></h2>
-    <p>RUT: <span id="usuarioRut"></span></p>
-    <!-- Aquí se cargará la malla -->
-  </main>
-
-
-  <footer>
-    <p>© 2025 Universidad del Norte</p>
-  </footer>
 
   <script src="../js2/main.js"></script>
 </body>
 </html>
+
