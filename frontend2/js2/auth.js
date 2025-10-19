@@ -29,11 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
     mensaje.textContent = "Conectando con el servidor...";
     mensaje.style.color = "#333";
 
-    const url = `https://puclaro.ucn.cl/eross/avance/login.php?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-
+    const url = `http://localhost:3000/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
     const requestOptions = {
-      method: "GET",
-      redirect: "follow"
+      method: 'GET',
+      redirect: 'follow'
     };
 
     try {

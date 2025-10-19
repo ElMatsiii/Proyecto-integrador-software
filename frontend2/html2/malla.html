@@ -31,19 +31,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const carrera = carreras[0];
   mensaje.innerHTML = `<p><strong>Cargando malla de ${carrera.nombre} (${carrera.codigo})...</strong></p>`;
 
-  const url = `https://losvilos.ucn.cl/hawaii/api/mallas?${carrera.codigo}-${carrera.catalogo}`;
+  const url = `http://localhost:3000/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+
 
   const headers = new Headers();
-  headers.append("X-HAWAII-AUTH", "jf400fejof13f");
+  headers.append('X-HAWAII-AUTH', 'jf400fejof13f');
 
   const requestOptions = {
-    method: "GET",
+    method: 'GET',
     headers: headers,
-    redirect: "follow"
+    redirect: 'follow'
   };
 
   try {
-    const response = await fetch(url, requestOptions);
+    const response = await fetch(`http://localhost:3000/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`);
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
     const rawText = await response.text();
