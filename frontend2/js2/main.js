@@ -166,23 +166,40 @@ function mostrarSelectorCarrera(container, data) {
 }
 
 // =============================
-// Mostrar ramos del INICIO
+// Mostrar ramos del INICIO (con nombre desde malla)
 // =============================
 async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, infoCreditos) {
   try {
-    const url = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
-    const response = await fetch(url);
-    const avance = await response.json();
+    contenedor.innerHTML = "<p>Cargando información...</p>";
+
+    // --- URLs ---
+    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+
+    // --- Fetch paralelo ---
+    const [respAvance, respMalla] = await Promise.all([fetch(urlAvance), fetch(urlMalla)]);
+    const avance = await respAvance.json();
+    const malla = await respMalla.json();
 
     if (!Array.isArray(avance) || avance.length === 0) {
       contenedor.innerHTML = "<p>No se encontraron ramos.</p>";
       return;
     }
 
+    // --- Crear mapa de códigos -> nombres ---
+    const mapaNombres = {};
+    if (Array.isArray(malla)) {
+      malla.forEach(curso => {
+        mapaNombres[curso.codigo] = curso.asignatura;
+      });
+    }
+
+    // --- Obtener semestres únicos ---
     const semestres = [...new Set(avance.map(r => r.period))].sort();
     const semestreActual = semestres[semestres.length - 1];
     let semestreSeleccionado = semestreActual;
 
+    // --- Dropdown ---
     selectSemestre.innerHTML = "";
     semestres.forEach((s) => {
       const opt = document.createElement("option");
@@ -192,6 +209,7 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
       selectSemestre.appendChild(opt);
     });
 
+    // --- Renderizado ---
     const renderRamos = (sem) => {
       const filtrados = avance.filter(r => r.period === sem);
       contenedor.innerHTML = "";
@@ -200,16 +218,29 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
       filtrados.forEach((r) => {
         const creditos = 6;
         totalCreditos += creditos;
+
         let color = "#f8f9fa";
         if (r.status === "APROBADO") color = "#d4edda";
         else if (r.status === "REPROBADO") color = "#f8d7da";
         else if (r.status === "INSCRITO" || r.status === "EN_CURSO") color = "#fff3cd";
 
+        // Nombre del ramo desde malla (fallback: código)
+        let nombreRamo = mapaNombres[r.course];
+
+        // Si no existe en la malla, usamos un fallback más descriptivo
+        if (!nombreRamo) {
+          if (r.course.startsWith("DCTE")) nombreRamo = "Curso de Formación General";
+          else if (r.course.startsWith("UNFP")) nombreRamo = "Curso de Formación Profesional";
+          else if (r.course.startsWith("SSED")) nombreRamo = "Curso de Inglés o Comunicación";
+          else nombreRamo = r.course; // fallback al código si no coincide con nada
+}
+
+
         const div = document.createElement("div");
         div.classList.add("curso");
         div.style.backgroundColor = color;
         div.innerHTML = `
-          <h4>${r.course}</h4>
+          <h4>${nombreRamo}</h4>
           <p><strong>Periodo:</strong> ${r.period}</p>
           <p><strong>Estado:</strong> ${r.status}</p>
           <p><strong>Créditos:</strong> ${creditos}</p>
@@ -229,14 +260,14 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
     };
 
     renderRamos(semestreSeleccionado);
-    selectSemestre.addEventListener("change", (e) => {
-      renderRamos(e.target.value);
-    });
+    selectSemestre.addEventListener("change", (e) => renderRamos(e.target.value));
+
   } catch (err) {
     console.error("Error al mostrar ramos:", err);
     contenedor.innerHTML = `<p style="color:red;">Error al cargar los ramos.</p>`;
   }
 }
+
 
 // =============================
 // Función para cargar Malla (solo visual, sin estados)
@@ -363,4 +394,167 @@ async function mostrarAvance(usuario, carrera) {
     console.error("Error cargando avance:", err);
     main.innerHTML = `<p style="color:red;">Error al conectar con el servidor.</p>`;
   }
+}
+// =============================
+// PROYECCIÓN MANUAL (solo ramos pendientes)
+// =============================
+if (window.location.pathname.includes("proyeccion-manual.html")) {
+  const contenedor = document.getElementById("proyeccionContainer");
+  const btnGuardar = document.getElementById("btnGuardarProyeccion");
+  const btnVolver = document.getElementById("btnVolver");
+
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const carrera = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
+
+  if (!usuario || !carrera) {
+    window.location.href = "index.html";
+  }
+
+  async function cargarRamosPendientes() {
+    try {
+      contenedor.innerHTML = "<p>Cargando ramos pendientes...</p>";
+
+      // --- Llamar a las APIs ---
+      const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+      const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+
+      const [respAvance, respMalla] = await Promise.all([fetch(urlAvance), fetch(urlMalla)]);
+      const avance = await respAvance.json();
+      const malla = await respMalla.json();
+
+      if (!Array.isArray(avance) || avance.length === 0) {
+        contenedor.innerHTML = "<p>No se encontró avance para este estudiante.</p>";
+        return;
+      }
+
+      // --- Obtener listas útiles ---
+      const aprobados = avance.filter(r => r.status === "APROBADO").map(r => r.course);
+      const enCurso = avance.filter(r => r.status === "INSCRITO" || r.status === "EN_CURSO").map(r => r.course);
+
+      // --- Determinar ramos pendientes ---
+      const pendientes = malla.filter((ramo) => {
+        // Si ya está aprobado o inscrito → se excluye
+        if (aprobados.includes(ramo.codigo) || enCurso.includes(ramo.codigo)) return false;
+
+        // Si tiene prerrequisitos, validamos que todos estén aprobados o en curso
+        if (ramo.prereq && ramo.prereq.trim() !== "") {
+          const prereqs = ramo.prereq.split(",").map(p => p.trim());
+          return prereqs.every(p => aprobados.includes(p) || enCurso.includes(p));
+        }
+
+        return true; // sin prerequisitos → disponible
+      });
+
+      // --- Mostrar resultados ---
+      if (pendientes.length === 0) {
+        contenedor.innerHTML = "<p>🎓 No hay ramos pendientes para proyectar. ¡Felicidades!</p>";
+        return;
+      }
+
+      contenedor.innerHTML = "";
+      pendientes.forEach((curso) => {
+        const div = document.createElement("div");
+        div.classList.add("curso");
+        div.innerHTML = `
+          <input type="checkbox" id="${curso.codigo}" />
+          <label for="${curso.codigo}">
+            <strong>${curso.asignatura}</strong><br>
+            <small>${curso.codigo} — ${curso.creditos} créditos</small>
+          </label>
+        `;
+        contenedor.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Error cargando ramos pendientes:", err);
+      contenedor.innerHTML = "<p style='color:red;'>Error al cargar los ramos pendientes.</p>";
+    }
+  }
+
+  cargarRamosPendientes();
+
+  btnGuardar.addEventListener("click", () => {
+    const seleccionados = [...document.querySelectorAll("input[type='checkbox']:checked")].map(
+      (chk) => chk.id
+    );
+    localStorage.setItem("proyeccionManual", JSON.stringify(seleccionados));
+    alert("Proyección manual guardada correctamente.");
+  });
+
+  btnVolver.addEventListener("click", () => {
+    window.location.href = "inicio.html";
+  });
+}
+
+
+// =============================
+// PROYECCIÓN AUTOMÁTICA
+// =============================
+if (window.location.pathname.includes("proyeccion-automatica.html")) {
+  const contenedor = document.getElementById("resultadoAuto");
+  const btnGenerar = document.getElementById("btnGenerarAuto");
+  const btnVolver = document.getElementById("btnVolver");
+
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const carrera = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
+
+  if (!usuario || !carrera) {
+    window.location.href = "index.html";
+  }
+
+  btnGenerar.addEventListener("click", async () => {
+    contenedor.innerHTML = "<p>Generando proyección automática...</p>";
+
+    try {
+      const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+      const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+
+      const [respAvance, respMalla] = await Promise.all([fetch(urlAvance), fetch(urlMalla)]);
+      const avance = await respAvance.json();
+      const malla = await respMalla.json();
+
+      // Obtener ramos aprobados
+      const aprobados = avance.filter(r => r.status === "APROBADO").map(r => r.course);
+
+      // Elegir ramos cuyos prerrequisitos estén cumplidos
+      const disponibles = malla.filter((r) => {
+        if (!r.prereq) return true;
+        const prereqs = r.prereq.split(",");
+        return prereqs.every(p => aprobados.includes(p));
+      });
+
+      // Limitar por créditos
+      const seleccion = [];
+      let totalCreditos = 0;
+      for (const ramo of disponibles) {
+        if (totalCreditos + ramo.creditos <= 35) {
+          seleccion.push(ramo);
+          totalCreditos += ramo.creditos;
+        }
+      }
+
+      // Mostrar resultado
+      contenedor.innerHTML = "";
+      seleccion.forEach((r) => {
+        const div = document.createElement("div");
+        div.classList.add("curso");
+        div.innerHTML = `
+          <h4>${r.asignatura}</h4>
+          <p>${r.codigo}</p>
+          <p><strong>${r.creditos}</strong> créditos</p>
+        `;
+        contenedor.appendChild(div);
+      });
+
+      if (seleccion.length === 0) {
+        contenedor.innerHTML = "<p>No hay ramos disponibles para proyectar.</p>";
+      }
+    } catch (err) {
+      console.error(err);
+      contenedor.innerHTML = "<p style='color:red;'>Error al generar la proyección.</p>";
+    }
+  });
+
+  btnVolver.addEventListener("click", () => {
+    window.location.href = "inicio.html";
+  });
 }
