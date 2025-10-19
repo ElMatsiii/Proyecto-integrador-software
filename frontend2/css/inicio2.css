@@ -102,7 +102,7 @@ main {
 
 .curso.aprobado { border-color: #28a745; }
 .curso.en-curso { border-color: #ffc107; }
-.curso.pendiente { border-color: #dc3545; }
+.curso.pendiente { border-color: #9c0b0b; }
 
 /* Tablas (comparación) */
 table {
@@ -167,4 +167,150 @@ footer {
   color: white;
   padding: 15px 0;
   border-radius: 0;
+}
+.curso.aprobado {
+  border-color: #28a745;
+  background-color: #d4edda;
+}
+
+.curso.reprobado {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+}
+
+.curso.en-curso {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+}
+
+.curso.pendiente {
+  border-color: #df03fc;
+  background-color: #fbdeff;
+}
+/* ============================= */
+/* Ajuste visual para Mi Malla */
+/* ============================= */
+.pagina-malla main {
+  max-width: 100%;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 30px 60px;
+}
+
+.pagina-malla .malla-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  justify-items: stretch;
+  align-items: start;
+}
+
+.pagina-malla .bloque-nivel {
+  margin-bottom: 40px;
+}
+
+.pagina-malla .bloque-nivel h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.pagina-malla .curso {
+  background: #fff;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px 10px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.pagina-malla .curso:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.pagina-malla .curso h4 {
+  font-size: 0.95rem;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.pagina-malla .curso p {
+  font-size: 0.8rem;
+  color: #555;
+}
+/* ============================= */
+/* Malla centrada y uniforme */
+/* ============================= */
+.pagina-malla #mallaContainer {
+  display: flex;                  /* ← pone los semestres en fila */
+  flex-direction: row;            /* ← dirección horizontal */
+  justify-content: flex-start;        /* ← centra la malla */
+  align-items: flex-start;        /* ← alinea los semestres arriba */
+  gap: 40px;                      /* ← espacio entre semestres */
+  overflow-x: auto;               /* ← permite desplazamiento horizontal */
+  padding: 30px 40px;
+}
+
+/* Cada bloque (semestre) */
+.pagina-malla .bloque-nivel {
+  flex: 0 0 auto;                 /* ← mantiene el ancho de cada columna */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pagina-malla .bloque-nivel h3 {
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+/* Cursos dentro de cada semestre: vertical, centrados */
+.pagina-malla .malla-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Cajas uniformes */
+.pagina-malla .curso {
+  width: 180px;
+  height: 90px;
+  background: #fff;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.pagina-malla .curso h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 5px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+.pagina-malla .curso p {
+  font-size: 0.8rem;
+  color: #555;
+  margin: 0;
+}
+
+.pagina-malla .curso:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
