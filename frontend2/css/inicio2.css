@@ -455,3 +455,31 @@ footer {
   border: none !important;
   box-shadow: none !important;
 }
+#selectorCarreraContainer {
+  text-align: center;
+}
+
+#selectorCarreraContainer label {
+  font-weight: 500;
+  color: #333;
+}
+
+#selectorCarrera {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+#selectorCarrera:hover {
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
+}
+
+#etiquetaCarrera {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+

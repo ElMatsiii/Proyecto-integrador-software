@@ -7,53 +7,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector("main");
 
   // --- LOGIN ---
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const mensaje = document.getElementById("mensaje");
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const mensaje = document.getElementById("mensaje");
 
-      mensaje.textContent = "Iniciando sesión...";
-      mensaje.style.color = "black";
+    mensaje.textContent = "Iniciando sesión...";
+    mensaje.style.color = "black";
 
-      try {
-        const url = `https://puclaro.ucn.cl/eross/avance/login.php?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-        const response = await fetch(url);
-        const data = await response.json();
+    try {
+      const url = `https://puclaro.ucn.cl/eross/avance/login.php?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-        if (data.error) {
-          mensaje.textContent = "Credenciales incorrectas.";
-          mensaje.style.color = "red";
-          return;
-        }
-
-        // Guardar usuario base sin carrera seleccionada
-        localStorage.setItem(
-          "usuario",
-          JSON.stringify({
-            email,
-            rut: data.rut,
-            carreras: data.carreras,
-          })
-        );
-
-        // Si tiene más de una carrera -> mostrar selección
-        if (data.carreras.length > 1) {
-          mostrarSelectorCarrera(container, data);
-        } else {
-          const carrera = data.carreras[0];
-          localStorage.setItem("carreraSeleccionada", JSON.stringify(carrera));
-          window.location.href = "inicio.html";
-        }
-      } catch (err) {
-        console.error("Error de conexión:", err);
-        mensaje.textContent = "Error al conectar con el servidor.";
+      if (data.error) {
+        mensaje.textContent = "Credenciales incorrectas.";
         mensaje.style.color = "red";
+        return;
       }
-    });
-  }
+
+      // Ordenar carreras por catálogo descendente (más reciente primero)
+      const carrerasOrdenadas = data.carreras.sort((a, b) => b.catalogo.localeCompare(a.catalogo));
+
+      // Guardar usuario completo
+      localStorage.setItem(
+        "usuario",
+        JSON.stringify({
+          email,
+          rut: data.rut,
+          carreras: carrerasOrdenadas,
+        })
+      );
+
+      // Seleccionar por defecto la carrera más reciente
+      const carrera = carrerasOrdenadas[0];
+      localStorage.setItem("carreraSeleccionada", JSON.stringify(carrera));
+
+      // Ir directo a inicio.html
+      window.location.href = "inicio.html";
+    } catch (err) {
+      console.error("Error de conexión:", err);
+      mensaje.textContent = "Error al conectar con el servidor.";
+      mensaje.style.color = "red";
+    }
+  });
+}
+
 
   // --- LOGOUT ---
   const logoutBtn = document.querySelector(".logout");
@@ -88,38 +90,109 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  // --- INICIO (pantalla principal) ---
-  if (page.includes("inicio.html") && usuario && carreraSeleccionada) {
-    const nombreCarrera = document.getElementById("nombreCarrera");
-    const semestreSpan = document.getElementById("semestreActual");
-    const selectSemestre = document.getElementById("selectSemestre");
-    const ramosContainer = document.getElementById("ramosContainer");
-    const infoCreditos = document.getElementById("infoCreditos");
-    const btnManual = document.getElementById("btnManual");
-    const btnAuto = document.getElementById("btnAuto");
+// --- INICIO (pantalla principal) ---
+if (page.includes("inicio.html") && usuario) {
+  const nombreCarrera = document.getElementById("nombreCarrera");
+  const semestreSpan = document.getElementById("semestreActual");
+  const selectSemestre = document.getElementById("selectSemestre");
+  const ramosContainer = document.getElementById("ramosContainer");
+  const infoCreditos = document.getElementById("infoCreditos");
+  const btnManual = document.getElementById("btnManual");
+  const btnAuto = document.getElementById("btnAuto");
+  const selectorCarreraContainer = document.getElementById("selectorCarreraContainer");
+  const selectorCarrera = document.getElementById("selectorCarrera");
+  const etiquetaCarrera = document.getElementById("etiquetaCarrera");
+
+  const carreras = usuario.carreras;
+  let carreraSeleccionada = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
+
+  // Calcular semestre actual según fecha real (Ej: 202520 o 202610)
+  const ahora = new Date();
+  const año = ahora.getFullYear();
+  const semestre = ahora.getMonth() < 6 ? "10" : "20"; // Primer semestre: enero-junio → "10", segundo → "20"
+  const semestreActual = `${año}${semestre}`;
+  semestreSpan.textContent = semestreActual;
+
+  // Mostrar dropdown solo si hay más de una carrera
+  if (carreras.length > 1) {
+    selectorCarreraContainer.style.display = "block";
+    selectorCarrera.innerHTML = "";
+
+    carreras.forEach((c, index) => {
+      const opt = document.createElement("option");
+      opt.value = index;
+      opt.textContent = `${c.nombre} (${c.catalogo})`;
+      if (c.codigo === carreraSeleccionada?.codigo) opt.selected = true;
+      selectorCarrera.appendChild(opt);
+    });
+
+    selectorCarrera.addEventListener("change", async (e) => {
+      const seleccion = carreras[e.target.value];
+      localStorage.setItem("carreraSeleccionada", JSON.stringify(seleccion));
+      carreraSeleccionada = seleccion;
+      await actualizarInicio();
+    });
+  } else {
+    selectorCarreraContainer.style.display = "none";
+  }
+
+  async function actualizarInicio() {
+    if (!carreraSeleccionada) {
+      carreraSeleccionada = carreras[0];
+      localStorage.setItem("carreraSeleccionada", JSON.stringify(carreraSeleccionada));
+    }
 
     nombreCarrera.textContent = carreraSeleccionada.nombre;
 
-    // Calcular semestre actual
-    const ahora = new Date();
-    const año = ahora.getFullYear();
-    const semestre = ahora.getMonth() < 6 ? 1 : 2;
-    const semestreActual = `${año}-${semestre}`;
-    semestreSpan.textContent = semestreActual;
+    // Determinar si es la carrera actual o una anterior
+    const carreraMasReciente = carreras.reduce((a, b) => (b.catalogo > a.catalogo ? b : a));
+    if (carreraSeleccionada.codigo === carreraMasReciente.codigo) {
+      etiquetaCarrera.textContent = "Carrera actual";
+      etiquetaCarrera.style.color = "green";
+    } else {
+      etiquetaCarrera.textContent = "Carrera anterior";
+      etiquetaCarrera.style.color = "gray";
+    }
 
-    localStorage.setItem("semestreActual", semestreActual);
+    // Cargar avance de la carrera seleccionada
+    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carreraSeleccionada.codigo}`;
+    const response = await fetch(urlAvance);
+    const avance = await response.json();
 
-    // Cargar avance y mostrar ramos
-    mostrarRamosInicio(usuario, carreraSeleccionada, selectSemestre, ramosContainer, infoCreditos);
+    if (!Array.isArray(avance) || avance.length === 0) {
+      ramosContainer.innerHTML = "<p>No se encontraron registros para esta carrera.</p>";
+      return;
+    }
 
-    // Botones
-    btnManual.addEventListener("click", () => {
-      window.location.href = "proyeccion-manual.html";
+    // Obtener semestres únicos (ordenados)
+    const semestres = [...new Set(avance.map(r => r.period))].sort();
+
+    // Dropdown de semestres (todos los que existan)
+    selectSemestre.innerHTML = "";
+    semestres.forEach((s) => {
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s.endsWith("15")
+        ? `${s} (Invierno/Verano)`
+        : s.endsWith("10")
+        ? `${s} (Primer semestre)`
+        : `${s} (Segundo semestre)`;
+      selectSemestre.appendChild(opt);
     });
-    btnAuto.addEventListener("click", () => {
-      window.location.href = "proyeccion-automatica.html";
-    });
+
+    // Mostrar semestre más reciente al inicio
+    selectSemestre.value = semestres[semestres.length - 1];
+
+    await mostrarRamosInicio(usuario, carreraSeleccionada, selectSemestre, ramosContainer, infoCreditos);
   }
+
+  actualizarInicio();
+
+  btnManual.addEventListener("click", () => window.location.href = "proyeccion-manual.html");
+  btnAuto.addEventListener("click", () => window.location.href = "proyeccion-automatica.html");
+}
+
+
 
   // --- MALLA ---
   if (page.includes("malla.html") && usuario && carreraSeleccionada) {
@@ -133,109 +206,105 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =============================
-// Selector de carrera
-// =============================
-function mostrarSelectorCarrera(container, data) {
-  const carreras = data.carreras;
-  container.innerHTML = `
-    <h2>Bienvenido/a</h2>
-    <p>Selecciona la carrera que deseas visualizar:</p>
-    <div class="selector-carreras" style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
-      ${carreras
-        .map(
-          (c) =>
-            `<button class="btn-carrera" data-codigo="${c.codigo}" data-nombre="${c.nombre}" data-catalogo="${c.catalogo}" style="padding:10px;border:none;border-radius:8px;background:#667eea;color:white;cursor:pointer;">
-              ${c.nombre} (${c.codigo})
-            </button>`
-        )
-        .join("")}
-    </div>
-  `;
-
-  document.querySelectorAll(".btn-carrera").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const carrera = {
-        codigo: btn.dataset.codigo,
-        nombre: btn.dataset.nombre,
-        catalogo: btn.dataset.catalogo,
-      };
-      localStorage.setItem("carreraSeleccionada", JSON.stringify(carrera));
-      window.location.href = "inicio.html";
-    });
-  });
-}
-
-// =============================
-// Mostrar ramos del INICIO (con nombre desde malla)
+// Selector de carrera → Mostrar Ramos Inicio (versión mejorada)
 // =============================
 async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, infoCreditos) {
   try {
-    contenedor.innerHTML = "<p>Cargando información...</p>";
-
-    // --- URLs ---
-    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
-    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
-
-    // --- Fetch paralelo ---
-    const [respAvance, respMalla] = await Promise.all([fetch(urlAvance), fetch(urlMalla)]);
-    const avance = await respAvance.json();
-    const malla = await respMalla.json();
+    // 1️⃣ Obtener avance académico
+    const url = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+    const response = await fetch(url);
+    const avance = await response.json();
 
     if (!Array.isArray(avance) || avance.length === 0) {
       contenedor.innerHTML = "<p>No se encontraron ramos.</p>";
       return;
     }
 
-    // --- Crear mapa de códigos -> nombres ---
-    const mapaNombres = {};
-    if (Array.isArray(malla)) {
-      malla.forEach(curso => {
-        mapaNombres[curso.codigo] = curso.asignatura;
-      });
-    }
-
-    // --- Obtener semestres únicos ---
+    // 2️⃣ Identificar los semestres únicos
     const semestres = [...new Set(avance.map(r => r.period))].sort();
     const semestreActual = semestres[semestres.length - 1];
     let semestreSeleccionado = semestreActual;
 
-    // --- Dropdown ---
+    // 3️⃣ Llenar el dropdown de semestres
     selectSemestre.innerHTML = "";
     semestres.forEach((s) => {
       const opt = document.createElement("option");
       opt.value = s;
-      opt.textContent = s;
+      opt.textContent = s.endsWith("15")
+        ? `${s} (Invierno/Verano)`
+        : s.endsWith("10")
+        ? `${s} (Primer semestre)`
+        : `${s} (Segundo semestre)`;
       if (s === semestreActual) opt.selected = true;
       selectSemestre.appendChild(opt);
     });
 
-    // --- Renderizado ---
+    // 4️⃣ Obtener malla para obtener nombres de ramos
+    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+    const responseMalla = await fetch(urlMalla);
+    const malla = await responseMalla.json();
+
+    // Crear mapa de nombres con normalización completa
+    const mapaNombres = {};
+    if (Array.isArray(malla)) {
+      malla.forEach(c => {
+        const codigoNormalizado = c.codigo
+          .trim()
+          .toUpperCase()
+          .replace(/[\s\-]/g, ""); // elimina espacios y guiones
+        mapaNombres[codigoNormalizado] = c.asignatura.trim();
+      });
+    }
+
+    // 5️⃣ Función robusta para buscar el nombre del ramo
+    const obtenerNombre = (codigo) => {
+      const codigoLimpio = codigo
+        .trim()
+        .toUpperCase()
+        .replace(/[\s\-]/g, "");
+
+      // Coincidencia exacta
+      if (mapaNombres[codigoLimpio]) return mapaNombres[codigoLimpio];
+
+      // Coincidencia parcial por sufijo (para ECINM ↔ ECIN, DCCB ↔ DCC)
+      const encontrado = Object.keys(mapaNombres).find(k =>
+        k.endsWith(codigoLimpio.slice(-5))
+      );
+      if (encontrado) return mapaNombres[encontrado];
+
+      // Fallback genérico por prefijo
+      if (codigoLimpio.startsWith("DCTE")) return "Curso de Formación General";
+      if (codigoLimpio.startsWith("UNFP")) return "Curso de Formación Profesional";
+      if (codigoLimpio.startsWith("SSED")) return "Curso de Inglés o Comunicación";
+      if (codigoLimpio.startsWith("ECIN")) return "Curso de Ingeniería o Programación";
+      if (codigoLimpio.startsWith("DCCB")) return "Curso de Ciencias Básicas";
+
+      return codigo; // fallback final
+    };
+
+    // 6️⃣ Renderizar los ramos sin duplicados dentro de cada semestre
     const renderRamos = (sem) => {
-      const filtrados = avance.filter(r => r.period === sem);
       contenedor.innerHTML = "";
+
+      // Agrupar por curso dentro del semestre (evita duplicados dentro del mismo)
+      const vistos = new Set();
+      const filtrados = avance.filter(r => r.period === sem && !vistos.has(r.course) && vistos.add(r.course));
+
       let totalCreditos = 0;
 
       filtrados.forEach((r) => {
+        // Buscar nombre usando coincidencia avanzada
+        const nombreRamo = obtenerNombre(r.course);
         const creditos = 6;
         totalCreditos += creditos;
 
+        // Colores según estado
         let color = "#f8f9fa";
-        if (r.status === "APROBADO") color = "#d4edda";
-        else if (r.status === "REPROBADO") color = "#f8d7da";
-        else if (r.status === "INSCRITO" || r.status === "EN_CURSO") color = "#fff3cd";
+        if (r.status === "APROBADO") color = "#123d1d";
+        else if (r.status === "REPROBADO") color = "#3d1a1a";
+        else if (r.status === "INSCRITO" || r.status === "EN_CURSO") color = "#4d3b00";
 
-        // Nombre del ramo desde malla (fallback: código)
-        let nombreRamo = mapaNombres[r.course];
-
-        // Si no existe en la malla, usamos un fallback más descriptivo
-        if (!nombreRamo) {
-          if (r.course.startsWith("DCTE")) nombreRamo = "Curso de Formación General";
-          else if (r.course.startsWith("UNFP")) nombreRamo = "Curso de Formación Profesional";
-          else if (r.course.startsWith("SSED")) nombreRamo = "Curso de Inglés o Comunicación";
-          else nombreRamo = r.course; // fallback al código si no coincide con nada
-}
-
-
+        // Crear bloque visual
         const div = document.createElement("div");
         div.classList.add("curso");
         div.style.backgroundColor = color;
@@ -248,6 +317,7 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
         contenedor.appendChild(div);
       });
 
+      // Créditos totales y validación de límite
       const exceso = totalCreditos > 35 ? totalCreditos - 35 : 0;
       infoCreditos.innerHTML = `
         <p>Total créditos del semestre: <strong>${totalCreditos}</strong></p>
@@ -259,6 +329,7 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
       `;
     };
 
+    // 7️⃣ Mostrar por defecto el semestre más reciente
     renderRamos(semestreSeleccionado);
     selectSemestre.addEventListener("change", (e) => renderRamos(e.target.value));
 
@@ -267,7 +338,6 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
     contenedor.innerHTML = `<p style="color:red;">Error al cargar los ramos.</p>`;
   }
 }
-
 
 // =============================
 // Función para cargar Malla (solo visual, sin estados)
@@ -331,70 +401,206 @@ async function cargarMalla(carrera) {
 }
 
 // =============================
-// Avance (Resumen con tabla)
+// AVANCE / RESUMEN ACADÉMICO (versión con columna "Intentos")
 // =============================
 async function mostrarAvance(usuario, carrera) {
   const main = document.querySelector("main");
-  const dash = document.createElement("div");
-  dash.classList.add("dashboard");
+
+  // Estructura base
+  main.innerHTML = `
+    <h2>Resumen Académico</h2>
+    <div class="dashboard" id="resumenDashboard"></div>
+    <div class="dashboard" id="avanceCarrera"></div>
+
+    <div class="tabla-container" style="margin-top:25px;">
+      <table id="tablaResumen" style="
+        width:100%;
+        border-collapse:separate;
+        border-spacing:0 10px;
+        font-size:15px;
+      ">
+        <thead style="background:linear-gradient(135deg,#5f48cc,#7a66cc);color:white;">
+          <tr>
+            <th style="padding:10px;border-top-left-radius:10px;">Código</th>
+            <th>Nombre del ramo</th>
+            <th>Estado</th>
+            <th>Período</th>
+            <th>Intentos</th>
+            <th style="border-top-right-radius:10px;">Tipo de Inscripción</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  `;
+
+  const dash = document.getElementById("resumenDashboard");
+  const avanceBox = document.getElementById("avanceCarrera");
+  const tbody = document.querySelector("#tablaResumen tbody");
 
   try {
-    const url = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
-    const response = await fetch(url);
-    const data = await response.json();
+    // 1️⃣ Obtener avance académico
+    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+    const respAvance = await fetch(urlAvance);
+    const data = await respAvance.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-      main.innerHTML = "<p>No se encontraron registros de avance.</p>";
+      main.innerHTML += `<p>No se encontró información académica para esta carrera.</p>`;
       return;
     }
 
-    // --- Cálculos del dashboard ---
-    const total = data.length;
-    const aprobados = data.filter(r => r.status === "APROBADO").length;
-    const reprobados = data.filter(r => r.status === "REPROBADO").length;
-    const enCurso = data.filter(r => r.status === "INSCRITO" || r.status === "EN_CURSO").length;
-    const avance = total > 0 ? ((aprobados / total) * 100).toFixed(1) : 0;
+    // 2️⃣ Obtener malla (para nombres)
+    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+    const respMalla = await fetch(urlMalla);
+    const malla = await respMalla.json();
 
-    // --- Dashboard superior ---
+    // Crear mapa normalizado
+    const mapaNombres = {};
+    if (Array.isArray(malla)) {
+      malla.forEach(c => {
+        const codigoNormalizado = c.codigo
+          .trim()
+          .toUpperCase()
+          .replace(/[\s\-]/g, "");
+        mapaNombres[codigoNormalizado] = c.asignatura.trim();
+      });
+    }
+
+    // Función de coincidencia robusta
+    const obtenerNombre = (codigo) => {
+      const codigoLimpio = codigo.trim().toUpperCase().replace(/[\s\-]/g, "");
+      if (mapaNombres[codigoLimpio]) return mapaNombres[codigoLimpio];
+
+      const encontrado = Object.keys(mapaNombres).find(k =>
+        k.endsWith(codigoLimpio.slice(-5))
+      );
+      if (encontrado) return mapaNombres[encontrado];
+
+      if (codigoLimpio.startsWith("DCTE")) return "Curso de Formación General";
+      if (codigoLimpio.startsWith("UNFP")) return "Curso de Formación Profesional";
+      if (codigoLimpio.startsWith("SSED")) return "Curso de Inglés o Comunicación";
+      if (codigoLimpio.startsWith("ECIN")) return "Curso de Ingeniería o Programación";
+      if (codigoLimpio.startsWith("DCCB")) return "Curso de Ciencias Básicas";
+
+      return codigo;
+    };
+
+    // 3️⃣ Agrupar por curso para calcular intentos y obtener el más reciente
+    const agrupados = {};
+    data.forEach(r => {
+      const codigo = r.course.trim().toUpperCase();
+      if (!agrupados[codigo]) agrupados[codigo] = [];
+      agrupados[codigo].push(r);
+    });
+
+    const resumenCursos = Object.entries(agrupados).map(([codigo, intentos]) => {
+      // Ordenar por período
+      intentos.sort((a, b) => a.period - b.period);
+      const ultimoIntento = intentos[intentos.length - 1];
+
+      return {
+        codigo,
+        nombre: obtenerNombre(codigo),
+        status: ultimoIntento.status,
+        period: ultimoIntento.period,
+        inscriptionType: ultimoIntento.inscriptionType,
+        intentos: intentos.length
+      };
+    });
+
+    // 4️⃣ Calcular métricas con base en todos los intentos (no solo el último)
+    let totalRamosMalla = 0;
+    try {
+      // Intentamos obtener la cantidad de ramos de la malla real
+      totalRamosMalla = Array.isArray(malla) ? malla.length : resumenCursos.length;
+    } catch {
+      totalRamosMalla = resumenCursos.length;
+    }
+
+    // 1️⃣ Ramos aprobados → al menos un intento aprobado
+    const aprobados = Object.values(agrupados).filter(intentos =>
+      intentos.some(r => r.status === "APROBADO")
+    ).length;
+
+    // 2️⃣ Ramos reprobados → al menos un intento reprobado
+    const reprobados = Object.values(agrupados).filter(intentos =>
+      intentos.some(r => r.status === "REPROBADO")
+    ).length;
+
+    // 3️⃣ Ramos inscritos → al menos un intento en curso
+    const inscritos = Object.values(agrupados).filter(intentos =>
+      intentos.some(r => ["INSCRITO", "EN_CURSO"].includes(r.status))
+    ).length;
+
+    // 4️⃣ Avance de carrera basado en ramos aprobados sobre el total en malla
+    const avanceCarreraPorc = ((aprobados / totalRamosMalla) * 100).toFixed(1);
+    const creditosAprobados = aprobados * 6;
+
+
+    // 5️⃣ Mostrar métricas
     dash.innerHTML = `
-      <p>Créditos aprobados: <strong>${aprobados}</strong></p>
-      <p>Ramos reprobados: <strong>${reprobados}</strong></p>
-      <p>Ramos inscritos/en curso: <strong>${enCurso}</strong></p>
-      <p>Avance de carrera: <strong>${avance}%</strong></p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;background:linear-gradient(135deg,#5f48cc,#7a66cc);padding:15px;border-radius:10px;">
+          <p><strong>Créditos aprobados:</strong> ${creditosAprobados}</p>
+        </div>
+        <div style="flex:1;background:linear-gradient(135deg,#663399,#7b68ee);padding:15px;border-radius:10px;">
+          <p><strong>Ramos reprobados:</strong> ${reprobados}</p>
+        </div>
+        <div style="flex:1;background:linear-gradient(135deg,#5f48cc,#836fff);padding:15px;border-radius:10px;">
+          <p><strong>Ramos inscritos/en curso:</strong> ${inscritos}</p>
+        </div>
+      </div>
     `;
 
-    main.appendChild(dash);
-
-    // --- Tabla de detalle ---
-    const tabla = document.createElement("table");
-    tabla.classList.add("tabla-avance");
-    tabla.innerHTML = `
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Estado</th>
-          <th>Período</th>
-          <th>Tipo de Inscripción</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.map(r => `
-          <tr class="${r.status.toLowerCase()}">
-            <td>${r.course}</td>
-            <td>${r.status}</td>
-            <td>${r.period}</td>
-            <td>${r.inscriptionType}</td>
-          </tr>
-        `).join("")}
-      </tbody>
+    avanceBox.innerHTML = `
+      <div style="margin-top:15px;background:linear-gradient(135deg,#4b3db4,#7a66cc);padding:15px;border-radius:10px;">
+        <p><strong>Avance de carrera:</strong> ${avanceCarreraPorc}%</p>
+      </div>
     `;
-    main.appendChild(tabla);
+
+    // 6️⃣ Renderizar tabla
+    tbody.innerHTML = "";
+    resumenCursos
+      .sort((a, b) => a.period.localeCompare(b.period))
+      .forEach((r) => {
+        const row = document.createElement("tr");
+
+        let colorFondo = "#1e1e1e";
+        if (r.status === "APROBADO") colorFondo = "#123d1d";
+        else if (r.status === "REPROBADO") colorFondo = "#3d1a1a";
+        else if (["INSCRITO", "EN_CURSO"].includes(r.status)) colorFondo = "#4d3b00";
+
+        row.style.backgroundColor = colorFondo;
+        row.style.borderRadius = "10px";
+        row.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
+        row.style.cursor = "pointer";
+
+        row.onmouseenter = () => {
+          row.style.transform = "scale(1.01)";
+          row.style.boxShadow = "0 0 10px rgba(255,255,255,0.15)";
+        };
+        row.onmouseleave = () => {
+          row.style.transform = "scale(1)";
+          row.style.boxShadow = "none";
+        };
+
+        row.innerHTML = `
+          <td style="padding:10px 12px;border-radius:10px 0 0 10px;">${r.codigo}</td>
+          <td style="padding:10px;">${r.nombre}</td>
+          <td style="padding:10px;">${r.status}</td>
+          <td style="padding:10px;">${r.period}</td>
+          <td style="padding:10px;text-align:center;">${r.intentos}</td>
+          <td style="padding:10px;border-radius:0 10px 10px 0;">${r.inscriptionType || "-"}</td>
+        `;
+        tbody.appendChild(row);
+      });
 
   } catch (err) {
-    console.error("Error cargando avance:", err);
-    main.innerHTML = `<p style="color:red;">Error al conectar con el servidor.</p>`;
+    console.error("Error al cargar resumen:", err);
+    main.innerHTML += `<p style="color:red;">Error al conectar con el servidor.</p>`;
   }
 }
+
 // =============================
 // PROYECCIÓN MANUAL (solo ramos pendientes)
 // =============================
