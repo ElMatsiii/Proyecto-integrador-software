@@ -482,4 +482,158 @@ footer {
   font-size: 0.95rem;
   font-weight: 600;
 }
+/* ============================================= */
+/* 🎨 Tema claro / oscuro con fallback automático */
+/* ============================================= */
+
+:root {
+  --bg-body: #f5f7fa;
+  --text-color: #222;
+  --card-bg: #fff;
+  --border-color: #ccc;
+
+  --aprobado: #d4edda;
+  --reprobado: #f8d7da;
+  --inscrito: #fff3cd;
+
+  --table-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --table-header-text: #fff;
+
+  --footer-bg: #333;
+  --footer-text: #fff;
+}
+
+/* 🌙 Tema oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-body: #0d0d0d;
+    --text-color: #e0e0e0;
+    --card-bg: #1c1c1c;
+    --border-color: #444;
+
+    --aprobado: #123d1d;
+    --reprobado: #3d1a1a;
+    --inscrito: #4d3b00;
+
+    --table-header: linear-gradient(135deg, #5a4ddf, #7b68ee);
+    --table-header-text: #fff;
+
+    --footer-bg: #0a0a0a;
+    --footer-text: #aaa;
+  }
+}
+
+/* Aplicar variables globales */
+body {
+  background-color: var(--bg-body);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+main, .dashboard, .tabla-avance {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.curso {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  transition: 0.2s;
+}
+
+/* Estados */
+.curso.aprobado { background-color: var(--aprobado) !important; }
+.curso.reprobado { background-color: var(--reprobado) !important; }
+.curso.en-curso,
+.curso.inscrito { background-color: var(--inscrito) !important; }
+
+/* Tabla */
+.tabla-avance th {
+  background: var(--table-header);
+  color: var(--table-header-text);
+}
+
+/* Footer */
+footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+}
+
+/* Botones */
+button, .btn, .acciones button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+/* ============================================= */
+/* 🎓 Tabla de resumen adaptativa modo claro/oscuro */
+/* ============================================= */
+
+/* Estilo base de la tabla */
+#tablaResumen {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: 0.3s;
+}
+
+#tablaResumen th {
+  background: var(--table-header);
+  color: var(--table-header-text);
+  padding: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+#tablaResumen td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Estados controlados por JS */
+#tablaResumen tr.aprobado td {
+  background-color: var(--aprobado);
+}
+
+#tablaResumen tr.reprobado td {
+  background-color: var(--reprobado);
+}
+
+#tablaResumen tr.inscrito td {
+  background-color: var(--inscrito);
+}
+
+/* Hover */
+#tablaResumen tr:hover td {
+  background-color: rgba(102, 126, 234, 0.15);
+}
+/* ============================================= */
+/* 🧹 Eliminar bordes y fondos de contenedores Dashboard */
+/* ============================================= */
+
+/* Quita fondo y borde a los dashboards de resumen */
+#resumenDashboard,
+#avanceCarrera {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Evita que el <div class="dashboard"> externo genere bloque oscuro */
+.dashboard {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
 

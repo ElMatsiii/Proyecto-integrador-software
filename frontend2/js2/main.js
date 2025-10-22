@@ -299,15 +299,13 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
         totalCreditos += creditos;
 
         // Colores según estado
-        let color = "#f8f9fa";
-        if (r.status === "APROBADO") color = "#123d1d";
-        else if (r.status === "REPROBADO") color = "#3d1a1a";
-        else if (r.status === "INSCRITO" || r.status === "EN_CURSO") color = "#4d3b00";
-
-        // Crear bloque visual
         const div = document.createElement("div");
         div.classList.add("curso");
-        div.style.backgroundColor = color;
+
+        if (r.status === "APROBADO") div.classList.add("aprobado");
+        else if (r.status === "REPROBADO") div.classList.add("reprobado");
+        else if (r.status === "INSCRITO" || r.status === "EN_CURSO") div.classList.add("inscrito");
+
         div.innerHTML = `
           <h4>${nombreRamo}</h4>
           <p><strong>Periodo:</strong> ${r.period}</p>
@@ -565,12 +563,11 @@ async function mostrarAvance(usuario, carrera) {
       .forEach((r) => {
         const row = document.createElement("tr");
 
-        let colorFondo = "#1e1e1e";
-        if (r.status === "APROBADO") colorFondo = "#123d1d";
-        else if (r.status === "REPROBADO") colorFondo = "#3d1a1a";
-        else if (["INSCRITO", "EN_CURSO"].includes(r.status)) colorFondo = "#4d3b00";
+        // Asignar clase según estado para que el CSS maneje los colores
+        if (r.status === "APROBADO") row.classList.add("aprobado");
+        else if (r.status === "REPROBADO") row.classList.add("reprobado");
+        else if (r.status === "INSCRITO" || r.status === "EN_CURSO") row.classList.add("inscrito");
 
-        row.style.backgroundColor = colorFondo;
         row.style.borderRadius = "10px";
         row.style.transition = "transform 0.2s ease, box-shadow 0.2s ease";
         row.style.cursor = "pointer";
