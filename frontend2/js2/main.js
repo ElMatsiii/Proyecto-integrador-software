@@ -1,12 +1,9 @@
-// =============================
-// main.js - lógica central
-// =============================
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const container = document.querySelector("main");
 
-  // --- LOGIN ---
+  // LOGIN 
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -42,7 +39,7 @@ if (loginForm) {
         })
       );
 
-      // Seleccionar por defecto la carrera más reciente
+      // Seleccionar por defecto la carrera mas reciente
       const carrera = carrerasOrdenadas[0];
       localStorage.setItem("carreraSeleccionada", JSON.stringify(carrera));
 
@@ -57,7 +54,7 @@ if (loginForm) {
 }
 
 
-  // --- LOGOUT ---
+  //LOGOUT
   const logoutBtn = document.querySelector(".logout");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
@@ -68,7 +65,7 @@ if (loginForm) {
     });
   }
 
-  // --- VALIDAR SESIÓN ---
+  //VALIDAR SESION
   const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
   const carreraSeleccionada = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
   const page = window.location.pathname;
@@ -77,7 +74,7 @@ if (loginForm) {
     window.location.href = "index.html";
   }
 
-  // --- PERFIL ---
+  //PERFIL
   if (page.includes("perfil.html") && usuario && carreraSeleccionada) {
     const main = document.querySelector("main");
     main.innerHTML = `
@@ -90,7 +87,7 @@ if (loginForm) {
     `;
   }
 
-// --- INICIO (pantalla principal) ---
+//INICIO
 if (page.includes("inicio.html") && usuario) {
   const nombreCarrera = document.getElementById("nombreCarrera");
   const semestreSpan = document.getElementById("semestreActual");
@@ -106,10 +103,10 @@ if (page.includes("inicio.html") && usuario) {
   const carreras = usuario.carreras;
   let carreraSeleccionada = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
 
-  // Calcular semestre actual según fecha real (Ej: 202520 o 202610)
+  // Calcular semestre actual según fecha real
   const ahora = new Date();
   const año = ahora.getFullYear();
-  const semestre = ahora.getMonth() < 6 ? "10" : "20"; // Primer semestre: enero-junio → "10", segundo → "20"
+  const semestre = ahora.getMonth() < 6 ? "10" : "20";
   const semestreActual = `${año}${semestre}`;
   semestreSpan.textContent = semestreActual;
 
@@ -164,10 +161,10 @@ if (page.includes("inicio.html") && usuario) {
       return;
     }
 
-    // Obtener semestres únicos (ordenados)
+    // Obtener semestres unicos
     const semestres = [...new Set(avance.map(r => r.period))].sort();
 
-    // Dropdown de semestres (todos los que existan)
+    // Dropdown de semestres
     selectSemestre.innerHTML = "";
     semestres.forEach((s) => {
       const opt = document.createElement("option");
@@ -180,23 +177,23 @@ if (page.includes("inicio.html") && usuario) {
       selectSemestre.appendChild(opt);
     });
 
-    // Mostrar semestre más reciente al inicio
+    // Mostrar semestre mas reciente al inicio
     selectSemestre.value = semestres[semestres.length - 1];
 
     await mostrarRamosInicio(usuario, carreraSeleccionada, selectSemestre, ramosContainer, infoCreditos);
   }
   actualizarInicio();
 }
-  // --- MALLA ---
+  //MALLA
   if (page.includes("malla.html") && usuario && carreraSeleccionada) {
     cargarMalla(carreraSeleccionada);
   }
 
-  // --- AVANCE / RESUMEN ---
+  //AVANCE / RESUMEN
   if (page.includes("resumen.html") && usuario && carreraSeleccionada) {
     mostrarAvance(usuario, carreraSeleccionada);
   }
-  // --- PROYECCIONES ---
+  //PROYECCIONES
   if (window.location.pathname.includes("proyecciones.html")) {
     const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
     const carrera = JSON.parse(localStorage.getItem("carreraSeleccionada") || "null");
@@ -204,23 +201,30 @@ if (page.includes("inicio.html") && usuario) {
     if (!usuario || !carrera) {
       window.location.href = "index.html";
     } else {
+      // Muestra la malla de la carrera con colores
       mostrarMallaProyeccion(usuario, carrera);
     }
 
-    document.getElementById("btnManual").addEventListener("click", () => {
-      window.location.href = "proyeccion-manual.html";
-    });
+    // Botón: Proyección Manual
+    const btnManual = document.getElementById("btnIrManual");
+    if (btnManual) {
+      btnManual.addEventListener("click", () => {
+        alert("Selecciona manualmente tus ramos desde la malla (modo pendiente).");
+        // Aquí más adelante puedes activar la lógica de selección manual
+      });
+    }
 
-    document.getElementById("btnAuto").addEventListener("click", () => {
-      window.location.href = "proyeccion-automatica.html";
-    });
+    // Botón: Proyección Automática
+    const btnAuto = document.getElementById("btnIrAutomatica");
+    if (btnAuto) {
+      btnAuto.addEventListener("click", () =>
+        generarProyeccionAutomatica(usuario, carrera)
+      );
+    }
   }
-
 });
 
-// =============================
-// Selector de carrera → Mostrar Ramos Inicio (versión mejorada)
-// =============================
+// Selector de carrera → Mostrar Ramos Inicio
 async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, infoCreditos) {
   try {
     //Obtener avance académico
@@ -238,7 +242,7 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
     const semestreActual = semestres[semestres.length - 1];
     let semestreSeleccionado = semestreActual;
 
-    //lenar el dropdown de semestres
+    //llenar el dropdown de semestres
     selectSemestre.innerHTML = "";
     semestres.forEach((s) => {
       const opt = document.createElement("option");
@@ -257,56 +261,49 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
     const responseMalla = await fetch(urlMalla);
     const malla = await responseMalla.json();
 
-    //Crear mapa de nombres con normalización completa
     const mapaNombres = {};
     if (Array.isArray(malla)) {
       malla.forEach(c => {
         const codigoNormalizado = c.codigo
           .trim()
           .toUpperCase()
-          .replace(/[\s\-]/g, ""); // elimina espacios y guiones
+          .replace(/[\s\-]/g, "");
         mapaNombres[codigoNormalizado] = c.asignatura.trim();
       });
     }
 
-    //Función robusta para buscar el nombre del ramo
     const obtenerNombre = (codigo) => {
       const codigoLimpio = codigo
         .trim()
         .toUpperCase()
         .replace(/[\s\-]/g, "");
 
-      // Coincidencia exacta
       if (mapaNombres[codigoLimpio]) return mapaNombres[codigoLimpio];
 
-      // Coincidencia parcial por sufijo (para ECINM ↔ ECIN, DCCB ↔ DCC)
       const encontrado = Object.keys(mapaNombres).find(k =>
         k.endsWith(codigoLimpio.slice(-5))
       );
       if (encontrado) return mapaNombres[encontrado];
 
-      // Fallback genérico por prefijo
       if (codigoLimpio.startsWith("DCTE")) return "Curso de Formación General";
       if (codigoLimpio.startsWith("UNFP")) return "Curso de Formación Profesional";
       if (codigoLimpio.startsWith("SSED")) return "Curso de Inglés o Comunicación";
       if (codigoLimpio.startsWith("ECIN")) return "Curso de Ingeniería o Programación";
       if (codigoLimpio.startsWith("DCCB")) return "Curso de Ciencias Básicas";
 
-      return codigo; // fallback final
+      return codigo;
     };
 
-    //Renderizar los ramos sin duplicados dentro de cada semestre
     const renderRamos = (sem) => {
       contenedor.innerHTML = "";
 
-      // Agrupar por curso dentro del semestre (evita duplicados dentro del mismo)
+      // Agrupar por curso dentro del semestre
       const vistos = new Set();
       const filtrados = avance.filter(r => r.period === sem && !vistos.has(r.course) && vistos.add(r.course));
 
       let totalCreditos = 0;
 
       filtrados.forEach((r) => {
-        // Buscar nombre usando coincidencia avanzada
         const nombreRamo = obtenerNombre(r.course);
         const creditos = 6;
         totalCreditos += creditos;
@@ -328,7 +325,6 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
         contenedor.appendChild(div);
       });
 
-      // Créditos totales y validación de límite
       const exceso = totalCreditos > 35 ? totalCreditos - 35 : 0;
       infoCreditos.innerHTML = `
         <p>Total créditos del semestre: <strong>${totalCreditos}</strong></p>
@@ -339,8 +335,6 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
         }
       `;
     };
-
-    //Mostrar por defecto el semestre más reciente
     renderRamos(semestreSeleccionado);
     selectSemestre.addEventListener("change", (e) => renderRamos(e.target.value));
 
@@ -350,15 +344,13 @@ async function mostrarRamosInicio(usuario, carrera, selectSemestre, contenedor, 
   }
 }
 
-// =============================
+
 // Función para cargar Malla
-// =============================
 async function cargarMalla(carrera) {
   const container = document.getElementById("mallaContainer");
   const main = document.querySelector("main");
 
   try {
-    // Obtener malla desde el proxy
     const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
     const response = await fetch(urlMalla);
     const data = await response.json();
@@ -367,18 +359,15 @@ async function cargarMalla(carrera) {
       container.innerHTML = "<p>No se encontraron ramos en la malla.</p>";
       return;
     }
-
-    // Agrupar por nivel (semestres)
+    // Agrupar por semestre
     const niveles = {};
     data.forEach((curso) => {
       if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
       niveles[curso.nivel].push(curso);
     });
 
-    // Limpiar contenido
     container.innerHTML = "";
 
-    // Generar visualización tipo bloques
     Object.keys(niveles)
       .sort((a, b) => a - b)
       .forEach((nivel) => {
@@ -411,13 +400,10 @@ async function cargarMalla(carrera) {
   }
 }
 
-// =============================
-// AVANCE / RESUMEN ACADÉMICO (versión con columna "Intentos")
-// =============================
+// AVANCE
 async function mostrarAvance(usuario, carrera) {
   const main = document.querySelector("main");
 
-  // Estructura base
   main.innerHTML = `
     <h2>Resumen Académico</h2>
     <div class="dashboard" id="resumenDashboard"></div>
@@ -450,7 +436,6 @@ async function mostrarAvance(usuario, carrera) {
   const tbody = document.querySelector("#tablaResumen tbody");
 
   try {
-    //Obtener avance académico
     const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
     const respAvance = await fetch(urlAvance);
     const data = await respAvance.json();
@@ -460,12 +445,10 @@ async function mostrarAvance(usuario, carrera) {
       return;
     }
 
-    //Obtener malla (para nombres)
     const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
     const respMalla = await fetch(urlMalla);
     const malla = await respMalla.json();
 
-    // Crear mapa normalizado
     const mapaNombres = {};
     if (Array.isArray(malla)) {
       malla.forEach(c => {
@@ -477,7 +460,6 @@ async function mostrarAvance(usuario, carrera) {
       });
     }
 
-    // Función de coincidencia robusta
     const obtenerNombre = (codigo) => {
       const codigoLimpio = codigo.trim().toUpperCase().replace(/[\s\-]/g, "");
       if (mapaNombres[codigoLimpio]) return mapaNombres[codigoLimpio];
@@ -496,7 +478,7 @@ async function mostrarAvance(usuario, carrera) {
       return codigo;
     };
 
-    // 3️Agrupar por curso para calcular intentos y obtener el más reciente
+    // Agrupar por curso para calcular intentos y obtener el más reciente
     const agrupados = {};
     data.forEach(r => {
       const codigo = r.course.trim().toUpperCase();
@@ -505,7 +487,6 @@ async function mostrarAvance(usuario, carrera) {
     });
 
     const resumenCursos = Object.entries(agrupados).map(([codigo, intentos]) => {
-      // Ordenar por período
       intentos.sort((a, b) => a.period - b.period);
       const ultimoIntento = intentos[intentos.length - 1];
 
@@ -519,36 +500,31 @@ async function mostrarAvance(usuario, carrera) {
       };
     });
 
-    //Calcular métricas con base en todos los intentos (no solo el último)
     let totalRamosMalla = 0;
     try {
-      // Intentamos obtener la cantidad de ramos de la malla real
       totalRamosMalla = Array.isArray(malla) ? malla.length : resumenCursos.length;
     } catch {
       totalRamosMalla = resumenCursos.length;
     }
 
-    //Ramos aprobados → al menos un intento aprobado
+    //Ramos aprobados
     const aprobados = Object.values(agrupados).filter(intentos =>
       intentos.some(r => r.status === "APROBADO")
     ).length;
 
-    //Ramos reprobados → al menos un intento reprobado
+    //Ramos reprobados
     const reprobados = Object.values(agrupados).filter(intentos =>
       intentos.some(r => r.status === "REPROBADO")
     ).length;
 
-    //Ramos inscritos → al menos un intento en curso
+    //Ramos inscritos
     const inscritos = Object.values(agrupados).filter(intentos =>
       intentos.some(r => ["INSCRITO", "EN_CURSO"].includes(r.status))
     ).length;
 
-    //Avance de carrera basado en ramos aprobados sobre el total en malla
     const avanceCarreraPorc = ((aprobados / totalRamosMalla) * 100).toFixed(1);
     const creditosAprobados = aprobados * 6;
 
-
-    //Mostrar métricas
     dash.innerHTML = `
       <div style="display:flex;gap:20px;flex-wrap:wrap;">
         <div style="flex:1;background:linear-gradient(135deg,#5f48cc,#7a66cc);padding:15px;border-radius:10px;">
@@ -569,7 +545,6 @@ async function mostrarAvance(usuario, carrera) {
       </div>
     `;
 
-    //Renderizar tabla
     tbody.innerHTML = "";
     resumenCursos
       .sort((a, b) => a.period.localeCompare(b.period))
@@ -611,9 +586,7 @@ async function mostrarAvance(usuario, carrera) {
   }
 }
 
-// =============================
-// NUEVA SECCIÓN: PROYECCIONES UNIFICADAS
-// =============================
+//PROYECCIONES
 if (window.location.pathname.includes("proyecciones.html")) {
   const contenedor = document.getElementById("contenedorProyeccion");
   const btnIrManual = document.getElementById("btnIrManual");
@@ -626,7 +599,6 @@ if (window.location.pathname.includes("proyecciones.html")) {
     window.location.href = "index.html";
   }
 
-  // Botón Proyección Manual
   btnIrManual.addEventListener("click", async () => {
     contenedor.innerHTML = "<h3>Proyección Manual</h3><p>Cargando ramos pendientes...</p>";
 
@@ -650,7 +622,7 @@ if (window.location.pathname.includes("proyecciones.html")) {
       });
 
       if (pendientes.length === 0) {
-        contenedor.innerHTML = "<p>🎓 No hay ramos pendientes para proyectar. ¡Felicidades!</p>";
+        contenedor.innerHTML = "<p>No hay ramos pendientes para proyectar. ¡Felicidades!</p>";
         return;
       }
 
@@ -687,7 +659,6 @@ if (window.location.pathname.includes("proyecciones.html")) {
     }
   });
 
-  // Botón Proyección Automática
   btnIrAutomatica.addEventListener("click", async () => {
     contenedor.innerHTML = "<h3>Proyección Automática</h3><p>Generando...</p>";
 
@@ -742,15 +713,12 @@ if (window.location.pathname.includes("proyecciones.html")) {
   });
 }
 
-// =============================
-// VISUALIZAR MALLA EN PROYECCIONES
-// =============================
+//MALLA EN PROYECCIONES
 async function mostrarMallaProyeccion(usuario, carrera) {
   const contenedor = document.getElementById("contenedorMallaProyeccion");
   contenedor.innerHTML = "<p>Cargando malla...</p>";
 
   try {
-    // Obtener datos de malla y avance del estudiante
     const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
     const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
 
@@ -763,7 +731,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       return;
     }
 
-    // Mapear estado de cada ramo según avance
     const estadoRamos = {};
     avance.forEach(r => {
       const codigo = r.course.trim().toUpperCase();
@@ -772,7 +739,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       else if (r.status === "INSCRITO" || r.status === "EN_CURSO") estadoRamos[codigo] = "inscrito";
     });
 
-    // Agrupar la malla por semestre
     const mallaPorNivel = {};
     malla.forEach(r => {
       const nivel = r.nivel || "Sin nivel";
@@ -780,7 +746,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       mallaPorNivel[nivel].push(r);
     });
 
-    // Renderizar la malla
     contenedor.innerHTML = "";
     const nivelesOrdenados = Object.keys(mallaPorNivel).sort((a, b) => a - b);
 
@@ -820,15 +785,12 @@ async function mostrarMallaProyeccion(usuario, carrera) {
   }
 }
 
-// =============================
-// VISUALIZAR MALLA EN PROYECCIONES
-// =============================
 async function mostrarMallaProyeccion(usuario, carrera) {
   const contenedor = document.getElementById("contenedorMallaProyeccion");
   contenedor.innerHTML = "<p>Cargando malla...</p>";
 
   try {
-    // Obtener datos de malla y avance del estudiante
+
     const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
     const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
 
@@ -841,7 +803,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       return;
     }
 
-    // Mapear estado de cada ramo según avance
     const estadoRamos = {};
     avance.forEach(r => {
       const codigo = r.course.trim().toUpperCase();
@@ -849,8 +810,7 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       else if (r.status === "REPROBADO") estadoRamos[codigo] = "reprobado";
       else if (r.status === "INSCRITO" || r.status === "EN_CURSO") estadoRamos[codigo] = "inscrito";
     });
-
-    // Agrupar la malla por semestre
+ 
     const mallaPorNivel = {};
     malla.forEach(r => {
       const nivel = r.nivel || "Sin nivel";
@@ -858,7 +818,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       mallaPorNivel[nivel].push(r);
     });
 
-    // Renderizar la malla
     contenedor.innerHTML = "";
     const nivelesOrdenados = Object.keys(mallaPorNivel).sort((a, b) => a - b);
 
@@ -898,97 +857,15 @@ async function mostrarMallaProyeccion(usuario, carrera) {
   }
 }
 
-// =============================
-// VISUALIZAR MALLA EN PROYECCIONES
-// =============================
-async function mostrarMallaProyeccion(usuario, carrera) {
-  const contenedor = document.getElementById("contenedorMallaProyeccion");
-  contenedor.innerHTML = "<p>Cargando malla...</p>";
-
-  try {
-    // Obtener datos de malla y avance del estudiante
-    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
-    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
-
-    const [respMalla, respAvance] = await Promise.all([fetch(urlMalla), fetch(urlAvance)]);
-    const malla = await respMalla.json();
-    const avance = await respAvance.json();
-
-    if (!Array.isArray(malla) || !Array.isArray(avance)) {
-      contenedor.innerHTML = "<p>Error al cargar los datos de la malla.</p>";
-      return;
-    }
-
-    // Mapear estado de cada ramo según avance
-    const estadoRamos = {};
-    avance.forEach(r => {
-      const codigo = r.course.trim().toUpperCase();
-      if (r.status === "APROBADO") estadoRamos[codigo] = "aprobado";
-      else if (r.status === "REPROBADO") estadoRamos[codigo] = "reprobado";
-      else if (r.status === "INSCRITO" || r.status === "EN_CURSO") estadoRamos[codigo] = "inscrito";
-    });
-
-    // Agrupar la malla por semestre
-    const mallaPorNivel = {};
-    malla.forEach(r => {
-      const nivel = r.nivel || "Sin nivel";
-      if (!mallaPorNivel[nivel]) mallaPorNivel[nivel] = [];
-      mallaPorNivel[nivel].push(r);
-    });
-
-    // Renderizar la malla
-    contenedor.innerHTML = "";
-    const nivelesOrdenados = Object.keys(mallaPorNivel).sort((a, b) => a - b);
-
-    nivelesOrdenados.forEach(nivel => {
-      const columna = document.createElement("div");
-      columna.classList.add("bloque-nivel");
-
-      const titulo = document.createElement("h3");
-      titulo.textContent = `Semestre ${nivel}`;
-      columna.appendChild(titulo);
-
-      const grid = document.createElement("div");
-      grid.classList.add("malla-grid");
-
-      mallaPorNivel[nivel].forEach(ramo => {
-        const div = document.createElement("div");
-        div.classList.add("curso");
-
-        const codigo = ramo.codigo.trim().toUpperCase();
-        const estado = estadoRamos[codigo] || "pendiente";
-        div.classList.add(estado);
-
-        div.innerHTML = `
-          <h4>${ramo.asignatura}</h4>
-          <p>${codigo}</p>
-          <p>${ramo.creditos} créditos</p>
-        `;
-        grid.appendChild(div);
-      });
-
-      columna.appendChild(grid);
-      contenedor.appendChild(columna);
-    });
-  } catch (error) {
-    console.error("Error al cargar malla de proyección:", error);
-    contenedor.innerHTML = "<p style='color:red;'>Error al cargar la malla de proyección.</p>";
-  }
-}
-
-// =============================
-// PROYECCIÓN MANUAL INTEGRADA EN MALLA
-// =============================
 async function mostrarMallaProyeccion(usuario, carrera) {
   const contenedor = document.getElementById("mallaProyeccionContainer");
-  const botonManual = document.getElementById("btnManual");
-  const botonAuto = document.getElementById("btnAuto");
+  const botonManual = document.getElementById("btnIrManual");
+  const botonAuto = document.getElementById("btnIrAutomatico");
   const limiteCreditos = 30;
 
   try {
     contenedor.innerHTML = "<p>Cargando malla curricular...</p>";
 
-    // Obtener datos de malla y avance
     const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
     const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
     const [respMalla, respAvance] = await Promise.all([fetch(urlMalla), fetch(urlAvance)]);
@@ -1001,17 +878,14 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       return;
     }
 
-    // Normalizar códigos
     const normalizarCodigo = (codigo) =>
       codigo?.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || "";
 
-    // Determinar el semestre actual del usuario
     const ahora = new Date();
     const año = ahora.getFullYear();
     const semestre = ahora.getMonth() < 6 ? "10" : "20";
     const semestreActual = parseInt(`${año}${semestre}`);
 
-    // Mapear ramos y estados
     const estadoRamos = {};
     avance.forEach((r) => {
       const cod = normalizarCodigo(r.course);
@@ -1026,7 +900,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       }
     });
 
-    // Determinar los pendientes y prerequisitos
     const obtenerEstado = (codigoMalla) => {
       const codNorm = normalizarCodigo(codigoMalla);
       if (estadoRamos[codNorm]) return estadoRamos[codNorm].estado;
@@ -1036,24 +909,20 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       return similar ? estadoRamos[similar].estado : "pendiente";
     };
 
-    // Agrupar malla por nivel
     const niveles = {};
     malla.forEach((curso) => {
       if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
       niveles[curso.nivel].push(curso);
     });
 
-    // Renderizar malla
     contenedor.innerHTML = "";
     contenedor.classList.add("malla-proyeccion");
 
-    // Contador y alerta
     const contador = document.createElement("p");
     contador.style.margin = "10px 0";
     contador.innerHTML = `<strong>Créditos seleccionados:</strong> 0 / ${limiteCreditos}`;
     contenedor.before(contador);
 
-    // Estado interno de selección
     let creditosSeleccionados = 0;
     const seleccionados = new Set();
 
@@ -1061,7 +930,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       contador.innerHTML = `<strong>Créditos seleccionados:</strong> ${creditosSeleccionados} / ${limiteCreditos}`;
     };
 
-    // Función para saber si un ramo está desbloqueado por prerequisitos
     const prereqCumplidos = (curso) => {
       if (!curso.prereq) return true;
       const prereqs = curso.prereq.split(",").map((p) => normalizarCodigo(p));
@@ -1072,12 +940,11 @@ async function mostrarMallaProyeccion(usuario, carrera) {
       );
     };
 
-    // Función para saber si está "atrasado"
     const esAtrasado = (curso) => {
       const cod = normalizarCodigo(curso.codigo);
       const estado = estadoRamos[cod];
       if (estado?.estado === "pendiente" && estado?.periodo) {
-        return semestreActual - estado.periodo > 20; // diferencia de +2 semestres
+        return semestreActual - estado.periodo > 20;
       }
       return false;
     };
@@ -1108,12 +975,10 @@ async function mostrarMallaProyeccion(usuario, carrera) {
             <small>${curso.creditos} créditos</small>
           `;
 
-          // Pendiente (solo seleccionable si desbloqueado)
           if (estado === "pendiente") {
             div.style.cursor = desbloqueado ? "pointer" : "not-allowed";
             if (!desbloqueado) div.style.opacity = "0.5";
 
-            // Click para seleccionar
             div.addEventListener("click", () => {
               if (!desbloqueado) return alert("Prerrequisitos no cumplidos.");
               if (seleccionados.has(curso.codigo)) {
@@ -1133,7 +998,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
             });
           }
 
-          // Atrasados (obligatorios)
           if (atrasado) {
             div.classList.add("obligatorio");
             seleccionados.add(curso.codigo);
@@ -1149,7 +1013,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
 
     actualizarContador();
 
-    // Estilo visual
     const style = document.createElement("style");
     style.textContent = `
       .curso.seleccionado {
@@ -1161,7 +1024,7 @@ async function mostrarMallaProyeccion(usuario, carrera) {
         position: relative;
       }
       .curso.obligatorio::after {
-        content: "📘 Obligatorio";
+        content: "Obligatorio";
         position: absolute;
         bottom: 5px;
         font-size: 0.7rem;
@@ -1170,7 +1033,6 @@ async function mostrarMallaProyeccion(usuario, carrera) {
     `;
     document.head.appendChild(style);
 
-    // Botón para guardar proyección
     botonManual.addEventListener("click", () => {
       const listaSeleccion = Array.from(seleccionados);
       if (listaSeleccion.length === 0) {
@@ -1183,5 +1045,136 @@ async function mostrarMallaProyeccion(usuario, carrera) {
   } catch (err) {
     console.error("Error al cargar proyección manual:", err);
     contenedor.innerHTML = `<p style="color:red;">Error al cargar malla curricular.</p>`;
+  }
+}
+
+//PROYECCIÓN AUTOMÁTICA
+async function generarProyeccionAutomatica(usuario, carrera) {
+  const contenedor = document.getElementById("mallaProyeccionContainer");
+  contenedor.innerHTML = "<p>Generando proyección automática...</p>";
+
+  try {
+    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
+    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
+
+    const [respAvance, respMalla] = await Promise.all([
+      fetch(urlAvance),
+      fetch(urlMalla)
+    ]);
+
+    const avance = await respAvance.json();
+    const malla = await respMalla.json();
+
+    if (!Array.isArray(avance) || !Array.isArray(malla)) {
+      contenedor.innerHTML = "<p style='color:red;'>No se pudo obtener la información del alumno.</p>";
+      return;
+    }
+
+    const normalizar = str => (str || "").toString().trim().toUpperCase();
+
+    const aprobados = new Set(avance
+      .filter(r => r.status === "APROBADO")
+      .map(r => normalizar(r.course))
+    );
+
+    const reprobados = new Set(avance
+      .filter(r => r.status === "REPROBADO")
+      .map(r => normalizar(r.course))
+    );
+
+    const inscritos = new Set(avance
+      .filter(r => r.status === "INSCRITO" || r.status === "EN_CURSO")
+      .map(r => normalizar(r.course))
+    );
+
+    const pendientes = malla.filter(r => {
+      const cod = normalizar(r.codigo);
+      return !aprobados.has(cod) && !inscritos.has(cod);
+    });
+
+    const desbloqueados = pendientes.filter(r => {
+      if (!r.prereq || r.prereq.trim() === "") return true;
+      const prereqs = r.prereq.split(",").map(p => normalizar(p));
+      return prereqs.every(p => aprobados.has(p));
+    });
+
+    const semestreActual = Number(usuario.semestreActual) || 202520;
+    const atrasados = malla.filter(r => {
+      const cod = normalizar(r.codigo);
+      const diff = semestreActual - Number(r.semestre * 10);
+      return reprobados.has(cod) && diff >= 20;
+    });
+
+    const seleccion = [...atrasados];
+    let totalCreditos = atrasados.reduce((acc, r) => acc + (parseInt(r.creditos) || 0), 0);
+
+    for (const ramo of desbloqueados) {
+      const cod = normalizar(ramo.codigo);
+      const creditos = parseInt(ramo.creditos) || 6;
+
+      if (totalCreditos + creditos <= 30 && !seleccion.find(s => normalizar(s.codigo) === cod)) {
+        seleccion.push(ramo);
+        totalCreditos += creditos;
+      }
+    }
+
+    const niveles = {};
+    malla.forEach(curso => {
+      if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
+      niveles[curso.nivel].push(curso);
+    });
+
+    contenedor.innerHTML = "";
+
+    Object.keys(niveles)
+      .sort((a, b) => a - b)
+      .forEach(nivel => {
+        const bloque = document.createElement("div");
+        bloque.classList.add("bloque-nivel");
+
+        const titulo = document.createElement("h3");
+        titulo.textContent = `Semestre ${nivel}`;
+        bloque.appendChild(titulo);
+
+        const grid = document.createElement("div");
+        grid.classList.add("malla-grid");
+
+        niveles[nivel].forEach(curso => {
+          const cod = normalizar(curso.codigo);
+          const div = document.createElement("div");
+          div.classList.add("curso");
+
+          let colorClase = "pendiente";
+
+          if (aprobados.has(cod)) colorClase = "aprobado";
+          else if (reprobados.has(cod)) colorClase = "reprobado";
+          else if (inscritos.has(cod)) colorClase = "inscrito";
+          else if (seleccion.find(s => normalizar(s.codigo) === cod)) colorClase = "seleccionado-auto";
+
+          div.classList.add(colorClase);
+
+          div.innerHTML = `
+            <h4>${curso.asignatura}</h4>
+            <p>${curso.codigo}</p>
+            <p><strong>${curso.creditos}</strong> créditos</p>
+          `;
+          grid.appendChild(div);
+        });
+
+        bloque.appendChild(grid);
+        contenedor.appendChild(bloque);
+      });
+
+    const resumen = document.createElement("p");
+    resumen.style.marginTop = "15px";
+    resumen.innerHTML = `
+      <strong>Proyección generada automáticamente:</strong> 
+      ${seleccion.length} ramos (${totalCreditos} créditos seleccionados)
+    `;
+    contenedor.appendChild(resumen);
+
+  } catch (err) {
+    console.error("Error en proyección automática:", err);
+    contenedor.innerHTML = `<p style='color:red;'>Error al generar proyección automática.</p>`;
   }
 }

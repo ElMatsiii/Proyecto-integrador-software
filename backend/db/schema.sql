@@ -16,7 +16,7 @@ CREATE TABLE proyecciones (
     id SERIAL PRIMARY KEY,
     usuario_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
     carrera_id INT REFERENCES carreras(id) ON DELETE CASCADE,
-    nombre_proyeccion VARCHAR(100) NOT NULL, -- ej: "Proyección Semestre 5-6"
+    nombre_proyeccion VARCHAR(100) NOT NULL, 
     creado_en TIMESTAMP DEFAULT NOW()
 );
 CREATE TABLE proyeccion_cursos (
@@ -24,7 +24,7 @@ CREATE TABLE proyeccion_cursos (
     proyeccion_id INT REFERENCES proyecciones(id) ON DELETE CASCADE,
     codigo_asignatura VARCHAR(20) NOT NULL,
     nombre_asignatura VARCHAR(100) NOT NULL,
-    nivel INT, -- semestre al que pertenece en la malla
+    nivel INT, 
     creditos INT
 );
 
