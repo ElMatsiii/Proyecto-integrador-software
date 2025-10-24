@@ -15,7 +15,7 @@ app.get("/api/malla", async (req, res) => {
   const url = `https://losvilos.ucn.cl/hawaii/api/mallas?${codigo}-${catalogo}`;
 
   try {
-    console.log("🔗 Solicitando malla:", url);
+    console.log("Solicitando malla:", url);
 
     const response = await axios.get(url, {
       headers: {
@@ -26,17 +26,17 @@ app.get("/api/malla", async (req, res) => {
       httpsAgent: new (await import("https")).Agent({ keepAlive: true, minVersion: "TLSv1.2" }),
     });
 
-    console.log("✅ Código de respuesta:", response.status);
+    console.log("Código de respuesta:", response.status);
     res.json(response.data);
   } catch (error) {
     if (error.response) {
-      console.error("❌ Error HTTP:", error.response.status, error.response.data);
+      console.error("Error HTTP:", error.response.status, error.response.data);
       return res.status(error.response.status).json(error.response.data);
     }
-    console.error("❌ Error al conectar con API Hawaii:", error.message);
+    console.error("Error al conectar con API Hawaii:", error.message);
     res.status(500).json({ error: "Error al conectar con API Hawaii" });
   }
 });
 
 const PORT = 3000;
-app.listen(PORT, () => console.log(`✅ Proxy escuchando en http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Proxy escuchando en http://localhost:${PORT}`));

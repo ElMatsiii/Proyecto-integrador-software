@@ -637,3 +637,158 @@ button, .btn, .acciones button {
   box-shadow: none !important;
 }
 
+/* ===================================== */
+/* 🎓 Malla visual dentro de Proyecciones */
+/* ===================================== */
+
+/* Estructura general (idéntica a Mi Malla) */
+.malla-proyeccion {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 40px;
+  overflow-x: auto;
+  padding: 30px 40px;
+}
+
+.malla-proyeccion .bloque-nivel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 180px;
+}
+
+.malla-proyeccion .bloque-nivel h3 {
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+/* Cursos dentro del semestre (verticales y centrados) */
+.malla-proyeccion .malla-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Cajas de ramos */
+.malla-proyeccion .curso {
+  width: 180px;
+  height: 90px;
+  background: #fff;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.malla-proyeccion .curso h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 5px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+.malla-proyeccion .curso p {
+  font-size: 0.8rem;
+  color: #555;
+  margin: 0;
+}
+
+/* Hover */
+.malla-proyeccion .curso:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* ===================================== */
+/* 🎨 Colores según estado del ramo */
+/* ===================================== */
+
+/* Aprobado → Verde */
+.malla-proyeccion .curso.aprobado {
+  background-color: #d4edda !important;
+  border-color: #28a745 !important;
+  color: #0f5132 !important;
+}
+
+/* Reprobado → Rojo */
+.malla-proyeccion .curso.reprobado {
+  background-color: #f8d7da !important;
+  border-color: #dc3545 !important;
+  color: #842029 !important;
+}
+
+/* Inscrito o En curso → Amarillo */
+.malla-proyeccion .curso.inscrito,
+.malla-proyeccion .curso.en-curso {
+  background-color: #fff3cd !important;
+  border-color: #ffc107 !important;
+  color: #664d03 !important;
+}
+
+/* Pendiente (sin cursar aún) */
+.malla-proyeccion .curso.pendiente {
+  background-color: #f9f9f9 !important;
+  border-color: #e9ecef !important;
+  color: #333 !important;
+}
+
+/* =============================== */
+/* 🌙 Modo oscuro automático */
+/* =============================== */
+@media (prefers-color-scheme: dark) {
+  .malla-proyeccion .curso {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+  }
+
+  .malla-proyeccion .curso.aprobado {
+    background-color: #123d1d !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+  }
+
+  .malla-proyeccion .curso.reprobado {
+    background-color: #3d1a1a !important;
+    border-color: #dc3545 !important;
+    color: #fff !important;
+  }
+
+  .malla-proyeccion .curso.inscrito,
+  .malla-proyeccion .curso.en-curso {
+    background-color: #4d3b00 !important;
+    border-color: #ffc107 !important;
+    color: #fff !important;
+  }
+
+  .malla-proyeccion .curso.pendiente {
+    background-color: #1c1c1c !important;
+    border-color: #333 !important;
+    color: #ccc !important;
+  }
+}
+
