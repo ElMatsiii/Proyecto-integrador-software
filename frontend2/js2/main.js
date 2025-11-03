@@ -1051,130 +1051,191 @@ async function mostrarMallaProyeccion(usuario, carrera) {
 //PROYECCIÓN AUTOMÁTICA
 async function generarProyeccionAutomatica(usuario, carrera) {
   const contenedor = document.getElementById("mallaProyeccionContainer");
-  contenedor.innerHTML = "<p>Generando proyección automática...</p>";
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "<p>Cargando proyección automática...</p>";
 
   try {
-    const urlAvance = `https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`;
-    const urlMalla = `http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`;
-
+    // === 1. Obtener datos desde las APIs ===
     const [respAvance, respMalla] = await Promise.all([
-      fetch(urlAvance),
-      fetch(urlMalla)
+      fetch(`https://puclaro.ucn.cl/eross/avance/avance.php?rut=${usuario.rut}&codcarrera=${carrera.codigo}`),
+      fetch(`http://localhost:3000/api/malla?codigo=${carrera.codigo}&catalogo=${carrera.catalogo}`)
     ]);
 
     const avance = await respAvance.json();
     const malla = await respMalla.json();
 
     if (!Array.isArray(avance) || !Array.isArray(malla)) {
-      contenedor.innerHTML = "<p style='color:red;'>No se pudo obtener la información del alumno.</p>";
+      contenedor.innerHTML = "<p>Error al cargar datos.</p>";
       return;
     }
 
-    const normalizar = str => (str || "").toString().trim().toUpperCase();
+    const normalizar = (c) => c?.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || "";
 
-    const aprobados = new Set(avance
-      .filter(r => r.status === "APROBADO")
-      .map(r => normalizar(r.course))
-    );
+    // === 2. Clasificación de estados ===
+    const aprobados = new Set(avance.filter(r => r.status === "APROBADO").map(r => normalizar(r.course)));
+    const inscritos = new Set(avance.filter(r => ["INSCRITO", "EN_CURSO"].includes(r.status)).map(r => normalizar(r.course)));
+    const aprobadosSimulados = new Set([...aprobados, ...inscritos]);
 
-    const reprobados = new Set(avance
-      .filter(r => r.status === "REPROBADO")
-      .map(r => normalizar(r.course))
-    );
+    // === 3. Pendientes iniciales ===
+    let pendientesRestantes = malla.filter(r => !aprobadosSimulados.has(normalizar(r.codigo)));
 
-    const inscritos = new Set(avance
-      .filter(r => r.status === "INSCRITO" || r.status === "EN_CURSO")
-      .map(r => normalizar(r.course))
-    );
+    // === 4. Configuración de parámetros ===
+    const MAX_CREDITOS = 30;
+    const fecha = new Date();
+    const año = fecha.getFullYear();
+    const semestreActual = fecha.getMonth() < 6 ? 10 : 20;
+    let semestreProyectado = semestreActual === 10 ? año * 100 + 20 : (año + 1) * 100 + 10;
 
-    const pendientes = malla.filter(r => {
-      const cod = normalizar(r.codigo);
-      return !aprobados.has(cod) && !inscritos.has(cod);
-    });
+    // === 5. Validación de prerrequisitos (ignorando los inexistentes) ===
+    const cumplePrereq = (ramo) => {
+      if (!ramo.prereq || ramo.prereq.trim() === "") return true;
+      const prereqs = ramo.prereq.split(",").map(p => normalizar(p));
+      // Ignorar prerrequisitos que no existan en la malla
+      const prereqsValidos = prereqs.filter(p => malla.some(m => normalizar(m.codigo) === p));
+      return prereqsValidos.every(p => aprobadosSimulados.has(p));
+    };
 
-    const desbloqueados = pendientes.filter(r => {
-      if (!r.prereq || r.prereq.trim() === "") return true;
-      const prereqs = r.prereq.split(",").map(p => normalizar(p));
-      return prereqs.every(p => aprobados.has(p));
-    });
+    const plan = [];
 
-    const semestreActual = Number(usuario.semestreActual) || 202520;
-    const atrasados = malla.filter(r => {
-      const cod = normalizar(r.codigo);
-      const diff = semestreActual - Number(r.semestre * 10);
-      return reprobados.has(cod) && diff >= 20;
-    });
+    // === 6. Generar todos los semestres hasta egresar ===
+    while (pendientesRestantes.length > 0) {
+      let semestre = [];
+      let creditosUsados = 0;
+      let desbloqueados = pendientesRestantes.filter(cumplePrereq);
+      let progreso = true;
 
-    const seleccion = [...atrasados];
-    let totalCreditos = atrasados.reduce((acc, r) => acc + (parseInt(r.creditos) || 0), 0);
-
-    for (const ramo of desbloqueados) {
-      const cod = normalizar(ramo.codigo);
-      const creditos = parseInt(ramo.creditos) || 6;
-
-      if (totalCreditos + creditos <= 30 && !seleccion.find(s => normalizar(s.codigo) === cod)) {
-        seleccion.push(ramo);
-        totalCreditos += creditos;
+      while (progreso && creditosUsados < MAX_CREDITOS && desbloqueados.length > 0) {
+        progreso = false;
+        for (const ramo of [...desbloqueados]) {
+          const c = Number(ramo.creditos) || 6;
+          const codigo = normalizar(ramo.codigo);
+          if (!aprobadosSimulados.has(codigo) && creditosUsados + c <= MAX_CREDITOS) {
+            semestre.push(ramo);
+            creditosUsados += c;
+            aprobadosSimulados.add(codigo);
+            pendientesRestantes = pendientesRestantes.filter(r => normalizar(r.codigo) !== codigo);
+            progreso = true;
+          }
+        }
+        desbloqueados = pendientesRestantes.filter(cumplePrereq);
       }
+
+      if (semestre.length === 0) {
+        console.warn("⚠️ No se pudieron desbloquear más ramos (posible ciclo o error de datos).");
+        break;
+      }
+
+      plan.push({ semestre: semestreProyectado, ramos: semestre, creditos: creditosUsados });
+
+      // Avanzar semestre regular (10 → 20 → siguiente año 10)
+      semestreProyectado = semestreProyectado % 100 === 10
+        ? semestreProyectado + 10
+        : (Math.floor(semestreProyectado / 100) + 1) * 100 + 10;
     }
 
-    const niveles = {};
-    malla.forEach(curso => {
-      if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
-      niveles[curso.nivel].push(curso);
-    });
-
+    // === 7. Renderizado de la malla ===
     contenedor.innerHTML = "";
+    const mallaDiv = document.createElement("div");
+    mallaDiv.classList.add("malla-proyeccion");
 
-    Object.keys(niveles)
-      .sort((a, b) => a - b)
-      .forEach(nivel => {
-        const bloque = document.createElement("div");
-        bloque.classList.add("bloque-nivel");
+    plan.forEach((bloque) => {
+      const bloqueDiv = document.createElement("div");
+      bloqueDiv.classList.add("bloque-nivel");
+      bloqueDiv.innerHTML = `
+        <h3>Semestre ${bloque.semestre}</h3>
+        <p>${bloque.creditos} créditos</p>
+      `;
+      const grid = document.createElement("div");
+      grid.classList.add("malla-grid");
 
-        const titulo = document.createElement("h3");
-        titulo.textContent = `Semestre ${nivel}`;
-        bloque.appendChild(titulo);
-
-        const grid = document.createElement("div");
-        grid.classList.add("malla-grid");
-
-        niveles[nivel].forEach(curso => {
-          const cod = normalizar(curso.codigo);
-          const div = document.createElement("div");
-          div.classList.add("curso");
-
-          let colorClase = "pendiente";
-
-          if (aprobados.has(cod)) colorClase = "aprobado";
-          else if (reprobados.has(cod)) colorClase = "reprobado";
-          else if (inscritos.has(cod)) colorClase = "inscrito";
-          else if (seleccion.find(s => normalizar(s.codigo) === cod)) colorClase = "seleccionado-auto";
-
-          div.classList.add(colorClase);
-
-          div.innerHTML = `
-            <h4>${curso.asignatura}</h4>
-            <p>${curso.codigo}</p>
-            <p><strong>${curso.creditos}</strong> créditos</p>
-          `;
-          grid.appendChild(div);
-        });
-
-        bloque.appendChild(grid);
-        contenedor.appendChild(bloque);
+      bloque.ramos.forEach(r => {
+        const div = document.createElement("div");
+        div.classList.add("curso", "sugerido");
+        div.innerHTML = `
+          <h4>${r.asignatura || r.nombre}</h4>
+          <p>${r.codigo}</p>
+          <p>${r.creditos || 6} créditos</p>
+        `;
+        grid.appendChild(div);
       });
 
-    const resumen = document.createElement("p");
-    resumen.style.marginTop = "15px";
-    resumen.innerHTML = `
-      <strong>Proyección generada automáticamente:</strong> 
-      ${seleccion.length} ramos (${totalCreditos} créditos seleccionados)
+      bloqueDiv.appendChild(grid);
+      mallaDiv.appendChild(bloqueDiv);
+    });
+
+    // === 8. Cálculo del resumen lateral ===
+    const totalMalla = malla.reduce((s, r) => s + (Number(r.creditos) || 0), 0);
+    const creditosAprobados = [...aprobadosSimulados].reduce((s, c) => {
+      const ramo = malla.find(r => normalizar(r.codigo) === c);
+      return s + (ramo ? Number(ramo.creditos) : 0);
+    }, 0);
+    const avanceFinal = (creditosAprobados / totalMalla) * 100;
+    const ramosTotales = plan.reduce((s, p) => s + p.ramos.length, 0);
+
+    // === 9. Crear resumen lateral sticky ===
+    const resumenWrapper = document.createElement("div");
+    resumenWrapper.classList.add("resumen-wrapper");
+
+    const resumenFinal = document.createElement("div");
+    resumenFinal.classList.add("resumen-lateral");
+    resumenFinal.innerHTML = `
+      <div class="resumen-header-lateral">
+        <h3>Resumen de Proyección</h3>
+      </div>
+      <div class="resumen-body-lateral">
+        <p><strong>Semestres proyectados:</strong> ${plan.length}</p>
+        <p><strong>Proyección inicia en:</strong> ${plan[0]?.semestre || "—"}</p>
+        <p><strong>Ramos totales en proyección:</strong> ${ramosTotales}</p>
+        <p><strong>Avance total al egreso:</strong> ${avanceFinal.toFixed(1)}%</p>
+        <div class="barra-progreso-lateral">
+          <div class="progreso-lateral" style="width:${avanceFinal.toFixed(1)}%"></div>
+        </div>
+      </div>
     `;
-    contenedor.appendChild(resumen);
+    resumenWrapper.appendChild(resumenFinal);
+
+    // === 10. Layout conjunto (malla + resumen) ===
+    // Crear contenedor con layout horizontal
+    const layoutContainer = document.createElement("div");
+    layoutContainer.classList.add("proyeccion-layout-auto");
+    layoutContainer.style.display = "flex";
+    layoutContainer.style.flexDirection = "row";
+    layoutContainer.style.justifyContent = "space-between";
+    layoutContainer.style.alignItems = "flex-start";
+    layoutContainer.style.gap = "30px";
+    layoutContainer.style.width = "100%";
+
+    // La malla ocupará la parte izquierda
+    mallaDiv.style.flex = "3";
+    mallaDiv.style.display = "flex";
+    mallaDiv.style.flexWrap = "nowrap";
+    mallaDiv.style.overflowX = "auto";
+    mallaDiv.style.padding = "30px 40px";
+
+    // El resumen quedará a la derecha
+    resumenWrapper.style.flex = "1";
+    resumenWrapper.style.minWidth = "280px";
+    resumenWrapper.style.maxWidth = "360px";
+    resumenWrapper.style.position = "sticky";
+    resumenWrapper.style.top = "100px";
+    resumenWrapper.style.alignSelf = "flex-start";
+
+    // Insertar ambos en el contenedor principal
+    layoutContainer.appendChild(mallaDiv);
+    layoutContainer.appendChild(resumenWrapper);
+    contenedor.appendChild(layoutContainer);
 
   } catch (err) {
     console.error("Error en proyección automática:", err);
-    contenedor.innerHTML = `<p style='color:red;'>Error al generar proyección automática.</p>`;
+    contenedor.innerHTML = "<p style='color:red;'>Error al generar proyección automática.</p>";
   }
 }
+
+
+
+
+
+
+
+

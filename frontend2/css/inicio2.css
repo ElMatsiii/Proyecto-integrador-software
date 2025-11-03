@@ -737,4 +737,186 @@ button, .btn, .acciones button {
   border: 3px solid #764ba2 !important;
   box-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
 }
+/* === Layout principal === */
+.proyeccion-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* === Contenedor del resumen lateral === */
+.resumen-wrapper {
+  flex: 1;
+  min-width: 280px;
+  max-width: 360px;
+  position: sticky;
+  top: 100px; /* 👈 Se mantiene visible al hacer scroll */
+}
+
+/* === Tarjeta del resumen === */
+.resumen-lateral {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* === Encabezado degradado === */
+.resumen-header-lateral {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0.9rem 1rem;
+}
+
+.resumen-header-lateral h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* === Cuerpo === */
+.resumen-body-lateral {
+  padding: 1.3rem 1.8rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.resumen-body-lateral p {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resumen-body-lateral strong {
+  color: #5b4bff;
+  font-weight: 600;
+}
+
+/* === Barra de progreso === */
+.barra-progreso-lateral {
+  position: relative;
+  height: 12px;
+  background-color: #e9e9e9;
+  border-radius: 8px;
+  margin-top: 1.2rem;
+  overflow: hidden;
+}
+
+.progreso-lateral {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 0 10px rgba(100, 50, 255, 0.3);
+  transition: width 1.3s ease-in-out;
+}
+
+/* Hover */
+.resumen-lateral:hover {
+  box-shadow: 0 8px 28px rgba(100, 50, 255, 0.25);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .proyeccion-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .resumen-wrapper {
+    position: static;
+    max-width: 100%;
+    justify-content: center;
+  }
+  .resumen-lateral {
+    width: 90%;
+  }
+}
+/* === Tarjeta lateral refinada === */
+.resumen-lateral {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  width: 100%;
+  animation: slideInRight 0.6s ease-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.resumen-lateral:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(120, 80, 255, 0.2);
+}
+
+/* === Encabezado con el degradado exacto === */
+.resumen-header-lateral {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.resumen-header-lateral h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* === Cuerpo del resumen === */
+.resumen-body-lateral {
+  padding: 1.3rem 1.8rem;
+  font-size: 0.95rem;
+  color: #333;
+  background: linear-gradient(180deg, #ffffff 0%, #f9f9ff 100%);
+}
+
+.resumen-body-lateral p {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resumen-body-lateral strong {
+  color: #222;
+  font-weight: 600;
+}
+
+/* === Barra de progreso refinada === */
+.barra-progreso-lateral {
+  position: relative;
+  height: 12px;
+  background-color: #ecebff;
+  border-radius: 8px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.progreso-lateral {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 0 12px rgba(120, 100, 255, 0.4);
+  transition: width 1.3s ease-in-out;
+}
+
+/* === Animación elegante === */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 
