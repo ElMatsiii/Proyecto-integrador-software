@@ -110,20 +110,21 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       contador = document.createElement("div");
       contador.id = "contadorCreditosProyeccion";
       contador.style.cssText = `
-        position: sticky;
-        top: 80px;
+        position: fixed;
+        top: 20px;
+        right: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 15px 20px;
         border-radius: 10px;
-        margin-bottom: 20px;
         text-align: center;
         font-size: 1.2rem;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        z-index: 10;
+        z-index: 1000;
+        min-width: 250px;
       `;
       contador.innerHTML = `<strong>Créditos seleccionados:</strong> <span id="creditosActuales">0</span> / ${LIMITE_CREDITOS}`;
-      contenedor.before(contador);
+      document.body.appendChild(contador);
     }
 
     let creditosSeleccionados = 0;
