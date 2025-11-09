@@ -13,25 +13,23 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    // 🔹 Llamar API real
+    // Llamar API de login
     const respuesta = await axios.get(
       `https://puclaro.ucn.cl/eross/avance/login.php?email=${email}&password=${password}`
     );
 
-    // 🔹 Si devuelve error
     if (respuesta.data.error) {
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
     const { rut, carreras } = respuesta.data;
 
-    // 🔹 Validar estructura mínima
     if (!rut || !Array.isArray(carreras)) {
       console.error("❌ Respuesta inesperada del API:", respuesta.data);
       return res.status(500).json({ error: "Respuesta inválida desde API UCN" });
     }
 
-    // 🔹 Guardar en BD
+    // Solo guardar el usuario (sin carreras)
     await pool.query(
       `INSERT INTO usuarios (rut, email)
        VALUES ($1, $2)
@@ -39,19 +37,12 @@ router.post("/", async (req, res) => {
       [rut, email]
     );
 
-    for (const c of carreras) {
-      await pool.query(
-        `INSERT INTO carreras (codigo, nombre, catalogo, rut_usuario)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (codigo, rut_usuario) DO NOTHING`,
-        [c.codigo, c.nombre, c.catalogo, rut]
-      );
-    }
-
-    // 🔹 Crear token JWT
+    // Crear token JWT
     const token = generarToken({ rut, email });
 
+    // Devolver datos sin guardar carreras en BD
     res.json({ rut, carreras, token });
+    
   } catch (error) {
     console.error("💥 Error en /api/login:", error.message);
     if (error.response) {

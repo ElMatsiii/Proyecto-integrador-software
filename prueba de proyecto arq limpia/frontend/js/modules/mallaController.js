@@ -1,43 +1,82 @@
 import { obtenerMalla } from "../services/apiService.js";
 import { storage } from "../services/storageService.js";
-import { mostrarError } from "../services/utils.js";
+import { mostrarError, obtenerNombreRamo } from "../services/utils.js";
 
 export async function initMalla() {
   const main = document.querySelector("main");
-  const auth = storage.requireAuth();
   
+  if (!main) {
+    console.error("No se encontró el elemento main");
+    return;
+  }
+
+  const auth = storage.requireAuth();
   const carrera = storage.getCarrera();
 
-  if (!carrera) return mostrarError("Carrera no encontrada", main);
+  if (!carrera) {
+    mostrarError("Carrera no encontrada", main);
+    return;
+  }
+
+  main.innerHTML = `
+    <h2>Malla Curricular</h2>
+    <p>Cargando malla de ${carrera.nombre}...</p>
+  `;
 
   try {
     const data = await obtenerMalla(carrera.codigo, carrera.catalogo);
-    if (!Array.isArray(data)) return mostrarError("No hay datos de malla", main);
+    
+    if (!Array.isArray(data) || data.length === 0) {
+      mostrarError("No hay datos de malla disponibles", main);
+      return;
+    }
 
     const niveles = {};
-    data.forEach((r) => (niveles[r.nivel] = [...(niveles[r.nivel] || []), r]));
+    data.forEach((ramo) => {
+      const nivel = ramo.nivel || 0;
+      if (!niveles[nivel]) niveles[nivel] = [];
+      niveles[nivel].push(ramo);
+    });
 
-    main.innerHTML = "<h2>Malla Curricular</h2>";
+    let html = `
+      <h2>Malla Curricular</h2>
+      <p><strong>Carrera:</strong> ${carrera.nombre}</p>
+      <div id="mallaContainer">
+    `;
+
     Object.keys(niveles)
-      .sort((a, b) => a - b)
+      .sort((a, b) => Number(a) - Number(b))
       .forEach((nivel) => {
-        const bloque = document.createElement("div");
-        bloque.innerHTML = `<h3>Semestre ${nivel}</h3>`;
-        bloque.classList.add("bloque-nivel");
-        const grid = document.createElement("div");
-        grid.classList.add("malla-grid");
+        html += `
+          <div class="bloque-nivel">
+            <h3>Semestre ${nivel}</h3>
+            <div class="malla-grid">
+        `;
 
         niveles[nivel].forEach((curso) => {
-          const div = document.createElement("div");
-          div.classList.add("curso");
-          div.innerHTML = `<h4>${curso.asignatura}</h4><p>${curso.codigo}</p>`;
-          grid.appendChild(div);
+          // 🔹 Usar la nueva función para obtener el nombre
+          const nombre = obtenerNombreRamo(curso.codigo, curso.asignatura);
+          
+          html += `
+            <div class="curso">
+              <h4>${nombre}</h4>
+              <p><strong>Código:</strong> ${curso.codigo}</p>
+              <p><strong>Créditos:</strong> ${curso.creditos}</p>
+            </div>
+          `;
         });
 
-        bloque.appendChild(grid);
-        main.appendChild(bloque);
+        html += `
+            </div>
+          </div>
+        `;
       });
-  } catch {
-    mostrarError("Error al cargar malla curricular", main);
+
+    html += `</div>`;
+    main.innerHTML = html;
+
+  } catch (error) {
+    console.error("Error al cargar malla:", error);
+    mostrarError("Error al cargar malla curricular. Intenta nuevamente.", main);
   }
 }
