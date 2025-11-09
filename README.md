@@ -8,3 +8,22 @@ npm init -y
 luego ir a la terminal del proyecto y copiar npm init -y
 luego npm install axios
 luego node proxy.js
+
+## Configuración de la Base de Datos
+
+Requisitos
+Docker y Docker Compose instalados
+
+Instalación
+Clona el repositorio
+Ejecuta:
+   docker-compose up -d
+
+La base de datos estará disponible en localhost:5432
+
+Credenciales por defecto
+Host: localhost
+Puerto: 5432
+Usuario: postgres
+Contraseña: postgres
+Base de datos: postgres
