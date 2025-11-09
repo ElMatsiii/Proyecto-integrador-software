@@ -15,19 +15,43 @@ export async function initProyeccion() {
   const btnManual = document.getElementById("btnIrManual");
   const btnAuto = document.getElementById("btnIrAutomatica");
 
+  // Ocultar botones iniciales (se mostrarán según corresponda)
+  const accionesContainer = document.querySelector(".acciones");
+  if (accionesContainer) {
+    accionesContainer.style.display = "none";
+  }
+
   // Cargar malla inicial con colores de estado
   await mostrarMallaProyeccion(auth, carrera, contenedor);
 
-  // Botón Manual: Solo guarda la selección, no recarga
-  btnManual.addEventListener("click", () => guardarProyeccionManual());
-  
   // Botón Automático: Genera nueva proyección
-  btnAuto.addEventListener("click", () => generarProyeccionAutomatica(auth, carrera, contenedor));
+  btnAuto.addEventListener("click", () => {
+    accionesContainer.style.display = "none";
+    generarProyeccionAutomatica(auth, carrera, contenedor);
+  });
+}
+
+// === LIMPIAR BOTONES PREVIOS ===
+function limpiarBotones() {
+  const botonesAEliminar = [
+    "btnGuardarProyeccionManual",
+    "btnGenerarAutomatica",
+    "btnVolverManual",
+    "btnGuardarProyeccionAutomatica"
+  ];
+  
+  botonesAEliminar.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.remove();
+  });
 }
 
 // === MOSTRAR MALLA CON ESTADOS Y MODO MANUAL (inicial) ===
 async function mostrarMallaProyeccion(auth, carrera, contenedor) {
   try {
+    // Limpiar todos los botones previos
+    limpiarBotones();
+    
     contenedor.innerHTML = "<p>Cargando malla curricular...</p>";
 
     const [avance, malla] = await Promise.all([
@@ -104,40 +128,32 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
     contenedor.innerHTML = "";
     contenedor.classList.add("malla-proyeccion");
 
-    // Contador de créditos (solo crearlo una vez)
-    let contador = document.getElementById("contadorCreditosProyeccion");
-    if (!contador) {
-      contador = document.createElement("div");
-      contador.id = "contadorCreditosProyeccion";
-      contador.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        min-width: 250px;
-      `;
-      contador.innerHTML = `<strong>Créditos seleccionados:</strong> <span id="creditosActuales">0</span> / ${LIMITE_CREDITOS}`;
-      document.body.appendChild(contador);
+    // ✅ ELIMINAR CONTADOR PREVIO Y CREAR UNO NUEVO ESTÁTICO
+    let contadorExistente = document.getElementById("contadorCreditosProyeccion");
+    if (contadorExistente) {
+      contadorExistente.remove();
     }
+
+    // Crear nuevo contador
+    const contador = document.createElement("div");
+    contador.id = "contadorCreditosProyeccion";
+    contador.innerHTML = `<strong>Créditos seleccionados:</strong> <span id="creditosActuales">0</span> / ${LIMITE_CREDITOS}`;
+    
+    // Insertar al inicio del contenedor
+    contenedor.insertAdjacentElement("beforebegin", contador);
 
     let creditosSeleccionados = 0;
     const seleccionados = new Set();
 
     const actualizarContador = () => {
       document.getElementById("creditosActuales").textContent = creditosSeleccionados;
+      const contadorEl = document.getElementById("contadorCreditosProyeccion");
       if (creditosSeleccionados > LIMITE_CREDITOS) {
-        contador.style.background = "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)";
+        contadorEl.style.background = "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)";
       } else if (creditosSeleccionados === LIMITE_CREDITOS) {
-        contador.style.background = "linear-gradient(135deg, #f39c12 0%, #e67e22 100%)";
+        contadorEl.style.background = "linear-gradient(135deg, #f39c12 0%, #e67e22 100%)";
       } else {
-        contador.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+        contadorEl.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
       }
     };
 
@@ -244,27 +260,68 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
           transform: scale(1.05);
           box-shadow: 0 0 15px rgba(0, 123, 255, 0.5) !important;
         }
+        
+        .boton-proyeccion-centrado {
+          display: block;
+          margin: 30px auto;
+          padding: 12px 30px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .boton-proyeccion-centrado:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
       `;
       document.head.appendChild(style);
     }
 
+    // ✅ CREAR BOTÓN DE GUARDAR PROYECCIÓN DEBAJO DE LA MALLA
+    const btnGuardarProyeccion = document.createElement("button");
+    btnGuardarProyeccion.id = "btnGuardarProyeccionManual";
+    btnGuardarProyeccion.className = "boton-proyeccion-centrado";
+    btnGuardarProyeccion.textContent = "Guardar Proyección Manual";
+    btnGuardarProyeccion.addEventListener("click", () => guardarProyeccionManual());
+    
+    contenedor.after(btnGuardarProyeccion);
+
+    // ✅ CREAR BOTÓN DE PROYECCIÓN AUTOMÁTICA DEBAJO DEL BOTÓN DE GUARDAR
+    const btnProyeccionAuto = document.createElement("button");
+    btnProyeccionAuto.id = "btnGenerarAutomatica";
+    btnProyeccionAuto.className = "boton-proyeccion-centrado";
+    btnProyeccionAuto.textContent = "Generar Proyección Automática";
+    btnProyeccionAuto.addEventListener("click", () => {
+      generarProyeccionAutomatica(auth, carrera, contenedor);
+    });
+    
+    btnGuardarProyeccion.after(btnProyeccionAuto);
+
     // Mensaje final (solo si no existe)
     let mensajeFinal = document.getElementById("mensajeProyeccionManual");
-    if (!mensajeFinal) {
-      mensajeFinal = document.createElement("p");
-      mensajeFinal.id = "mensajeProyeccionManual";
-      mensajeFinal.style.cssText = `
-        text-align: center;
-        margin-top: 20px;
-        font-size: 1.1rem;
-        color: #555;
-      `;
-      mensajeFinal.innerHTML = `
-        Haz clic en los ramos pendientes para seleccionarlos.<br>
-        <small>Los ramos con prerrequisitos no cumplidos aparecen deshabilitados.</small>
-      `;
-      contenedor.after(mensajeFinal);
+    if (mensajeFinal) {
+      mensajeFinal.remove();
     }
+
+    mensajeFinal = document.createElement("p");
+    mensajeFinal.id = "mensajeProyeccionManual";
+    mensajeFinal.style.cssText = `
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #555;
+    `;
+    mensajeFinal.innerHTML = `
+      Haz clic en los ramos pendientes para seleccionarlos.<br>
+      <small>Los ramos con prerrequisitos no cumplidos aparecen deshabilitados.</small>
+    `;
+    contador.after(mensajeFinal);
 
   } catch (err) {
     console.error("Error al cargar malla de proyección:", err);
@@ -272,7 +329,7 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
   }
 }
 
-// === GUARDAR PROYECCIÓN MANUAL (sin recargar la vista) ===
+// === GUARDAR PROYECCIÓN MANUAL ===
 function guardarProyeccionManual() {
   const seleccionados = Array.from(document.querySelectorAll(".curso.seleccionado-auto")).map(
     (el) => ({
@@ -298,11 +355,50 @@ function guardarProyeccionManual() {
   alert(`✅ Proyección manual guardada correctamente\n\n📚 ${seleccionados.length} ramos seleccionados\n📊 ${proyeccion.totalCreditos} créditos totales`);
 }
 
-// === ELIMINAR FUNCIÓN activarModoManual (ya no se necesita) ===
+// === GUARDAR PROYECCIÓN AUTOMÁTICA ===
+function guardarProyeccionAutomatica(plan) {
+  if (!plan || plan.length === 0) {
+    alert("No hay proyección para guardar.");
+    return;
+  }
+
+  const ramosSeleccionados = [];
+  plan.forEach(bloque => {
+    bloque.ramos.forEach(ramo => {
+      ramosSeleccionados.push({
+        codigo: ramo.codigo,
+        nombre: obtenerNombreRamo(ramo.codigo, ramo.asignatura),
+        creditos: ramo.creditos || 6,
+        semestre: bloque.semestre
+      });
+    });
+  });
+
+  const proyeccion = {
+    fecha: new Date().toISOString(),
+    tipo: "automatica",
+    ramos: ramosSeleccionados,
+    totalCreditos: ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0),
+    semestres: plan.length
+  };
+
+  localStorage.setItem("proyeccionAutomatica", JSON.stringify(proyeccion));
+  alert(`✅ Proyección automática guardada correctamente\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${proyeccion.totalCreditos} créditos totales`);
+}
 
 // === PROYECCIÓN AUTOMÁTICA ===
 async function generarProyeccionAutomatica(auth, carrera, contenedor) {
   try {
+    // Limpiar todos los botones previos
+    limpiarBotones();
+    
+    // Eliminar contador y mensaje de la vista manual
+    const contador = document.getElementById("contadorCreditosProyeccion");
+    const mensaje = document.getElementById("mensajeProyeccionManual");
+    
+    if (contador) contador.remove();
+    if (mensaje) mensaje.remove();
+
     contenedor.innerHTML = "<p>Generando proyección automática...</p>";
 
     const [avance, malla] = await Promise.all([
@@ -378,7 +474,7 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       }
 
       if (semestre.length === 0) {
-        console.warn("⚠️ No se pudieron desbloquear más ramos.");
+        console.warn("No se pudieron desbloquear más ramos.");
         break;
       }
 
@@ -434,19 +530,36 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     const resumenWrapper = document.createElement("div");
     resumenWrapper.classList.add("resumen-wrapper");
 
+    // Calcular fecha de egreso estimada
+    const semestreInicio = plan[0]?.semestre || semestreProyectado;
+    const añoInicio = Math.floor(semestreInicio / 100);
+    const tipoSemestre = semestreInicio % 100;
+    const mesInicio = tipoSemestre === 10 ? 3 : 8; // Marzo o Agosto
+    
+    const mesesTotales = plan.length * 6; // 6 meses por semestre
+    const fechaEgreso = new Date(añoInicio, mesInicio - 1);
+    fechaEgreso.setMonth(fechaEgreso.getMonth() + mesesTotales);
+    
+    const opcionesFormato = { year: 'numeric', month: 'long' };
+    const fechaEgresoTexto = fechaEgreso.toLocaleDateString('es-CL', opcionesFormato);
+
     const resumenFinal = document.createElement("div");
     resumenFinal.classList.add("resumen-lateral");
     resumenFinal.innerHTML = `
       <div class="resumen-header-lateral">
-        <h3>Resumen de Proyección</h3>
+        <h3>Resumen de Proyección Automática</h3>
       </div>
       <div class="resumen-body-lateral">
-        <p><strong>Semestres proyectados:</strong> ${plan.length}</p>
-        <p><strong>Proyección inicia en:</strong> ${plan[0]?.semestre || "—"}</p>
-        <p><strong>Ramos totales:</strong> ${ramosTotales}</p>
-        <p><strong>Avance al egreso:</strong> ${avanceFinal.toFixed(1)}%</p>
+        <p><strong>Semestres proyectados:</strong> <span>${plan.length} semestres</span></p>
+        <p><strong>Proyección inicia en:</strong> <span>${plan[0]?.semestre || "—"}</span></p>
+        <p><strong>Fecha estimada de egreso:</strong> <span>${fechaEgresoTexto}</span></p>
+        <p><strong>Ramos pendientes:</strong> <span>${ramosTotales} ramos</span></p>
+        <p><strong>Créditos totales:</strong> <span>${plan.reduce((s, p) => s + p.creditos, 0)} créditos</span></p>
+        <p style="border-top: 2px solid #e9ecef; padding-top: 20px; margin-top: 20px;">
+          <strong>Avance al completar:</strong> <span>${avanceFinal.toFixed(1)}%</span>
+        </p>
         <div class="barra-progreso-lateral">
-          <div class="progreso-lateral" style="width:${avanceFinal.toFixed(1)}%"></div>
+          <div class="progreso-lateral" style="width:${avanceFinal.toFixed(1)}%">${avanceFinal.toFixed(1)}%</div>
         </div>
       </div>
     `;
@@ -457,6 +570,27 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     layoutContainer.appendChild(mallaDiv);
     layoutContainer.appendChild(resumenWrapper);
     contenedor.appendChild(layoutContainer);
+
+    // ✅ CREAR BOTÓN PARA GUARDAR PROYECCIÓN AUTOMÁTICA
+    const btnGuardarAuto = document.createElement("button");
+    btnGuardarAuto.id = "btnGuardarProyeccionAutomatica";
+    btnGuardarAuto.className = "boton-proyeccion-centrado";
+    btnGuardarAuto.textContent = "Guardar Proyección Automática";
+    btnGuardarAuto.addEventListener("click", () => guardarProyeccionAutomatica(plan));
+    
+    contenedor.after(btnGuardarAuto);
+
+    // ✅ CREAR BOTÓN PARA VOLVER A PROYECCIÓN MANUAL
+    const btnVolverManual = document.createElement("button");
+    btnVolverManual.id = "btnVolverManual";
+    btnVolverManual.className = "boton-proyeccion-centrado";
+    btnVolverManual.textContent = "Volver a Proyección Manual";
+    btnVolverManual.addEventListener("click", () => {
+      // Recargar la vista manual
+      mostrarMallaProyeccion(auth, carrera, contenedor);
+    });
+    
+    btnGuardarAuto.after(btnVolverManual);
 
   } catch (err) {
     console.error("Error en proyección automática:", err);
