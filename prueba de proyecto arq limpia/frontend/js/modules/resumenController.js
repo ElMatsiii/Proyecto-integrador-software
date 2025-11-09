@@ -32,35 +32,59 @@ export async function initResumen() {
       mallaPorCodigo[codigoNormalizado] = ramo;
     });
 
-    // Enriquecer avance con datos de la malla
-    const avanceEnriquecido = avance.map((r) => {
+    // Agrupar ramos por código y contar apariciones
+    const ramosPorCodigo = {};
+    
+    avance.forEach((r) => {
       const codigoNormalizado = normalizarCodigo(r.course);
       const datosMalla = mallaPorCodigo[codigoNormalizado];
       
-      // 🔹 Usar la nueva función para obtener el nombre
       const nombreMalla = datosMalla?.asignatura;
       const nombreAvance = r.course_name;
       const nombre = obtenerNombreRamo(r.course, nombreMalla || nombreAvance);
       
-      return {
-        codigo: r.course,
-        nombre: nombre,
-        creditos: datosMalla?.creditos || r.credits || 0,
-        periodo: r.period || r.periodo || "—",
-        estado: r.status || "—",
-        nivel: datosMalla?.nivel || "—"
-      };
+      if (!ramosPorCodigo[codigoNormalizado]) {
+        ramosPorCodigo[codigoNormalizado] = {
+          codigo: r.course,
+          nombre: nombre,
+          creditos: datosMalla?.creditos || r.credits || 0,
+          nivel: datosMalla?.nivel || "—",
+          veces: 0,
+          periodos: [],
+          estados: []
+        };
+      }
+      
+      ramosPorCodigo[codigoNormalizado].veces++;
+      ramosPorCodigo[codigoNormalizado].periodos.push(r.period || r.periodo || "—");
+      ramosPorCodigo[codigoNormalizado].estados.push(r.status || "—");
+    });
+
+    // Convertir a array para facilitar el procesamiento
+    const avanceAgrupado = Object.values(ramosPorCodigo);
+
+    // Determinar el estado final de cada ramo
+    avanceAgrupado.forEach((ramo) => {
+      if (ramo.estados.includes("APROBADO")) {
+        ramo.estadoFinal = "APROBADO";
+      } else if (ramo.estados.includes("INSCRITO") || ramo.estados.includes("EN_CURSO")) {
+        ramo.estadoFinal = "INSCRITO";
+      } else if (ramo.estados.includes("REPROBADO")) {
+        ramo.estadoFinal = "REPROBADO";
+      } else {
+        ramo.estadoFinal = ramo.estados[ramo.estados.length - 1];
+      }
     });
 
     // Calcular estadísticas
     const total = malla.length;
-    const aprobados = avanceEnriquecido.filter((r) => r.estado === "APROBADO").length;
-    const reprobados = avanceEnriquecido.filter((r) => r.estado === "REPROBADO").length;
-    const inscritos = avanceEnriquecido.filter((r) => ["INSCRITO", "EN_CURSO"].includes(r.estado)).length;
+    const aprobados = avanceAgrupado.filter((r) => r.estadoFinal === "APROBADO").length;
+    const reprobados = avanceAgrupado.filter((r) => r.estadoFinal === "REPROBADO").length;
+    const inscritos = avanceAgrupado.filter((r) => ["INSCRITO", "EN_CURSO"].includes(r.estadoFinal)).length;
     const pendientes = total - aprobados - reprobados - inscritos;
 
-    const creditosAprobados = avanceEnriquecido
-      .filter((r) => r.estado === "APROBADO")
+    const creditosAprobados = avanceAgrupado
+      .filter((r) => r.estadoFinal === "APROBADO")
       .reduce((sum, r) => sum + Number(r.creditos || 0), 0);
 
     const creditosTotales = malla.reduce((sum, r) => sum + Number(r.creditos || 0), 0);
@@ -88,16 +112,22 @@ export async function initResumen() {
             <th>Código</th>
             <th>Créditos</th>
             <th>Semestre</th>
-            <th>Período Cursado</th>
+            <th>Períodos Cursados</th>
+            <th>Veces Cursado</th>
             <th>Estado</th>
           </tr>
         </thead>
         <tbody>
-          ${avanceEnriquecido.map((r) => {
+          ${avanceAgrupado.map((r) => {
             const estadoClass = 
-              r.estado === "APROBADO" ? "aprobado" :
-              r.estado === "REPROBADO" ? "reprobado" :
-              ["INSCRITO", "EN_CURSO"].includes(r.estado) ? "inscrito" : "";
+              r.estadoFinal === "APROBADO" ? "aprobado" :
+              r.estadoFinal === "REPROBADO" ? "reprobado" :
+              ["INSCRITO", "EN_CURSO"].includes(r.estadoFinal) ? "inscrito" : "";
+            
+            // Crear lista de períodos (mostrar los últimos 3 si hay muchos)
+            const periodosTexto = r.periodos.length > 3
+              ? r.periodos.slice(-3).join(", ") + "..."
+              : r.periodos.join(", ");
             
             return `
               <tr class="${estadoClass}">
@@ -105,8 +135,9 @@ export async function initResumen() {
                 <td>${r.codigo}</td>
                 <td>${r.creditos}</td>
                 <td>${r.nivel}</td>
-                <td>${r.periodo}</td>
-                <td>${r.estado}</td>
+                <td>${periodosTexto}</td>
+                <td>${r.veces}</td>
+                <td>${r.estadoFinal}</td>
               </tr>
             `;
           }).join("")}
