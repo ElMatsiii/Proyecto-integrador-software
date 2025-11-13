@@ -4,6 +4,15 @@ import { initMalla } from "./modules/mallaController.js";
 import { initResumen } from "./modules/resumenController.js";
 import { initProyeccion } from "./modules/proyeccionController.js";
 import { initInicio } from "./modules/inicioController.js";
+import { initDarkMode, darkModeStyles } from "./modules/darkModeController.js";
+
+// Inyectar estilos del modo oscuro
+const styleElement = document.createElement('style');
+styleElement.textContent = darkModeStyles;
+document.head.appendChild(styleElement);
+
+// Inicializar modo oscuro en todas las páginas
+initDarkMode();
 
 const path = window.location.pathname;
 
@@ -30,4 +39,3 @@ if (logoutBtn) {
     window.location.href = "../html/index.html";
   });
 }
-

@@ -460,42 +460,6 @@ footer {
   font-weight: 600;
 }
 
-:root {
-  --bg-body: #f5f7fa;
-  --text-color: #222;
-  --card-bg: #fff;
-  --border-color: #ccc;
-
-  --aprobado: #d4edda;
-  --reprobado: #f8d7da;
-  --inscrito: #fff3cd;
-
-  --table-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --table-header-text: #fff;
-
-  --footer-bg: #333;
-  --footer-text: #fff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-body: #0d0d0d;
-    --text-color: #e0e0e0;
-    --card-bg: #1c1c1c;
-    --border-color: #444;
-
-    --aprobado: #123d1d;
-    --reprobado: #3d1a1a;
-    --inscrito: #4d3b00;
-
-    --table-header: linear-gradient(135deg, #5a4ddf, #7b68ee);
-    --table-header-text: #fff;
-
-    --footer-bg: #0a0a0a;
-    --footer-text: #aaa;
-  }
-}
-
 body {
   background-color: var(--bg-body);
   color: var(--text-color);
