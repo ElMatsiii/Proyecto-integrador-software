@@ -2,24 +2,81 @@
 // Guardar en: frontend/js/modules/darkModeController.js
 
 export function initDarkMode() {
-  // Crear el botón de modo oscuro
+  // Esperar a que el DOM esté listo
+  const init = () => {
+    // Buscar el nav existente
+    const nav = document.querySelector('nav ul');
+    
+    if (!nav) {
+      // Si no hay nav (ej: página de login), usar el método flotante
+      createFloatingButton();
+      return;
+    }
+    
+    // Crear el botón de modo oscuro para el nav
+    const darkModeLi = document.createElement('li');
+    darkModeLi.style.cssText = 'margin-left: auto; display: flex; align-items: center;';
+    
+    const darkModeButton = document.createElement('button');
+    darkModeButton.id = 'darkModeToggle';
+    darkModeButton.className = 'dark-mode-toggle-nav';
+    darkModeButton.innerHTML = '🌙 Modo';
+    darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
+    darkModeButton.type = 'button';
+    
+    darkModeLi.appendChild(darkModeButton);
+    nav.appendChild(darkModeLi);
+
+    // Cargar preferencia guardada
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      darkModeButton.innerHTML = '☀️ Modo';
+    }
+
+    // Toggle al hacer clic
+    darkModeButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        darkModeButton.innerHTML = '🌙 Modo';
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        darkModeButton.innerHTML = '☀️ Modo';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  };
+  
+  // Ejecutar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 100); // Pequeño delay para asegurar que el DOM esté listo
+  }
+}
+
+// Función auxiliar para crear botón flotante (solo en login)
+function createFloatingButton() {
   const darkModeButton = document.createElement('button');
-  darkModeButton.id = 'darkModeToggle';
+  darkModeButton.id = 'darkModeToggleFloat';
   darkModeButton.className = 'dark-mode-toggle';
   darkModeButton.innerHTML = '🌙';
   darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
+  darkModeButton.type = 'button';
   
-  // Añadir el botón al body
   document.body.appendChild(darkModeButton);
-
-  // Cargar preferencia guardada
+  
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
     darkModeButton.innerHTML = '☀️';
   }
-
-  // Toggle al hacer clic
+  
   darkModeButton.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     
@@ -37,38 +94,48 @@ export function initDarkMode() {
 
 // Estilos CSS para el botón y el modo oscuro
 export const darkModeStyles = `
-/* Botón de modo oscuro flotante */
-.dark-mode-toggle {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
+/* Botón de modo oscuro en el nav */
+.dark-mode-toggle-nav {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-size: 24px;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
-  z-index: 9999;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
-.dark-mode-toggle:hover {
-  transform: scale(1.1) rotate(15deg);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+.dark-mode-toggle-nav:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.dark-mode-toggle:active {
-  transform: scale(0.95);
+[data-theme="dark"] .dark-mode-toggle-nav {
+  background: linear-gradient(135deg, #5a4ddf 0%, #7b68ee 100%);
 }
 
-/* Variables CSS para modo claro (por defecto) */
-:root {
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+nav ul li:has(.dark-mode-toggle-nav) {
+  margin-left: auto;
+}
+
+/* Variables CSS para modo claro (por defecto) - SIEMPRE modo claro a menos que el usuario lo cambie */
+:root,
+:root:not([data-theme]) {
   --bg-body: #f5f7fa;
   --text-color: #222;
   --card-bg: #fff;
@@ -101,6 +168,16 @@ export const darkModeStyles = `
   --nav-text: #333;
   --nav-hover-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --nav-hover-text: #fff;
+}
+
+/* Deshabilitar completamente el modo oscuro automático del sistema */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="dark"]) {
+    --bg-body: #f5f7fa;
+    --text-color: #222;
+    --card-bg: #fff;
+    --border-color: #e9ecef;
+  }
 }
 
 /* Variables CSS para modo oscuro */
@@ -146,18 +223,60 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-main, .dashboard, .tabla-avance, .resumen-lateral {
+/* Asegurar que TODO el texto tenga buen contraste */
+h1, h2, h3, h4, h5, h6,
+p, span, label, a, li,
+.curso h4, .curso p, .curso small,
+.ramo-card h4, .ramo-card p, .ramo-card strong {
+  color: inherit;
+}
+
+main {
   background-color: var(--card-bg);
   color: var(--text-color);
   border-color: var(--border-color);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+main h2, main h3, main h4, main p, main label, main strong {
+  color: var(--text-color) !important;
+}
+
+.container,
+.container * {
+  color: var(--text-color);
+}
+
+.dashboard {
+  background: transparent;
+}
+
+.dashboard p {
+  background: var(--header-bg);
+  color: var(--header-text) !important;
+}
+
+.dashboard p strong {
+  color: var(--header-text) !important;
+}
+
+.tabla-avance, .resumen-lateral {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estados de cursos - MODO CLARO */
 .curso {
   background-color: var(--card-bg);
   color: var(--text-color);
   border-color: var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.curso h4, .curso p, .curso small {
+  color: inherit !important;
 }
 
 .curso.aprobado {
@@ -166,9 +285,21 @@ main, .dashboard, .tabla-avance, .resumen-lateral {
   color: var(--aprobado-text) !important;
 }
 
+.curso.aprobado h4,
+.curso.aprobado p,
+.curso.aprobado small {
+  color: var(--aprobado-text) !important;
+}
+
 .curso.reprobado {
   background-color: var(--reprobado-bg) !important;
   border-color: var(--reprobado-border) !important;
+  color: var(--reprobado-text) !important;
+}
+
+.curso.reprobado h4,
+.curso.reprobado p,
+.curso.reprobado small {
   color: var(--reprobado-text) !important;
 }
 
@@ -179,9 +310,24 @@ main, .dashboard, .tabla-avance, .resumen-lateral {
   color: var(--inscrito-text) !important;
 }
 
+.curso.en-curso h4,
+.curso.en-curso p,
+.curso.en-curso small,
+.curso.inscrito h4,
+.curso.inscrito p,
+.curso.inscrito small {
+  color: var(--inscrito-text) !important;
+}
+
 .curso.pendiente {
   background-color: var(--pendiente-bg) !important;
   border-color: var(--pendiente-border) !important;
+  color: var(--pendiente-text) !important;
+}
+
+.curso.pendiente h4,
+.curso.pendiente p,
+.curso.pendiente small {
   color: var(--pendiente-text) !important;
 }
 
@@ -251,6 +397,12 @@ nav a.active {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.ramo-card h4,
+.ramo-card p,
+.ramo-card strong {
+  color: var(--text-color);
+}
+
 .resumen-body-lateral {
   background-color: var(--bg-body);
 }
@@ -259,6 +411,15 @@ nav a.active {
   background-color: var(--card-bg);
   color: var(--text-color);
   box-shadow: 0 2px 5px var(--shadow);
+}
+
+.resumen-body-lateral p strong {
+  color: var(--text-color);
+}
+
+.resumen-header-lateral {
+  background: var(--header-bg);
+  color: var(--header-text);
 }
 
 .barra-progreso-lateral {
@@ -270,7 +431,179 @@ nav a.active {
   color: var(--header-text);
 }
 
-/* Inputs y selects en modo oscuro */
+/* Estadísticas en inicio */
+#estadoCreditos p {
+  color: var(--text-color) !important;
+}
+
+#estadoCreditos strong {
+  color: var(--text-color) !important;
+}
+
+/* Selector de carrera */
+#selectorCarrera,
+#filtroSemestre,
+#selectCarrera {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Párrafos y labels */
+.container label,
+.container p,
+.container span {
+  color: var(--text-color) !important;
+}
+
+#nombreCarrera,
+#semestreActual,
+#totalCreditos {
+  color: var(--text-color) !important;
+}
+
+/* Mensajes y textos de proyecciones */
+.pagina-proyeccion main h2,
+.pagina-proyeccion main p,
+#mensajeProyeccionManual {
+  color: var(--text-color) !important;
+}
+
+/* Página de Malla */
+.pagina-malla main h2,
+.pagina-malla main p,
+.pagina-malla .curso h4,
+.pagina-malla .curso p {
+  color: inherit !important;
+}
+
+/* Textos de tablas */
+.tabla-avance td,
+.tabla-avance td strong {
+  color: var(--text-color) !important;
+}
+
+/* Resumen lateral - asegurar contraste */
+.resumen-body-lateral p,
+.resumen-body-lateral p strong,
+.resumen-body-lateral p span {
+  color: var(--text-color) !important;
+}
+
+/* Página de Versiones */
+.lista-versiones li {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+/* Malla Proyección - mejor contraste en TODOS los modos */
+.malla-proyeccion {
+  background-color: var(--bg-body);
+}
+
+.malla-proyeccion .bloque-nivel {
+  background-color: transparent;
+}
+
+.malla-proyeccion .bloque-nivel h3 {
+  background: var(--header-bg);
+  color: var(--header-text);
+}
+
+.malla-proyeccion .curso {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.malla-proyeccion .curso h4,
+.malla-proyeccion .curso p {
+  color: var(--text-color);
+}
+
+/* Estados específicos en malla proyección */
+.malla-proyeccion .curso.aprobado {
+  background-color: var(--aprobado-bg) !important;
+  border-color: var(--aprobado-border) !important;
+  color: var(--aprobado-text) !important;
+}
+
+.malla-proyeccion .curso.aprobado h4,
+.malla-proyeccion .curso.aprobado p,
+.malla-proyeccion .curso.aprobado small {
+  color: var(--aprobado-text) !important;
+}
+
+.malla-proyeccion .curso.reprobado {
+  background-color: var(--reprobado-bg) !important;
+  border-color: var(--reprobado-border) !important;
+  color: var(--reprobado-text) !important;
+}
+
+.malla-proyeccion .curso.reprobado h4,
+.malla-proyeccion .curso.reprobado p,
+.malla-proyeccion .curso.reprobado small {
+  color: var(--reprobado-text) !important;
+}
+
+.malla-proyeccion .curso.inscrito,
+.malla-proyeccion .curso.en-curso {
+  background-color: var(--inscrito-bg) !important;
+  border-color: var(--inscrito-border) !important;
+  color: var(--inscrito-text) !important;
+}
+
+.malla-proyeccion .curso.inscrito h4,
+.malla-proyeccion .curso.inscrito p,
+.malla-proyeccion .curso.inscrito small,
+.malla-proyeccion .curso.en-curso h4,
+.malla-proyeccion .curso.en-curso p,
+.malla-proyeccion .curso.en-curso small {
+  color: var(--inscrito-text) !important;
+}
+
+.malla-proyeccion .curso.pendiente {
+  background-color: var(--pendiente-bg) !important;
+  border-color: var(--pendiente-border) !important;
+  color: var(--pendiente-text) !important;
+}
+
+.malla-proyeccion .curso.pendiente h4,
+.malla-proyeccion .curso.pendiente p,
+.malla-proyeccion .curso.pendiente small {
+  color: var(--pendiente-text) !important;
+}
+
+/* Botón flotante solo para login */
+.dark-mode-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode-toggle:active {
+  transform: scale(0.95);
+}
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
