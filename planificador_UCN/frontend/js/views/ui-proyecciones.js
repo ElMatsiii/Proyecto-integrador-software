@@ -6,12 +6,11 @@ export function inicializarProyecciones() {
 
   btnGuardar.addEventListener("click", () => {
     const proyeccion = {
-      asignaturas: ["Ejemplo 1", "Ejemplo 2"], // aquí irá la malla real
+      asignaturas: ["Ejemplo 1", "Ejemplo 2"],
     };
     guardarProyeccion("Proyección manual", proyeccion);
-    alert("✅ Proyección guardada correctamente");
+    alert("Proyección guardada correctamente");
   });
 
-  // Ejemplo visual de render:
   container.innerHTML = "<p>Proyección cargada: Ninguna.</p>";
 }

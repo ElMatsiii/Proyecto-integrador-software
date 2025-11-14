@@ -1,4 +1,4 @@
-/* Reset */
+
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +15,7 @@ body {
   align-items: center;
 }
 
-/* Header */
+
 header {
   position: absolute;
   top: 0;
@@ -27,7 +27,7 @@ header {
   font-size: 1.3rem;
 }
 
-/* Caja de login y registro */
+
 .auth-container,
 .login-container {
   background: #ffffff;
@@ -46,7 +46,7 @@ header {
   color: #333;
 }
 
-/* Inputs */
+
 .auth-container input,
 .login-container input {
   width: 100%;
@@ -57,7 +57,7 @@ header {
   font-size: 14px;
 }
 
-/* Boton principal */
+
 .auth-container button,
 #loginBtn {
   width: 100%;
@@ -75,7 +75,7 @@ header {
   background-color: #1d2832;
 }
 
-/* Enlace inferior */
+
 .auth-container p,
 .login-container p {
   font-size: 14px;
@@ -90,7 +90,6 @@ header {
   text-decoration: underline;
 }
 
-/* Footer */
 footer {
   position: absolute;
   bottom: 10px;

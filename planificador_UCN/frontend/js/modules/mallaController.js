@@ -54,7 +54,6 @@ export async function initMalla() {
         `;
 
         niveles[nivel].forEach((curso) => {
-          // 🔹 Usar la nueva función para obtener el nombre
           const nombre = obtenerNombreRamo(curso.codigo, curso.asignatura);
           
           html += `

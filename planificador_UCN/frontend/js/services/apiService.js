@@ -1,4 +1,3 @@
-// apiService.js
 import { storage } from "./storageService.js";
 
 const API_BASE = "http://localhost:3000";
@@ -21,8 +20,7 @@ export async function loginUsuario(email, password) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || "Error de login");
-  // 👉 Devolvemos data para que el controller decida qué guardar
-  return data; // { token, rut, carreras: [...] }
+  return data;
 }
 
 export async function obtenerMalla(codigo, catalogo) {

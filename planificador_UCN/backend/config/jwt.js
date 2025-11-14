@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const SECRET = "clave-super-segura-ucn"; // cámbiala por una variable de entorno luego
+const SECRET = "clave-super-segura-ucn";
 
 export function generarToken(datosUsuario) {
   return jwt.sign(datosUsuario, SECRET, { expiresIn: "2h" });

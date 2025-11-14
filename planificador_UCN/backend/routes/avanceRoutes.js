@@ -12,18 +12,17 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    // Consultar directamente la API externa sin verificar BD
     const response = await axios.get(API_AVANCE, {
       params: { rut, codcarrera },
     });
 
     const avance = response.data;
     
-    console.log("✅ Avance obtenido de API externa");
+    console.log("Avance obtenido de API externa");
     res.json(avance);
     
   } catch (error) {
-    console.error("💥 Error al obtener avance:", error.message);
+    console.error("Error al obtener avance:", error.message);
     res.status(500).json({ error: "Error al obtener avance desde API externa" });
   }
 });

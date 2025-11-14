@@ -1,40 +1,33 @@
-// darkModeController.js
-// Guardar en: frontend/js/modules/darkModeController.js
 
 export function initDarkMode() {
-  // Esperar a que el DOM esté listo
   const init = () => {
-    // Buscar el nav existente
+  
     const nav = document.querySelector('nav ul');
     
     if (!nav) {
-      // Si no hay nav (ej: página de login), usar el método flotante
       createFloatingButton();
       return;
     }
     
-    // Crear el botón de modo oscuro para el nav
     const darkModeLi = document.createElement('li');
     darkModeLi.style.cssText = 'margin-left: auto; display: flex; align-items: center;';
     
     const darkModeButton = document.createElement('button');
     darkModeButton.id = 'darkModeToggle';
     darkModeButton.className = 'dark-mode-toggle-nav';
-    darkModeButton.innerHTML = '🌙 Modo';
+    darkModeButton.innerHTML = 'Modo';
     darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
     darkModeButton.type = 'button';
     
     darkModeLi.appendChild(darkModeButton);
     nav.appendChild(darkModeLi);
 
-    // Cargar preferencia guardada
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
-      darkModeButton.innerHTML = '☀️ Modo';
+      darkModeButton.innerHTML = 'Modo';
     }
 
-    // Toggle al hacer clic
     darkModeButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -42,25 +35,23 @@ export function initDarkMode() {
       
       if (currentTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'light');
-        darkModeButton.innerHTML = '🌙 Modo';
+        darkModeButton.innerHTML = 'Modo';
         localStorage.setItem('theme', 'light');
       } else {
         document.documentElement.setAttribute('data-theme', 'dark');
-        darkModeButton.innerHTML = '☀️ Modo';
+        darkModeButton.innerHTML = 'Modo';
         localStorage.setItem('theme', 'dark');
       }
     });
   };
   
-  // Ejecutar cuando el DOM esté listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    setTimeout(init, 100); // Pequeño delay para asegurar que el DOM esté listo
+    setTimeout(init, 100);
   }
 }
 
-// Función auxiliar para crear botón flotante (solo en login)
 function createFloatingButton() {
   const darkModeButton = document.createElement('button');
   darkModeButton.id = 'darkModeToggleFloat';
@@ -92,7 +83,6 @@ function createFloatingButton() {
   });
 }
 
-// Estilos CSS para el botón y el modo oscuro
 export const darkModeStyles = `
 /* Botón de modo oscuro en el nav */
 .dark-mode-toggle-nav {

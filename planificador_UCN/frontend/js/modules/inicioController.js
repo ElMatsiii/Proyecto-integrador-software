@@ -2,7 +2,7 @@ import { obtenerAvance, obtenerMalla } from "../services/apiService.js";
 import { storage } from "../services/storageService.js";
 import { normalizarCodigo, obtenerNombreRamo } from "../services/utils.js";
 
-// 🔹 Utilidad para formatear períodos
+
 function nombrePeriodo(p) {
   if (!p || String(p).length < 6) return p || "—";
   const y = String(p).slice(0, 4);
@@ -14,7 +14,7 @@ function nombrePeriodo(p) {
   return `${y} (${s})`;
 }
 
-// 🔹 Función para obtener nombre hardcodeado basado en el código
+
 function obtenerNombreHardcodeado(codigo) {
   if (!codigo || codigo === "—") return "Curso sin nombre";
   
@@ -35,7 +35,7 @@ export function initInicio() {
     const carrera = storage.getCarrera();
     if (!carrera) return window.location.replace("../html/index.html");
 
-    // Referencias DOM
+   
     const nombreCarreraEl = document.getElementById("nombreCarrera");
     const semestreActualEl = document.getElementById("semestreActual");
     const contenedorRamos = document.getElementById("contenedorRamos");
@@ -44,7 +44,7 @@ export function initInicio() {
     const filtroSemestre = document.getElementById("filtroSemestre");
     const selectCarrera = document.getElementById("selectCarrera");
 
-    // Selector de carrera
+    
     if (selectCarrera) {
       selectCarrera.innerHTML = "";
       (auth.carreras || []).forEach((c) => {
@@ -65,11 +65,10 @@ export function initInicio() {
       });
     }
 
-    // Mostrar nombre de carrera
+   
     nombreCarreraEl.textContent = carrera.nombre || "Carrera actual";
 
     try {
-      // 🔹 Obtener avance académico y malla curricular en paralelo
       const [avance, malla] = await Promise.all([
         obtenerAvance(auth.rut, carrera.codigo),
         obtenerMalla(carrera.codigo, carrera.catalogo)
@@ -80,16 +79,15 @@ export function initInicio() {
         return;
       }
 
-      // 🔹 Crear mapa de la malla para enriquecer datos
       const mallaPorCodigo = {};
       malla.forEach((ramo) => {
         const codigoNormalizado = normalizarCodigo(ramo.codigo);
         mallaPorCodigo[codigoNormalizado] = ramo;
       });
 
-      // 🔹 Enriquecer avance con datos de la malla
+      
       const avanceEnriquecido = avance.map((registro) => {
-        // Normalizar campos de diferentes APIs
+      
         const codigoCurso = registro.course || registro.codigo_asignatura || "—";
         const nombreAvance = registro.course_name || registro.asignatura || registro.nombre_asignatura || "Sin nombre";
         const estado = registro.status || registro.estado || "—";
@@ -98,14 +96,11 @@ export function initInicio() {
         const codigoNormalizado = normalizarCodigo(codigoCurso);
         const datosMalla = mallaPorCodigo[codigoNormalizado];
         
-        // 🔹 Obtener nombre usando múltiples fuentes
         let nombreFinal;
         
-        // Primero intentar con la función existente
         const nombreMalla = datosMalla?.asignatura;
         const nombreDesdeFuncion = obtenerNombreRamo(codigoCurso, nombreMalla || nombreAvance);
         
-        // Si el nombre es genérico o vacío, usar nombres hardcodeados
         if (!nombreDesdeFuncion || 
             nombreDesdeFuncion === "Sin nombre" || 
             nombreDesdeFuncion === "Curso sin nombre" ||
@@ -124,29 +119,25 @@ export function initInicio() {
         };
       });
 
-      // 🔹 Agrupar por período y eliminar duplicados POR SEMESTRE
       const porPeriodo = {};
       
       avanceEnriquecido.forEach((registro) => {
         const periodo = registro.periodo;
         const codigoCurso = registro.codigo;
         
-        // Si el periodo no existe, crearlo
         if (!porPeriodo[periodo]) {
           porPeriodo[periodo] = {
             cursos: [],
-            cursosVistos: new Set() // 👈 Set para rastrear códigos únicos
+            cursosVistos: new Set()
           };
         }
 
-        // Solo agregar si NO ha sido visto en este periodo
         if (!porPeriodo[periodo].cursosVistos.has(codigoCurso)) {
           porPeriodo[periodo].cursos.push(registro);
           porPeriodo[periodo].cursosVistos.add(codigoCurso);
         }
       });
 
-      // 🔹 Crear filtro de períodos (ordenados del más reciente al más antiguo)
       const periodos = Object.keys(porPeriodo).sort((a, b) => b.localeCompare(a));
       filtroSemestre.innerHTML = "";
       periodos.forEach((p) => {
@@ -156,7 +147,6 @@ export function initInicio() {
         filtroSemestre.appendChild(opt);
       });
 
-      // 🔹 Renderizador de período
       function renderPeriodo(periodo) {
         const datoPeriodo = porPeriodo[periodo];
         if (!datoPeriodo) {
@@ -173,7 +163,6 @@ export function initInicio() {
           if (c.estado === "APROBADO") aprob += c.creditos;
           if (c.estado === "REPROBADO") repro += c.creditos;
 
-          // Color según estado (solo INSCRITO, no EN_CURSO)
           const color =
             c.estado === "APROBADO"
               ? "#c8e6c9"
@@ -196,24 +185,21 @@ export function initInicio() {
           contenedorRamos.appendChild(card);
         });
 
-        // Mostrar estadísticas del semestre
         totalCreditosEl.textContent = total;
         estadoCreditosEl.innerHTML = `
           <p><strong>Aprobados:</strong> ${aprob} créditos</p>
           <p><strong>Reprobados:</strong> ${repro} créditos</p>
           <p style="color:${total > 35 ? "red" : "green"}">
-            ${total > 35 ? "⚠️ Límite excedido" : "✅ Dentro del límite de créditos"}
+            ${total > 35 ? "Límite excedido" : "Dentro del límite de créditos"}
           </p>
         `;
       }
 
-      // Mostrar el primer período (más reciente)
       if (periodos[0]) {
         semestreActualEl.textContent = nombrePeriodo(periodos[0]);
         renderPeriodo(periodos[0]);
       }
 
-      // Listener para cambio de semestre
       filtroSemestre.addEventListener("change", (e) =>
         renderPeriodo(e.target.value)
       );

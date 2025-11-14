@@ -25,14 +25,12 @@ export async function initResumen() {
       return mostrarError("No se pudo cargar la malla curricular", main);
     }
 
-    // Crear un mapa de la malla para búsqueda rápida
     const mallaPorCodigo = {};
     malla.forEach((ramo) => {
       const codigoNormalizado = normalizarCodigo(ramo.codigo);
       mallaPorCodigo[codigoNormalizado] = ramo;
     });
 
-    // Agrupar ramos por código y contar apariciones
     const ramosPorCodigo = {};
     
     avance.forEach((r) => {
@@ -60,10 +58,8 @@ export async function initResumen() {
       ramosPorCodigo[codigoNormalizado].estados.push(r.status || "—");
     });
 
-    // Convertir a array para facilitar el procesamiento
     const avanceAgrupado = Object.values(ramosPorCodigo);
 
-    // Determinar el estado final de cada ramo
     avanceAgrupado.forEach((ramo) => {
       if (ramo.estados.includes("APROBADO")) {
         ramo.estadoFinal = "APROBADO";
@@ -76,7 +72,6 @@ export async function initResumen() {
       }
     });
 
-    // Calcular estadísticas
     const total = malla.length;
     const aprobados = avanceAgrupado.filter((r) => r.estadoFinal === "APROBADO").length;
     const reprobados = avanceAgrupado.filter((r) => r.estadoFinal === "REPROBADO").length;
@@ -89,7 +84,6 @@ export async function initResumen() {
 
     const creditosTotales = malla.reduce((sum, r) => sum + Number(r.creditos || 0), 0);
 
-    // Renderizar dashboard
     main.innerHTML = `
       <h2>Resumen Académico</h2>
       <p><strong>Carrera:</strong> ${carrera.nombre}</p>
@@ -124,7 +118,6 @@ export async function initResumen() {
               r.estadoFinal === "REPROBADO" ? "reprobado" :
               ["INSCRITO", "EN_CURSO"].includes(r.estadoFinal) ? "inscrito" : "";
             
-            // Crear lista de períodos (mostrar los últimos 3 si hay muchos)
             const periodosTexto = r.periodos.length > 3
               ? r.periodos.slice(-3).join(", ") + "..."
               : r.periodos.join(", ");

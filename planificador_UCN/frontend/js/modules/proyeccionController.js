@@ -15,23 +15,19 @@ export async function initProyeccion() {
   const btnManual = document.getElementById("btnIrManual");
   const btnAuto = document.getElementById("btnIrAutomatica");
 
-  // Ocultar botones iniciales (se mostrarán según corresponda)
   const accionesContainer = document.querySelector(".acciones");
   if (accionesContainer) {
     accionesContainer.style.display = "none";
   }
 
-  // Cargar malla inicial con colores de estado
   await mostrarMallaProyeccion(auth, carrera, contenedor);
 
-  // Botón Automático: Genera nueva proyección
   btnAuto.addEventListener("click", () => {
     accionesContainer.style.display = "none";
     generarProyeccionAutomatica(auth, carrera, contenedor);
   });
 }
 
-// === LIMPIAR BOTONES PREVIOS ===
 function limpiarBotones() {
   const botonesAEliminar = [
     "btnGuardarProyeccionManual",
@@ -46,10 +42,8 @@ function limpiarBotones() {
   });
 }
 
-// === MOSTRAR MALLA CON ESTADOS Y MODO MANUAL (inicial) ===
 async function mostrarMallaProyeccion(auth, carrera, contenedor) {
   try {
-    // Limpiar todos los botones previos
     limpiarBotones();
     
     contenedor.innerHTML = "<p>Cargando malla curricular...</p>";
@@ -66,13 +60,11 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
 
     const LIMITE_CREDITOS = 30;
 
-    // Obtener fecha actual y calcular semestre actual
     const ahora = new Date();
     const año = ahora.getFullYear();
     const semestre = ahora.getMonth() < 6 ? "10" : "20";
     const semestreActual = parseInt(`${año}${semestre}`);
 
-    // Clasificar estados de los ramos
     const estadoRamos = {};
     avance.forEach((r) => {
       const cod = normalizarCodigo(r.course);
@@ -97,7 +89,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       return similar ? estadoRamos[similar].estado : "pendiente";
     };
 
-    // Función para verificar prerrequisitos
     const prereqCumplidos = (curso) => {
       if (!curso.prereq || curso.prereq.trim() === "") return true;
       const prereqs = curso.prereq.split(",").map((p) => normalizarCodigo(p));
@@ -108,7 +99,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       );
     };
 
-    // Detectar ramos atrasados
     const esAtrasado = (curso) => {
       const cod = normalizarCodigo(curso.codigo);
       const estado = estadoRamos[cod];
@@ -118,7 +108,7 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       return false;
     };
 
-    // Agrupar por nivel
+
     const niveles = {};
     malla.forEach((curso) => {
       if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
@@ -128,18 +118,15 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
     contenedor.innerHTML = "";
     contenedor.classList.add("malla-proyeccion");
 
-    // ✅ ELIMINAR CONTADOR PREVIO Y CREAR UNO NUEVO ESTÁTICO
     let contadorExistente = document.getElementById("contadorCreditosProyeccion");
     if (contadorExistente) {
       contadorExistente.remove();
     }
 
-    // Crear nuevo contador
     const contador = document.createElement("div");
     contador.id = "contadorCreditosProyeccion";
     contador.innerHTML = `<strong>Créditos seleccionados:</strong> <span id="creditosActuales">0</span> / ${LIMITE_CREDITOS}`;
     
-    // Insertar al inicio del contenedor
     contenedor.insertAdjacentElement("beforebegin", contador);
 
     let creditosSeleccionados = 0;
@@ -186,7 +173,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
             <small>${curso.creditos} créditos</small>
           `;
 
-          // Solo ramos pendientes son seleccionables
           if (estado === "pendiente") {
             div.style.cursor = desbloqueado ? "pointer" : "not-allowed";
             if (!desbloqueado) {
@@ -203,12 +189,10 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
               const creditos = Number(curso.creditos) || 6;
 
               if (seleccionados.has(curso.codigo)) {
-                // Deseleccionar
                 seleccionados.delete(curso.codigo);
                 div.classList.remove("seleccionado-auto");
                 creditosSeleccionados -= creditos;
               } else {
-                // Seleccionar
                 if (creditosSeleccionados + creditos > LIMITE_CREDITOS) {
                   alert(`No puedes superar los ${LIMITE_CREDITOS} créditos.`);
                   return;
@@ -222,11 +206,10 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
             });
           }
 
-          // Marcar ramos atrasados
           if (atrasado && estado === "pendiente") {
             div.style.border = "3px dashed #e67e22";
             const badge = document.createElement("span");
-            badge.textContent = "⚠️ Atrasado";
+            badge.textContent = "Atrasado";
             badge.style.cssText = `
               position: absolute;
               top: 5px;
@@ -250,7 +233,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
 
     actualizarContador();
 
-    // Agregar estilos para selección (solo una vez)
     if (!document.getElementById("proyeccion-styles")) {
       const style = document.createElement("style");
       style.id = "proyeccion-styles";
@@ -283,7 +265,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       document.head.appendChild(style);
     }
 
-    // ✅ CREAR BOTÓN DE GUARDAR PROYECCIÓN DEBAJO DE LA MALLA
     const btnGuardarProyeccion = document.createElement("button");
     btnGuardarProyeccion.id = "btnGuardarProyeccionManual";
     btnGuardarProyeccion.className = "boton-proyeccion-centrado";
@@ -292,7 +273,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
     
     contenedor.after(btnGuardarProyeccion);
 
-    // ✅ CREAR BOTÓN DE PROYECCIÓN AUTOMÁTICA DEBAJO DEL BOTÓN DE GUARDAR
     const btnProyeccionAuto = document.createElement("button");
     btnProyeccionAuto.id = "btnGenerarAutomatica";
     btnProyeccionAuto.className = "boton-proyeccion-centrado";
@@ -303,7 +283,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
     
     btnGuardarProyeccion.after(btnProyeccionAuto);
 
-    // Mensaje final (solo si no existe)
     let mensajeFinal = document.getElementById("mensajeProyeccionManual");
     if (mensajeFinal) {
       mensajeFinal.remove();
@@ -329,7 +308,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
   }
 }
 
-// === GUARDAR PROYECCIÓN MANUAL ===
 function guardarProyeccionManual() {
   const seleccionados = Array.from(document.querySelectorAll(".curso.seleccionado-auto")).map(
     (el) => ({
@@ -352,10 +330,9 @@ function guardarProyeccionManual() {
   };
 
   localStorage.setItem("proyeccionManual", JSON.stringify(proyeccion));
-  alert(`✅ Proyección manual guardada correctamente\n\n📚 ${seleccionados.length} ramos seleccionados\n📊 ${proyeccion.totalCreditos} créditos totales`);
+  alert(`Proyección manual guardada correctamente\n\n ${seleccionados.length} ramos seleccionados\n ${proyeccion.totalCreditos} créditos totales`);
 }
 
-// === GUARDAR PROYECCIÓN AUTOMÁTICA ===
 function guardarProyeccionAutomatica(plan) {
   if (!plan || plan.length === 0) {
     alert("No hay proyección para guardar.");
@@ -383,16 +360,14 @@ function guardarProyeccionAutomatica(plan) {
   };
 
   localStorage.setItem("proyeccionAutomatica", JSON.stringify(proyeccion));
-  alert(`✅ Proyección automática guardada correctamente\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${proyeccion.totalCreditos} créditos totales`);
+  alert(`Proyección automática guardada correctamente\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${proyeccion.totalCreditos} créditos totales`);
 }
 
-// === PROYECCIÓN AUTOMÁTICA ===
+
 async function generarProyeccionAutomatica(auth, carrera, contenedor) {
   try {
-    // Limpiar todos los botones previos
     limpiarBotones();
-    
-    // Eliminar contador y mensaje de la vista manual
+
     const contador = document.getElementById("contadorCreditosProyeccion");
     const mensaje = document.getElementById("mensajeProyeccionManual");
     
@@ -413,7 +388,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
 
     const MAX_CREDITOS = 30;
 
-    // Clasificar estados
     const aprobados = new Set(
       avance.filter((r) => r.status === "APROBADO").map((r) => normalizarCodigo(r.course))
     );
@@ -424,19 +398,17 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     );
     const aprobadosSimulados = new Set([...aprobados, ...inscritos]);
 
-    // Pendientes iniciales
+
     let pendientesRestantes = malla.filter(
       (r) => !aprobadosSimulados.has(normalizarCodigo(r.codigo))
     );
 
-    // Calcular semestre de inicio
     const fecha = new Date();
     const año = fecha.getFullYear();
     const semestreActual = fecha.getMonth() < 6 ? 10 : 20;
     let semestreProyectado =
       semestreActual === 10 ? año * 100 + 20 : (año + 1) * 100 + 10;
 
-    // Validación de prerrequisitos
     const cumplePrereq = (ramo) => {
       if (!ramo.prereq || ramo.prereq.trim() === "") return true;
       const prereqs = ramo.prereq.split(",").map((p) => normalizarCodigo(p));
@@ -448,7 +420,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
 
     const plan = [];
 
-    // Generar semestres
     while (pendientesRestantes.length > 0) {
       let semestre = [];
       let creditosUsados = 0;
@@ -480,14 +451,12 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
 
       plan.push({ semestre: semestreProyectado, ramos: semestre, creditos: creditosUsados });
 
-      // Avanzar semestre
       semestreProyectado =
         semestreProyectado % 100 === 10
           ? semestreProyectado + 10
           : (Math.floor(semestreProyectado / 100) + 1) * 100 + 10;
     }
 
-    // Renderizar
     contenedor.innerHTML = "";
     const mallaDiv = document.createElement("div");
     mallaDiv.classList.add("malla-proyeccion");
@@ -518,7 +487,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       mallaDiv.appendChild(bloqueDiv);
     });
 
-    // Resumen lateral
     const totalMalla = malla.reduce((s, r) => s + (Number(r.creditos) || 0), 0);
     const creditosAprobados = [...aprobadosSimulados].reduce((s, c) => {
       const ramo = malla.find((r) => normalizarCodigo(r.codigo) === c);
@@ -530,13 +498,12 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     const resumenWrapper = document.createElement("div");
     resumenWrapper.classList.add("resumen-wrapper");
 
-    // Calcular fecha de egreso estimada
     const semestreInicio = plan[0]?.semestre || semestreProyectado;
     const añoInicio = Math.floor(semestreInicio / 100);
     const tipoSemestre = semestreInicio % 100;
-    const mesInicio = tipoSemestre === 10 ? 3 : 8; // Marzo o Agosto
+    const mesInicio = tipoSemestre === 10 ? 3 : 8;
     
-    const mesesTotales = plan.length * 6; // 6 meses por semestre
+    const mesesTotales = plan.length * 6;
     const fechaEgreso = new Date(añoInicio, mesInicio - 1);
     fechaEgreso.setMonth(fechaEgreso.getMonth() + mesesTotales);
     
@@ -571,7 +538,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     layoutContainer.appendChild(resumenWrapper);
     contenedor.appendChild(layoutContainer);
 
-    // ✅ CREAR BOTÓN PARA GUARDAR PROYECCIÓN AUTOMÁTICA
     const btnGuardarAuto = document.createElement("button");
     btnGuardarAuto.id = "btnGuardarProyeccionAutomatica";
     btnGuardarAuto.className = "boton-proyeccion-centrado";
@@ -580,13 +546,11 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     
     contenedor.after(btnGuardarAuto);
 
-    // ✅ CREAR BOTÓN PARA VOLVER A PROYECCIÓN MANUAL
     const btnVolverManual = document.createElement("button");
     btnVolverManual.id = "btnVolverManual";
     btnVolverManual.className = "boton-proyeccion-centrado";
     btnVolverManual.textContent = "Volver a Proyección Manual";
     btnVolverManual.addEventListener("click", () => {
-      // Recargar la vista manual
       mostrarMallaProyeccion(auth, carrera, contenedor);
     });
     

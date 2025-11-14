@@ -13,7 +13,6 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    // Consultar directamente la API externa sin verificar BD
     const response = await axios.get(`${API_MALLA}?${codigo}-${catalogo}`, {
       headers: {
         "X-HAWAII-AUTH": "jf400fejof13f",
@@ -25,11 +24,11 @@ router.get("/", async (req, res) => {
 
     const malla = response.data;
     
-    console.log("✅ Malla obtenida de API externa");
+    console.log("Malla obtenida de API externa");
     res.json(malla);
     
   } catch (error) {
-    console.error("💥 Error al obtener malla:", error.message);
+    console.error("Error al obtener malla:", error.message);
     res.status(500).json({ error: "Error al obtener malla desde API externa" });
   }
 });

@@ -2,7 +2,7 @@ import { storage } from "../services/storageService.js";
 
 export function initPerfil() {
   const main = document.querySelector("main");
-  const auth = storage.requireAuth(); // Cambio aquí
+  const auth = storage.requireAuth(); 
   const carrera = storage.getCarrera();
 
   if (!auth || !carrera) {

@@ -9,5 +9,5 @@ export const pool = new Pool({
   port: 5432,
 });
 
-pool.on("connect", () => console.log("🟢 Conectado a PostgreSQL"));
-pool.on("error", (err) => console.error("🔴 Error en conexión:", err.stack));
+pool.on("connect", () => console.log("Conectado a PostgreSQL"));
+pool.on("error", (err) => console.error("Error en conexión:", err.stack));
