@@ -11,6 +11,5 @@ export function inicializarProyecciones() {
     guardarProyeccion("Proyección manual", proyeccion);
     alert("Proyección guardada correctamente");
   });
-
   container.innerHTML = "<p>Proyección cargada: Ninguna.</p>";
 }
