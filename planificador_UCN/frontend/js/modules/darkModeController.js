@@ -84,7 +84,6 @@ function createFloatingButton() {
 }
 
 export const darkModeStyles = `
-/* Botón de modo oscuro en el nav */
 .dark-mode-toggle-nav {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white !important;
@@ -123,7 +122,6 @@ nav ul li:has(.dark-mode-toggle-nav) {
   margin-left: auto;
 }
 
-/* Variables CSS para modo claro (por defecto) - SIEMPRE modo claro a menos que el usuario lo cambie */
 :root,
 :root:not([data-theme]) {
   --bg-body: #f5f7fa;
@@ -160,7 +158,6 @@ nav ul li:has(.dark-mode-toggle-nav) {
   --nav-hover-text: #fff;
 }
 
-/* Deshabilitar completamente el modo oscuro automático del sistema */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="dark"]) {
     --bg-body: #f5f7fa;
@@ -170,7 +167,6 @@ nav ul li:has(.dark-mode-toggle-nav) {
   }
 }
 
-/* Variables CSS para modo oscuro */
 [data-theme="dark"] {
   --bg-body: #0d0d0d;
   --text-color: #e0e0e0;
@@ -206,7 +202,6 @@ nav ul li:has(.dark-mode-toggle-nav) {
   --nav-hover-text: #fff;
 }
 
-/* Aplicar variables a los elementos */
 body {
   background-color: var(--bg-body);
   color: var(--text-color);
@@ -430,7 +425,6 @@ nav a.active {
   color: var(--text-color) !important;
 }
 
-/* Selector de carrera */
 #selectorCarrera,
 #filtroSemestre,
 #selectCarrera {
@@ -439,7 +433,6 @@ nav a.active {
   border-color: var(--border-color);
 }
 
-/* Párrafos y labels */
 .container label,
 .container p,
 .container span {
@@ -459,7 +452,6 @@ nav a.active {
   color: var(--text-color) !important;
 }
 
-/* Página de Malla */
 .pagina-malla main h2,
 .pagina-malla main p,
 .pagina-malla .curso h4,
@@ -467,27 +459,23 @@ nav a.active {
   color: inherit !important;
 }
 
-/* Textos de tablas */
 .tabla-avance td,
 .tabla-avance td strong {
   color: var(--text-color) !important;
 }
 
-/* Resumen lateral - asegurar contraste */
 .resumen-body-lateral p,
 .resumen-body-lateral p strong,
 .resumen-body-lateral p span {
   color: var(--text-color) !important;
 }
 
-/* Página de Versiones */
 .lista-versiones li {
   background-color: var(--card-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
 }
 
-/* Malla Proyección - mejor contraste en TODOS los modos */
 .malla-proyeccion {
   background-color: var(--bg-body);
 }
@@ -512,7 +500,6 @@ nav a.active {
   color: var(--text-color);
 }
 
-/* Estados específicos en malla proyección */
 .malla-proyeccion .curso.aprobado {
   background-color: var(--aprobado-bg) !important;
   border-color: var(--aprobado-border) !important;
@@ -565,7 +552,7 @@ nav a.active {
   color: var(--pendiente-text) !important;
 }
 
-/* Botón flotante solo para login */
+
 .dark-mode-toggle {
   position: fixed;
   bottom: 30px;
@@ -612,7 +599,6 @@ nav a.active {
   background: linear-gradient(135deg, #5a4ddf 0%, #7b68ee 100%);
 }
 
-/* Auth container en modo oscuro */
 [data-theme="dark"] .auth-container,
 [data-theme="dark"] .login-container {
   background-color: #1c1c1c;
