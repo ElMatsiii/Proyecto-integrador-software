@@ -1,4 +1,5 @@
 import { obtenerAvance, obtenerMalla } from "../services/apiService.js";
+import { guardarProyeccion } from "../services/apiService.js";
 import { storage } from "../services/storageService.js";
 import { normalizarCodigo, mostrarError, obtenerNombreRamo } from "../services/utils.js";
 
@@ -107,7 +108,6 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       }
       return false;
     };
-
 
     const niveles = {};
     malla.forEach((curso) => {
@@ -269,7 +269,7 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
     btnGuardarProyeccion.id = "btnGuardarProyeccionManual";
     btnGuardarProyeccion.className = "boton-proyeccion-centrado";
     btnGuardarProyeccion.textContent = "Guardar Proyección Manual";
-    btnGuardarProyeccion.addEventListener("click", () => guardarProyeccionManual());
+    btnGuardarProyeccion.addEventListener("click", () => guardarProyeccionManual(malla, seleccionados, carrera));
     
     contenedor.after(btnGuardarProyeccion);
 
@@ -308,32 +308,57 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
   }
 }
 
-function guardarProyeccionManual() {
-  const seleccionados = Array.from(document.querySelectorAll(".curso.seleccionado-auto")).map(
-    (el) => ({
-      codigo: el.querySelector("p").textContent,
-      nombre: el.querySelector("h4").textContent,
-      creditos: el.dataset.creditos || "6"
-    })
-  );
-
-  if (seleccionados.length === 0) {
+async function guardarProyeccionManual(malla, seleccionados, carrera) {
+  const seleccionadosArray = Array.from(seleccionados);
+  
+  if (seleccionadosArray.length === 0) {
     alert("Selecciona al menos un ramo para guardar la proyección.");
     return;
   }
 
-  const proyeccion = {
-    fecha: new Date().toISOString(),
+  const ramosSeleccionados = seleccionadosArray.map((codigo) => {
+    const ramo = malla.find(r => r.codigo === codigo);
+    return {
+      codigo: codigo,
+      nombre: obtenerNombreRamo(codigo, ramo?.asignatura),
+      creditos: ramo?.creditos || 6,
+      nivel: ramo?.nivel || 0
+    };
+  });
+
+  const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
+  
+  const nombreProyeccion = prompt("Ingresa un nombre para esta proyección:", `Proyección Manual - ${new Date().toLocaleDateString()}`);
+  
+  if (!nombreProyeccion) {
+    alert("Debe ingresar un nombre para la proyección");
+    return;
+  }
+
+  const proyeccionData = {
+    codigo_carrera: carrera.codigo,
     tipo: "manual",
-    ramos: seleccionados,
-    totalCreditos: seleccionados.reduce((sum, r) => sum + Number(r.creditos), 0)
+    nombre: nombreProyeccion,
+    total_creditos: totalCreditos,
+    total_ramos: ramosSeleccionados.length,
+    semestres_proyectados: 1,
+    fecha_egreso_estimada: null,
+    datos_completos: {
+      ramos: ramosSeleccionados,
+      fecha_creacion: new Date().toISOString()
+    }
   };
 
-  localStorage.setItem("proyeccionManual", JSON.stringify(proyeccion));
-  alert(`Proyección manual guardada correctamente\n\n ${seleccionados.length} ramos seleccionados\n ${proyeccion.totalCreditos} créditos totales`);
+  try {
+    const resultado = await guardarProyeccion(proyeccionData);
+    alert(`✅ ${resultado.mensaje}\n\n📚 ${ramosSeleccionados.length} ramos seleccionados\n📊 ${totalCreditos} créditos totales\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
+  } catch (error) {
+    console.error("Error al guardar proyección:", error);
+    alert("❌ Error al guardar la proyección. Intenta nuevamente.");
+  }
 }
 
-function guardarProyeccionAutomatica(plan) {
+async function guardarProyeccionAutomatica(plan, carrera) {
   if (!plan || plan.length === 0) {
     alert("No hay proyección para guardar.");
     return;
@@ -346,23 +371,56 @@ function guardarProyeccionAutomatica(plan) {
         codigo: ramo.codigo,
         nombre: obtenerNombreRamo(ramo.codigo, ramo.asignatura),
         creditos: ramo.creditos || 6,
-        semestre: bloque.semestre
+        semestre: bloque.semestre,
+        nivel: ramo.nivel
       });
     });
   });
 
-  const proyeccion = {
-    fecha: new Date().toISOString(),
+  const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
+  
+  const semestreInicio = plan[0]?.semestre || 0;
+  const añoInicio = Math.floor(semestreInicio / 100);
+  const tipoSemestre = semestreInicio % 100;
+  const mesInicio = tipoSemestre === 10 ? 3 : 8;
+  
+  const mesesTotales = plan.length * 6;
+  const fechaEgreso = new Date(añoInicio, mesInicio - 1);
+  fechaEgreso.setMonth(fechaEgreso.getMonth() + mesesTotales);
+  
+  const opcionesFormato = { year: 'numeric', month: 'long' };
+  const fechaEgresoTexto = fechaEgreso.toLocaleDateString('es-CL', opcionesFormato);
+  
+  const nombreProyeccion = prompt("Ingresa un nombre para esta proyección:", `Proyección Automática - ${new Date().toLocaleDateString()}`);
+  
+  if (!nombreProyeccion) {
+    alert("Debe ingresar un nombre para la proyección");
+    return;
+  }
+
+  const proyeccionData = {
+    codigo_carrera: carrera.codigo,
     tipo: "automatica",
-    ramos: ramosSeleccionados,
-    totalCreditos: ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0),
-    semestres: plan.length
+    nombre: nombreProyeccion,
+    total_creditos: totalCreditos,
+    total_ramos: ramosSeleccionados.length,
+    semestres_proyectados: plan.length,
+    fecha_egreso_estimada: fechaEgresoTexto,
+    datos_completos: {
+      plan: plan,
+      ramos: ramosSeleccionados,
+      fecha_creacion: new Date().toISOString()
+    }
   };
 
-  localStorage.setItem("proyeccionAutomatica", JSON.stringify(proyeccion));
-  alert(`Proyección automática guardada correctamente\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${proyeccion.totalCreditos} créditos totales`);
+  try {
+    const resultado = await guardarProyeccion(proyeccionData);
+    alert(`✅ ${resultado.mensaje}\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${totalCreditos} créditos totales\n📅 Egreso estimado: ${fechaEgresoTexto}\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
+  } catch (error) {
+    console.error("Error al guardar proyección:", error);
+    alert("❌ Error al guardar la proyección. Intenta nuevamente.");
+  }
 }
-
 
 async function generarProyeccionAutomatica(auth, carrera, contenedor) {
   try {
@@ -397,7 +455,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
         .map((r) => normalizarCodigo(r.course))
     );
     const aprobadosSimulados = new Set([...aprobados, ...inscritos]);
-
 
     let pendientesRestantes = malla.filter(
       (r) => !aprobadosSimulados.has(normalizarCodigo(r.codigo))
@@ -542,7 +599,7 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
     btnGuardarAuto.id = "btnGuardarProyeccionAutomatica";
     btnGuardarAuto.className = "boton-proyeccion-centrado";
     btnGuardarAuto.textContent = "Guardar Proyección Automática";
-    btnGuardarAuto.addEventListener("click", () => guardarProyeccionAutomatica(plan));
+    btnGuardarAuto.addEventListener("click", () => guardarProyeccionAutomatica(plan, carrera));
     
     contenedor.after(btnGuardarAuto);
 

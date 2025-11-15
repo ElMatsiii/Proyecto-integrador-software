@@ -1,7 +1,7 @@
-
 import loginRoutes from "./routes/loginRoutes.js";
 import mallaRoutes from "./routes/mallaRoutes.js";
 import avanceRoutes from "./routes/avanceRoutes.js";
+import proyeccionesRoutes from "./routes/proyeccionesRoutes.js";
 import { autenticarToken } from "./middleware/authMiddleware.js";
 import express from "express";
 import axios from "axios";
@@ -13,7 +13,6 @@ import https from "https";
 const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
-app.use("/api/login", loginRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +24,7 @@ app.get("/", (req, res) => {
   res.redirect("/html/index.html");
 });
 
-app.get("/api/malla",autenticarToken,async (req, res) => {
+app.get("/api/malla", autenticarToken, async (req, res) => {
   const { codigo, catalogo } = req.query;
 
   if (!codigo || !catalogo) {
@@ -58,10 +57,11 @@ app.get("/api/malla",autenticarToken,async (req, res) => {
   }
 });
 
+// Rutas
 app.use("/api/login", loginRoutes);
 app.use("/api/malla", mallaRoutes);
 app.use("/api/avance", avanceRoutes);
-
+app.use("/api/proyecciones", proyeccionesRoutes);
 
 app.use((req, res) => {
   res.status(404).send(`
@@ -70,12 +70,12 @@ app.use((req, res) => {
   `);
 });
 
-
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log("========================================");
   console.log(`Servidor activo en: http://localhost:${PORT}`);
   console.log("Frontend disponible en: /html/index.html");
   console.log("Endpoint API disponible en: /api/malla");
+  console.log("Endpoint proyecciones: /api/proyecciones");
   console.log("========================================\n");
 });

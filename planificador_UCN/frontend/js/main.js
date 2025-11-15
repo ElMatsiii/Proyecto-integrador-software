@@ -4,6 +4,7 @@ import { initMalla } from "./modules/mallaController.js";
 import { initResumen } from "./modules/resumenController.js";
 import { initProyeccion } from "./modules/proyeccionController.js";
 import { initInicio } from "./modules/inicioController.js";
+import { initVersiones } from "./modules/versionesController.js";
 import { initDarkMode, darkModeStyles } from "./modules/darkModeController.js";
 
 const styleElement = document.createElement('style');
@@ -26,13 +27,13 @@ else if (path.includes("perfil.html")) initPerfil();
 else if (path.includes("malla.html")) initMalla();
 else if (path.includes("resumen.html")) initResumen();
 else if (path.includes("proyecciones.html")) initProyeccion();
+else if (path.includes("versiones.html")) initVersiones();
 
 const logoutBtn = document.querySelector(".logout");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    localStorage.removeItem("usuarioUCN");
-    localStorage.removeItem("carreraSeleccionada");
+    sessionStorage.clear();
     window.location.href = "../html/index.html";
   });
 }
