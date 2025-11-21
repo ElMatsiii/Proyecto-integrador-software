@@ -62,15 +62,15 @@ export async function initVersiones() {
           ${tipoBadge}
         </div>
         <div class="proyeccion-info">
-          <p><strong>📅 Fecha:</strong> ${fechaFormateada}</p>
-          <p><strong>📚 Ramos:</strong> ${proy.total_ramos} ramos</p>
-          <p><strong>📊 Créditos:</strong> ${proy.total_creditos} créditos</p>
-          ${proy.semestres_proyectados ? `<p><strong>📆 Semestres:</strong> ${proy.semestres_proyectados}</p>` : ''}
-          ${proy.fecha_egreso_estimada ? `<p><strong>🎓 Egreso estimado:</strong> ${proy.fecha_egreso_estimada}</p>` : ''}
+          <p><strong>Fecha:</strong> ${fechaFormateada}</p>
+          <p><strong>Ramos:</strong> ${proy.total_ramos} ramos</p>
+          <p><strong>Créditos:</strong> ${proy.total_creditos} créditos</p>
+          ${proy.semestres_proyectados ? `<p><strong>Semestres:</strong> ${proy.semestres_proyectados}</p>` : ''}
+          ${proy.fecha_egreso_estimada ? `<p><strong>Egreso estimado:</strong> ${proy.fecha_egreso_estimada}</p>` : ''}
         </div>
         <div class="proyeccion-acciones">
-          <button class="btn-ver" data-id="${proy.id}">👁️ Ver detalle</button>
-          <button class="btn-eliminar" data-id="${proy.id}">🗑️ Eliminar</button>
+          <button class="btn-ver" data-id="${proy.id}">Ver detalle</button>
+          <button class="btn-eliminar" data-id="${proy.id}">Eliminar</button>
         </div>
       `;
       lista.appendChild(li);
@@ -116,7 +116,7 @@ async function mostrarDetalleProyeccion(id) {
           </div>
           <div class="modal-body">
             <div class="detalle-resumen">
-              <p><strong>Tipo:</strong> ${proyeccion.tipo === 'manual' ? 'Manual ✏️' : 'Automática 🤖'}</p>
+              <p><strong>Tipo:</strong> ${proyeccion.tipo === 'manual' ? 'Manual' : 'Automática'}</p>
               <p><strong>Total de ramos:</strong> ${proyeccion.total_ramos}</p>
               <p><strong>Total de créditos:</strong> ${proyeccion.total_creditos}</p>
               ${proyeccion.semestres_proyectados ? `<p><strong>Semestres proyectados:</strong> ${proyeccion.semestres_proyectados}</p>` : ''}
@@ -322,11 +322,11 @@ async function eliminarProyeccionConfirmada(id) {
 
   try {
     await eliminarProyeccion(id);
-    alert("✅ Proyección eliminada correctamente");
+    alert("Proyección eliminada correctamente");
     // Recargar la página para actualizar la lista
     window.location.reload();
   } catch (error) {
     console.error("Error al eliminar proyección:", error);
-    alert("❌ Error al eliminar la proyección. Intenta nuevamente.");
+    alert("Error al eliminar la proyección. Intenta nuevamente.");
   }
 }

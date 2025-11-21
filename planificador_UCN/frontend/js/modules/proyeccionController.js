@@ -351,10 +351,10 @@ async function guardarProyeccionManual(malla, seleccionados, carrera) {
 
   try {
     const resultado = await guardarProyeccion(proyeccionData);
-    alert(`✅ ${resultado.mensaje}\n\n📚 ${ramosSeleccionados.length} ramos seleccionados\n📊 ${totalCreditos} créditos totales\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
+    alert(`${resultado.mensaje}\n\n📚 ${ramosSeleccionados.length} ramos seleccionados\n📊 ${totalCreditos} créditos totales\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
   } catch (error) {
     console.error("Error al guardar proyección:", error);
-    alert("❌ Error al guardar la proyección. Intenta nuevamente.");
+    alert("Error al guardar la proyección. Intenta nuevamente.");
   }
 }
 
@@ -415,10 +415,10 @@ async function guardarProyeccionAutomatica(plan, carrera) {
 
   try {
     const resultado = await guardarProyeccion(proyeccionData);
-    alert(`✅ ${resultado.mensaje}\n\n📚 ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n📊 ${totalCreditos} créditos totales\n📅 Egreso estimado: ${fechaEgresoTexto}\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
+    alert(`${resultado.mensaje}\n\n${ramosSeleccionados.length} ramos en ${plan.length} semestres\n${totalCreditos} créditos totales\nEgreso estimado: ${fechaEgresoTexto}\n\nPuedes ver tus proyecciones guardadas en la sección "Versiones"`);
   } catch (error) {
     console.error("Error al guardar proyección:", error);
-    alert("❌ Error al guardar la proyección. Intenta nuevamente.");
+    alert("Error al guardar la proyección. Intenta nuevamente.");
   }
 }
 
