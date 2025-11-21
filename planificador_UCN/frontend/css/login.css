@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a5569 0%, #0d3c4d 100%);
+  background: #1a5569;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@ header {
   top: 0;
   width: 100%;
   text-align: center;
-  background: rgba(13, 60, 77, 0.95);
+  background: #134152;
   color: white;
   padding: 20px 0;
   font-size: 1.4rem;
@@ -41,7 +41,7 @@ header h1 {
   width: 380px;
   text-align: center;
   margin-top: 100px;
-  border-top: 5px solid #0e2b6b;
+  border-top: 5px solid #1a5569;
 }
 
 .login-title,
@@ -67,16 +67,16 @@ header h1 {
 .auth-container input:focus,
 .login-container input:focus {
   outline: none;
-  border-color: #e67e22;
+  border-color: #1a5569;
   background: white;
-  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 85, 105, 0.1);
 }
 
 .auth-container button,
 #loginBtn {
   width: 100%;
   padding: 12px;
-  background-color: #e67e22;
+  background-color: #1a5569;
   color: white;
   border: none;
   border-radius: 8px;
@@ -89,9 +89,9 @@ header h1 {
 
 .auth-container button:hover,
 #loginBtn:hover {
-  background-color: #d35400;
+  background-color: #134152;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 85, 105, 0.3);
 }
 
 .auth-container button:active,
@@ -107,7 +107,7 @@ header h1 {
 }
 
 .auth-container a {
-  color: #e67e22;
+  color: #1a5569;
   text-decoration: none;
   font-weight: 500;
 }

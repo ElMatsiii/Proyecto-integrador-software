@@ -26,24 +26,23 @@ footer {
   font-size: 0.9rem;
 }
 
-/* Navegación */
+/* Navegación - FONDO OSCURO UNIFORME */
 nav {
-  background: var(--nav-bg);
+  background: #1e2127 !important;
   border-radius: 0;
   padding: 0;
   margin: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
-  transition: background 0.3s ease;
 }
 
 nav ul {
   display: flex;
   list-style: none;
-  gap: 0;
+  gap: 8px;
   margin: 0;
-  padding: 0;
+  padding: 10px 15px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -54,46 +53,104 @@ nav li {
 
 nav a {
   text-decoration: none;
-  color: var(--nav-text);
-  padding: 15px 20px;
+  color: #d1d5db;
+  padding: 10px 18px;
   display: block;
   font-weight: 500;
+  border-radius: 6px;
   transition: all 0.3s ease;
   background: transparent;
 }
 
 nav a:hover {
-  background: var(--nav-hover-bg);
-  color: var(--text-color);
+  background: #1a5569;
+  color: white;
+  transform: translateY(-1px);
 }
 
 nav a.active {
-  background: var(--nav-active-bg);
+  background: #1a5569;
   color: white;
+  font-weight: 600;
 }
 
 nav a.logout {
-  background: var(--ucn-accent);
+  background: #1a5569;
   color: white;
   margin-left: auto;
 }
 
 nav a.logout:hover {
-  background: var(--ucn-accent-hover);
+  background: #134152;
 }
 
-/* Modo oscuro específico para navegación */
-[data-theme="dark"] nav a {
-  color: var(--nav-text);
+/* Botones especiales en el nav (Salir, Modo Oscuro) */
+.dark-mode-toggle-nav {
+  background: #1a5569 !important;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
-[data-theme="dark"] nav a:hover {
+body.loaded .dark-mode-toggle-nav {
+  transition: all 0.3s ease;
+}
+
+.dark-mode-toggle-nav:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #134152 !important;
+}
+
+/* Modo claro: nav con fondo oscuro consistente */
+[data-theme="light"] nav {
+  background: #1e2127 !important;
+}
+
+[data-theme="light"] nav a {
+  color: #d1d5db;
+}
+
+[data-theme="light"] nav a:hover,
+[data-theme="light"] nav a.active {
+  background: #1a5569;
   color: white;
+}
+
+/* Modo oscuro: mismo fondo oscuro */
+[data-theme="dark"] nav {
+  background: #1e2127 !important;
+}
+
+[data-theme="dark"] nav a {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] nav a:hover,
+[data-theme="dark"] nav a.active {
+  background: #1a5569;
+  color: white;
+}
+
+[data-theme="dark"] .dark-mode-toggle-nav {
+  background: #2a7a94 !important;
+}
+
+[data-theme="dark"] .dark-mode-toggle-nav:hover {
+  background: #1a5569 !important;
 }
 
 /* Main container */
 main {
-  background: #3a3d4e;
   background-color: var(--card-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
@@ -101,11 +158,14 @@ main {
   padding: 30px;
   margin: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.loaded main {
   transition: background-color 0.3s, color 0.3s;
 }
 
 main h2 {
-  color: white;
+  color: var(--text-color);
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 3px solid var(--ucn-accent);
@@ -115,7 +175,7 @@ main h2 {
 main p {
   margin: 10px 0;
   font-size: 1.1rem;
-  color: #e0e0e0;
+  color: var(--text-color);
 }
 
 /* Responsive */
@@ -123,15 +183,17 @@ main p {
   nav ul {
     flex-direction: column;
     width: 100%;
+    gap: 5px;
+    padding: 10px;
   }
   
   nav a {
     width: 100%;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   nav a.logout {
     margin-left: 0;
+    margin-top: 5px;
   }
 }

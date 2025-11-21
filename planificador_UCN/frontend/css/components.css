@@ -76,7 +76,7 @@
   font-size: 1.1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-  border-bottom: 4px solid var(--ucn-accent);
+  border-bottom: 4px solid var(--ucn-secondary);
 }
 
 .dashboard p:hover {
@@ -141,7 +141,7 @@ button:active, .btn:active {
 #selectorCarrera:focus {
   outline: none;
   border-color: var(--ucn-accent);
-  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 85, 105, 0.1);
 }
 
 #etiquetaCarrera {

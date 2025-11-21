@@ -1,7 +1,10 @@
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
 
 export function initDarkMode() {
   const init = () => {
-  
     const nav = document.querySelector('nav ul');
     
     if (!nav) {
@@ -15,40 +18,38 @@ export function initDarkMode() {
     const darkModeButton = document.createElement('button');
     darkModeButton.id = 'darkModeToggle';
     darkModeButton.className = 'dark-mode-toggle-nav';
-    darkModeButton.innerHTML = 'Modo';
     darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
     darkModeButton.type = 'button';
+    
+    // Actualizar texto del botón según el tema actual
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    darkModeButton.innerHTML = currentTheme === 'dark' ? '☀️ Claro' : '🌙 Oscuro';
     
     darkModeLi.appendChild(darkModeButton);
     nav.appendChild(darkModeLi);
 
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      darkModeButton.innerHTML = 'Modo';
-    }
-
     darkModeButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const theme = document.documentElement.getAttribute('data-theme');
       
-      if (currentTheme === 'dark') {
+      if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'light');
-        darkModeButton.innerHTML = 'Modo';
+        darkModeButton.innerHTML = '🌙 Oscuro';
         localStorage.setItem('theme', 'light');
       } else {
         document.documentElement.setAttribute('data-theme', 'dark');
-        darkModeButton.innerHTML = 'Modo';
+        darkModeButton.innerHTML = '☀️ Claro';
         localStorage.setItem('theme', 'dark');
       }
     });
   };
   
+  // Ejecutar inmediatamente si el DOM ya está listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    setTimeout(init, 100);
+    init();
   }
 }
 
@@ -56,22 +57,18 @@ function createFloatingButton() {
   const darkModeButton = document.createElement('button');
   darkModeButton.id = 'darkModeToggleFloat';
   darkModeButton.className = 'dark-mode-toggle';
-  darkModeButton.innerHTML = '🌙';
   darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
   darkModeButton.type = 'button';
   
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  darkModeButton.innerHTML = currentTheme === 'dark' ? '☀️' : '🌙';
+  
   document.body.appendChild(darkModeButton);
   
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    darkModeButton.innerHTML = '☀️';
-  }
-  
   darkModeButton.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const theme = document.documentElement.getAttribute('data-theme');
     
-    if (currentTheme === 'dark') {
+    if (theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'light');
       darkModeButton.innerHTML = '🌙';
       localStorage.setItem('theme', 'light');
@@ -85,7 +82,7 @@ function createFloatingButton() {
 
 export const darkModeStyles = `
 .dark-mode-toggle-nav {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1a5569;
   color: white !important;
   border: none;
   border-radius: 6px;
@@ -93,21 +90,30 @@ export const darkModeStyles = `
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 5px;
   white-space: nowrap;
 }
 
+/* Transiciones solo después de cargar */
+body.loaded .dark-mode-toggle-nav {
+  transition: all 0.3s ease;
+}
+
 .dark-mode-toggle-nav:hover {
   opacity: 0.9;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #134152;
 }
 
 [data-theme="dark"] .dark-mode-toggle-nav {
-  background: linear-gradient(135deg, #5a4ddf 0%, #7b68ee 100%);
+  background: #2a7a94;
+}
+
+[data-theme="dark"] .dark-mode-toggle-nav:hover {
+  background: #1a5569;
 }
 
 nav ul {
@@ -146,7 +152,7 @@ nav ul li:has(.dark-mode-toggle-nav) {
   --pendiente-border: #e9ecef;
   --pendiente-text: #333;
   
-  --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --header-bg: #1a5569;
   --header-text: #fff;
   
   --footer-bg: #333;
@@ -154,8 +160,8 @@ nav ul li:has(.dark-mode-toggle-nav) {
   
   --nav-bg: #fff;
   --nav-text: #333;
-  --nav-hover-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --nav-hover-text: #fff;
+  --nav-hover-bg: #f0f0f0;
+  --nav-hover-text: #1a5569;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -190,7 +196,7 @@ nav ul li:has(.dark-mode-toggle-nav) {
   --pendiente-border: #444;
   --pendiente-text: #ccc;
   
-  --header-bg: linear-gradient(135deg, #4a3f7a 0%, #5a3d6e 100%);
+  --header-bg: #1a5569;
   --header-text: #e0e0e0;
   
   --footer-bg: #0a0a0a;
@@ -198,7 +204,7 @@ nav ul li:has(.dark-mode-toggle-nav) {
   
   --nav-bg: #1c1c1c;
   --nav-text: #e0e0e0;
-  --nav-hover-bg: linear-gradient(135deg, #5a4ddf 0%, #7b68ee 100%);
+  --nav-hover-bg: #2a2a2a;
   --nav-hover-text: #fff;
 }
 
@@ -337,10 +343,14 @@ nav a {
   transition: color 0.3s ease, background 0.3s ease;
 }
 
-nav a:hover,
-nav a.active {
+nav a:hover {
   background: var(--nav-hover-bg) !important;
   color: var(--nav-hover-text) !important;
+}
+
+nav a.active {
+  background: #1a5569 !important;
+  color: white !important;
 }
 
 .tabla-avance {
@@ -561,7 +571,7 @@ nav a.active {
   height: 60px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1a5569;
   color: white;
   font-size: 24px;
   cursor: pointer;
@@ -576,11 +586,13 @@ nav a.active {
 .dark-mode-toggle:hover {
   transform: scale(1.1) rotate(15deg);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: #134152;
 }
 
 .dark-mode-toggle:active {
   transform: scale(0.95);
 }
+
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
@@ -596,7 +608,12 @@ nav a.active {
 /* Botones en modo oscuro */
 [data-theme="dark"] button,
 [data-theme="dark"] .btn {
-  background: linear-gradient(135deg, #5a4ddf 0%, #7b68ee 100%);
+  background: #2a7a94;
+}
+
+[data-theme="dark"] button:hover,
+[data-theme="dark"] .btn:hover {
+  background: #1a5569;
 }
 
 [data-theme="dark"] .auth-container,

@@ -192,7 +192,7 @@ async function mostrarDetalleProyeccion(id) {
           align-items: center;
           padding: 20px 30px;
           border-bottom: 2px solid #e9ecef;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: #1a5569;
           color: white;
           border-radius: 15px 15px 0 0;
         }
@@ -254,7 +254,7 @@ async function mostrarDetalleProyeccion(id) {
         }
 
         .tabla-ramos-detalle th {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: #1a5569;
           color: white;
           padding: 12px;
           text-align: left;

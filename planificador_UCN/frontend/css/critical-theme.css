@@ -1,0 +1,75 @@
+/* ========================================
+   CRITICAL-THEME.CSS - Estilos críticos para prevenir flash
+   Este archivo debe cargarse PRIMERO
+   ======================================== */
+
+/* Aplicar tema inmediatamente basado en el atributo data-theme */
+:root {
+  --bg-body: #e8eef1;
+  --text-color: #2c3e50;
+  --card-bg: #ffffff;
+  --nav-bg: #1e2127;
+  --nav-text: #d1d5db;
+  --nav-hover-bg: #1a5569;
+  --nav-active-bg: #1a5569;
+}
+
+[data-theme="dark"] {
+  --bg-body: #2b2d3a;
+  --text-color: #ffffff;
+  --card-bg: #3a3d4e;
+  --nav-bg: #1e2127;
+  --nav-text: #9ca3af;
+  --nav-hover-bg: #1a5569;
+  --nav-active-bg: #1a5569;
+}
+
+/* Aplicar fondo inmediatamente */
+html {
+  background-color: var(--bg-body);
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  transition: none;
+}
+
+/* Nav sin transición en carga inicial - FONDO OSCURO UNIFORME */
+nav {
+  background-color: #1e2127 !important;
+  transition: none !important;
+}
+
+nav a {
+  color: #d1d5db;
+  transition: none !important;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] nav a {
+  color: #9ca3af;
+}
+
+nav a:hover,
+nav a.active {
+  background-color: #1a5569;
+  color: white;
+}
+
+/* Main sin transición en carga inicial */
+main {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: none;
+}
+
+/* Activar transiciones después de la carga */
+body.loaded,
+body.loaded nav,
+body.loaded nav a,
+body.loaded main {
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+}

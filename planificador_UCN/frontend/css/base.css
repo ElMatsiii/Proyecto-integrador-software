@@ -33,8 +33,8 @@ body {
   /* Colores UCN */
   --ucn-primary: #1a5569;
   --ucn-secondary: #4a5568;
-  --ucn-accent: #e67e22;
-  --ucn-accent-hover: #d35400;
+  --ucn-accent: #1a5569;
+  --ucn-accent-hover: #134152;
   
   /* Color de tarjetas de ramos */
   --ramo-bg: #f8f9fa;
@@ -67,7 +67,7 @@ body {
   --nav-bg: #ffffff;
   --nav-text: #2c3e50;
   --nav-hover-bg: #f8f9fa;
-  --nav-active-bg: #5a5db0;
+  --nav-active-bg: #1a5569;
 }
 
 /* Modo Oscuro */
@@ -81,10 +81,12 @@ body {
   /* Colores UCN en oscuro */
   --ucn-primary: #2a7a94;
   --ucn-secondary: #5a6578;
+  --ucn-accent: #2a7a94;
+  --ucn-accent-hover: #1a5569;
   
-  /* Color de tarjetas de ramos - verde oliva/dorado */
-  --ramo-bg: #5a5a3a;
-  --ramo-border: #6a6a4a;
+  /* Color de tarjetas de ramos */
+  --ramo-bg: #3a3d4e;
+  --ramo-border: #4a4d5e;
   
   /* Estados de ramos - Modo Oscuro */
   --aprobado-bg: #2d5a2f;
@@ -100,15 +102,45 @@ body {
   --pendiente-border: #5a5d6e;
   
   /* Otros elementos oscuros */
-  --table-header: #4a5568;
+  --table-header: #1a5569;
   --footer-bg: #1a1d2a;
   
   /* Navegación oscura */
   --nav-bg: #2b2d3a;
   --nav-text: #a0a0a0;
   --nav-hover-bg: #3a3d4e;
-  --nav-active-bg: #5a5db0;
+  --nav-active-bg: #1a5569;
 }
+
+/* ========================================
+   ESTILOS CRÍTICOS PARA NAV (Anti-flash)
+   ======================================== */
+
+/* Aplicar inmediatamente los estilos del nav según el tema */
+nav {
+  background-color: var(--nav-bg);
+  transition: none !important; /* Sin transición en carga inicial */
+}
+
+nav a {
+  color: var(--nav-text);
+}
+
+nav a:hover,
+nav a.active {
+  background: var(--nav-active-bg);
+  color: white;
+}
+
+/* Restaurar transiciones después de la carga */
+body.loaded nav,
+body.loaded nav a {
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* ========================================
+   FIN ESTILOS CRÍTICOS
+   ======================================== */
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -119,6 +151,8 @@ body {
     
     --ucn-primary: #1a5569;
     --ucn-secondary: #0d3c4d;
+    --ucn-accent: #2a7a94;
+    --ucn-accent-hover: #1a5569;
     
     --aprobado-bg: #0d3818;
     --reprobado-bg: #3d1a1a;
@@ -138,6 +172,8 @@ body {
   
   --ucn-primary: #2a6d85;
   --ucn-secondary: #1a4d5d;
+  --ucn-accent: #2a7a94;
+  --ucn-accent-hover: #1a5569;
   
   --aprobado-bg: #0d3818;
   --reprobado-bg: #3d1a1a;

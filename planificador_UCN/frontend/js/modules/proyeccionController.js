@@ -140,7 +140,7 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       } else if (creditosSeleccionados === LIMITE_CREDITOS) {
         contadorEl.style.background = "linear-gradient(135deg, #f39c12 0%, #e67e22 100%)";
       } else {
-        contadorEl.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+        contadorEl.style.background = "linear-gradient(135deg, #1a5569 0%, #1a5569 100%)";
       }
     };
 
@@ -238,16 +238,16 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
       style.id = "proyeccion-styles";
       style.textContent = `
         .curso.seleccionado-auto {
-          outline: 3px solid #007bff !important;
+          outline: 3px solid #1a5569 !important;
           transform: scale(1.05);
-          box-shadow: 0 0 15px rgba(0, 123, 255, 0.5) !important;
+          box-shadow: 0 0 15px rgba(26, 85, 105, 0.5) !important;
         }
         
         .boton-proyeccion-centrado {
           display: block;
           margin: 30px auto;
           padding: 12px 30px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: #1a5569;
           color: white;
           border: none;
           border-radius: 8px;
@@ -260,6 +260,7 @@ async function mostrarMallaProyeccion(auth, carrera, contenedor) {
         .boton-proyeccion-centrado:hover {
           transform: translateY(-2px);
           box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+          background: #134152;
         }
       `;
       document.head.appendChild(style);

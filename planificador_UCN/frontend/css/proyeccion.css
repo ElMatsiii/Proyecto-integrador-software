@@ -94,7 +94,7 @@
   color: white;
   text-align: center;
   font-weight: 600;
-  background: var(--nav-active-bg);
+  background: var(--ucn-primary);
   border-radius: 8px;
   padding: 6px 10px;
   width: 100%;
@@ -171,8 +171,8 @@
 }
 
 .malla-proyeccion .curso.seleccionado-auto {
-  border: 3px solid #1a5569  !important;
-  box-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
+  border: 3px solid #1a5569 !important;
+  box-shadow: 0 0 10px rgba(26, 85, 105, 0.5);
 }
 
 /* Contador de créditos */
