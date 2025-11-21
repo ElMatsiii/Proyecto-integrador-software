@@ -186,13 +186,6 @@ export function initInicio() {
         });
 
         totalCreditosEl.textContent = total;
-        /*estadoCreditosEl.innerHTML = `
-          <p><strong>Aprobados:</strong> ${aprob} créditos</p>
-          <p><strong>Reprobados:</strong> ${repro} créditos</p>
-          <p style="color:${total > 35 ? "red" : "green"}">
-            ${total > 35 ? "Límite excedido" : "Dentro del límite de créditos"}
-          </p>
-        `;*/
       }
 
       if (periodos[0]) {

@@ -49,7 +49,6 @@ export async function initVersiones() {
         minute: '2-digit'
       });
 
-      const tipoIcono = proy.tipo === 'manual' ? '✏️' : '🤖';
       const tipoBadge = proy.tipo === 'manual' 
         ? '<span class="badge-tipo manual">Manual</span>' 
         : '<span class="badge-tipo automatica">Automática</span>';
@@ -58,7 +57,7 @@ export async function initVersiones() {
       li.className = "proyeccion-item";
       li.innerHTML = `
         <div class="proyeccion-header">
-          <h3>${tipoIcono} ${proy.nombre}</h3>
+          <h3>${proy.nombre}</h3>
           ${tipoBadge}
         </div>
         <div class="proyeccion-info">
