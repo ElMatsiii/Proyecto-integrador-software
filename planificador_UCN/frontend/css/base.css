@@ -1,0 +1,64 @@
+/* ========================================
+   BASE.CSS - Estilos globales y reset
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: var(--bg-body, #f5f7fa);
+  color: var(--text-color, #333);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Variables CSS para temas */
+:root {
+  --bg-body: #f5f7fa;
+  --text-color: #333;
+  --card-bg: #ffffff;
+  --border-color: #e9ecef;
+  --aprobado: #d4edda;
+  --reprobado: #f8d7da;
+  --inscrito: #fff3cd;
+  --table-header: #667eea;
+  --table-header-text: white;
+  --footer-bg: #333;
+  --footer-text: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-body: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2a2a2a;
+    --border-color: #444;
+    --aprobado: #123d1d;
+    --reprobado: #3d1a1a;
+    --inscrito: #4d3b00;
+    --footer-bg: #1a1a1a;
+    --footer-text: #e0e0e0;
+  }
+}
+
+[data-theme="dark"] {
+  --bg-body: #1a1a1a;
+  --text-color: #e0e0e0;
+  --card-bg: #2a2a2a;
+  --border-color: #444;
+  --aprobado: #123d1d;
+  --reprobado: #3d1a1a;
+  --inscrito: #4d3b00;
+  --footer-bg: #1a1a1a;
+  --footer-text: #e0e0e0;
+}

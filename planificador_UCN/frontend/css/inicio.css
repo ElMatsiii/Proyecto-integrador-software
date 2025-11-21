@@ -1,0 +1,302 @@
+/* ========================================
+   INICIO.CSS - Página de inicio/dashboard
+   ======================================== */
+
+/* Contenedor principal */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Información de la carrera */
+.carrera-actual {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 20px;
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+/* Información del semestre actual */
+main p {
+  margin: 15px 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+main p strong {
+  font-weight: 600;
+  color: #667eea;
+}
+
+#semestreActual {
+  font-weight: 600;
+  color: #764ba2;
+}
+
+/* Selectores */
+main label {
+  display: block;
+  margin-top: 25px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+#selectCarrera,
+#filtroSemestre {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#selectCarrera:hover,
+#filtroSemestre:hover {
+  border-color: #667eea;
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+}
+
+#selectCarrera:focus,
+#filtroSemestre:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Grid de ramos */
+#contenedorRamos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 30px 0;
+}
+
+/* Cards de ramos */
+.ramo-card {
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.ramo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ramo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.ramo-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 15px;
+  padding-right: 10px;
+}
+
+.ramo-card p {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.ramo-card p strong {
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
+}
+
+/* Colores según estado del ramo */
+.ramo-card[style*="rgb(200, 230, 201)"] {
+  background-color: var(--aprobado-bg) !important;
+  border-color: var(--aprobado-border) !important;
+}
+
+.ramo-card[style*="rgb(255, 249, 196)"] {
+  background-color: var(--inscrito-bg) !important;
+  border-color: var(--inscrito-border) !important;
+}
+
+.ramo-card[style*="rgb(255, 205, 210)"] {
+  background-color: var(--reprobado-bg) !important;
+  border-color: var(--reprobado-border) !important;
+}
+
+/* Contador de créditos */
+#totalCreditos {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+/* Estado de créditos */
+#estadoCreditos {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+#estadoCreditos p {
+  margin: 10px 0;
+  font-size: 1rem;
+}
+
+#estadoCreditos strong {
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* Mensaje cuando no hay ramos */
+#contenedorRamos p:only-child {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #666;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 10px;
+  border: 2px dashed var(--border-color);
+}
+
+/* Animación de carga */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ramo-card {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Modo oscuro específico para inicio */
+[data-theme="dark"] .carrera-actual {
+  background: linear-gradient(135deg, rgba(90, 77, 223, 0.2) 0%, rgba(123, 104, 238, 0.2) 100%);
+  border-left-color: #7b68ee;
+  color: #a89cee;
+}
+
+[data-theme="dark"] #semestreActual {
+  color: #a89cee;
+}
+
+[data-theme="dark"] .ramo-card p strong {
+  color: #aaa;
+}
+
+[data-theme="dark"] #totalCreditos {
+  background: linear-gradient(135deg, rgba(90, 77, 223, 0.2) 0%, rgba(123, 104, 238, 0.2) 100%);
+  color: #a89cee;
+}
+
+[data-theme="dark"] #estadoCreditos {
+  background: linear-gradient(135deg, rgba(90, 77, 223, 0.1) 0%, rgba(123, 104, 238, 0.1) 100%);
+  border-left-color: #7b68ee;
+}
+
+[data-theme="dark"] #estadoCreditos strong {
+  color: #a89cee;
+}
+
+[data-theme="dark"] #contenedorRamos p:only-child {
+  background: rgba(90, 77, 223, 0.1);
+  color: #aaa;
+  border-color: #444;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  #contenedorRamos {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  #contenedorRamos {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+  }
+
+  .ramo-card {
+    padding: 15px;
+  }
+
+  .ramo-card h4 {
+    font-size: 1rem;
+  }
+
+  #selectCarrera,
+  #filtroSemestre {
+    max-width: 100%;
+  }
+
+  #totalCreditos {
+    font-size: 1.2rem;
+    display: block;
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  #contenedorRamos {
+    grid-template-columns: 1fr;
+  }
+
+  .carrera-actual {
+    font-size: 1.1rem;
+    padding: 12px;
+  }
+
+  main label {
+    font-size: 0.95rem;
+  }
+
+  #selectCarrera,
+  #filtroSemestre {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+}

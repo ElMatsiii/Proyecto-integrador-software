@@ -1,0 +1,110 @@
+/* ========================================
+   TABLES.CSS - Estilos de tablas
+   ======================================== */
+
+/* Tabla básica */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th, table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #667eea;
+  background: var(--table-header);
+  color: white;
+  color: var(--table-header-text);
+  text-align: left;
+}
+
+/* Tabla de avance */
+.tabla-avance {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+.tabla-avance th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--table-header);
+  color: white;
+  color: var(--table-header-text);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla-avance td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+.tabla-avance tr.aprobado td {
+  background-color: var(--aprobado);
+}
+
+.tabla-avance tr.reprobado td {
+  background-color: var(--reprobado);
+}
+
+.tabla-avance tr.inscrito td,
+.tabla-avance tr.en_curso td {
+  background-color: var(--inscrito);
+}
+
+.tabla-avance tr:hover td {
+  background-color: #eef2ff;
+}
+
+/* Tabla de resumen */
+#tablaResumen {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: 0.3s;
+}
+
+#tablaResumen th {
+  background: var(--table-header);
+  color: var(--table-header-text);
+  padding: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+#tablaResumen td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#tablaResumen tr.aprobado td {
+  background-color: var(--aprobado);
+}
+
+#tablaResumen tr.reprobado td {
+  background-color: var(--reprobado);
+}
+
+#tablaResumen tr.inscrito td {
+  background-color: var(--inscrito);
+}
+
+#tablaResumen tr:hover td {
+  background-color: rgba(102, 126, 234, 0.15);
+}
