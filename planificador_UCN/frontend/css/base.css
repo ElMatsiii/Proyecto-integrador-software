@@ -11,8 +11,8 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  background-color: var(--bg-body, #f5f7fa);
-  color: var(--text-color, #333);
+  background-color: var(--bg-body, #e8eef1);
+  color: var(--text-color, #2c3e50);
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -22,43 +22,128 @@ body {
   padding: 20px;
 }
 
-/* Variables CSS para temas */
+/* Variables CSS para temas - Colores UCN */
 :root {
-  --bg-body: #f5f7fa;
-  --text-color: #333;
+  /* Modo Claro */
+  --bg-body: #e8eef1;
+  --text-color: #2c3e50;
   --card-bg: #ffffff;
-  --border-color: #e9ecef;
-  --aprobado: #d4edda;
-  --reprobado: #f8d7da;
-  --inscrito: #fff3cd;
-  --table-header: #667eea;
+  --border-color: #c5d3dc;
+  
+  /* Colores UCN */
+  --ucn-primary: #1a5569;
+  --ucn-secondary: #4a5568;
+  --ucn-accent: #e67e22;
+  --ucn-accent-hover: #d35400;
+  
+  /* Color de tarjetas de ramos */
+  --ramo-bg: #f8f9fa;
+  --ramo-border: #dee2e6;
+  
+  /* Estados de ramos - Modo Claro */
+  --aprobado: #4caf50;
+  --aprobado-bg: #e8f5e9;
+  --aprobado-border: #4caf50;
+  
+  --reprobado: #e74c3c;
+  --reprobado-bg: #ffebee;
+  --reprobado-border: #e74c3c;
+  
+  --inscrito: #f39c12;
+  --inscrito-bg: #fff3e0;
+  --inscrito-border: #f39c12;
+  
+  --pendiente: #95a5a6;
+  --pendiente-bg: #ecf0f1;
+  --pendiente-border: #bdc3c7;
+  
+  /* Otros elementos */
+  --table-header: #1a5569;
   --table-header-text: white;
-  --footer-bg: #333;
+  --footer-bg: #4a5568;
   --footer-text: white;
+  
+  /* Navegación */
+  --nav-bg: #ffffff;
+  --nav-text: #2c3e50;
+  --nav-hover-bg: #f8f9fa;
+  --nav-active-bg: #5a5db0;
+}
+
+/* Modo Oscuro */
+[data-theme="dark"] {
+  /* Fondo principal oscuro */
+  --bg-body: #2b2d3a;
+  --text-color: #ffffff;
+  --card-bg: #3a3d4e;
+  --border-color: #4a4d5e;
+  
+  /* Colores UCN en oscuro */
+  --ucn-primary: #2a7a94;
+  --ucn-secondary: #5a6578;
+  
+  /* Color de tarjetas de ramos - verde oliva/dorado */
+  --ramo-bg: #5a5a3a;
+  --ramo-border: #6a6a4a;
+  
+  /* Estados de ramos - Modo Oscuro */
+  --aprobado-bg: #2d5a2f;
+  --aprobado-border: #4caf50;
+  
+  --reprobado-bg: #5a2f2f;
+  --reprobado-border: #e74c3c;
+  
+  --inscrito-bg: #5a4a2f;
+  --inscrito-border: #f39c12;
+  
+  --pendiente-bg: #3a3d4e;
+  --pendiente-border: #5a5d6e;
+  
+  /* Otros elementos oscuros */
+  --table-header: #4a5568;
+  --footer-bg: #1a1d2a;
+  
+  /* Navegación oscura */
+  --nav-bg: #2b2d3a;
+  --nav-text: #a0a0a0;
+  --nav-hover-bg: #3a3d4e;
+  --nav-active-bg: #5a5db0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-body: #1a1a1a;
+    --bg-body: #0d1117;
     --text-color: #e0e0e0;
-    --card-bg: #2a2a2a;
-    --border-color: #444;
-    --aprobado: #123d1d;
-    --reprobado: #3d1a1a;
-    --inscrito: #4d3b00;
-    --footer-bg: #1a1a1a;
+    --card-bg: #1c2128;
+    --border-color: #30363d;
+    
+    --ucn-primary: #1a5569;
+    --ucn-secondary: #0d3c4d;
+    
+    --aprobado-bg: #0d3818;
+    --reprobado-bg: #3d1a1a;
+    --inscrito-bg: #4d3b00;
+    --pendiente-bg: #22272e;
+    
+    --footer-bg: #0d1117;
     --footer-text: #e0e0e0;
   }
 }
 
 [data-theme="dark"] {
-  --bg-body: #1a1a1a;
+  --bg-body: #0d1117;
   --text-color: #e0e0e0;
-  --card-bg: #2a2a2a;
-  --border-color: #444;
-  --aprobado: #123d1d;
-  --reprobado: #3d1a1a;
-  --inscrito: #4d3b00;
-  --footer-bg: #1a1a1a;
+  --card-bg: #1c2128;
+  --border-color: #30363d;
+  
+  --ucn-primary: #2a6d85;
+  --ucn-secondary: #1a4d5d;
+  
+  --aprobado-bg: #0d3818;
+  --reprobado-bg: #3d1a1a;
+  --inscrito-bg: #4d3b00;
+  --pendiente-bg: #22272e;
+  
+  --footer-bg: #0d1117;
   --footer-text: #e0e0e0;
 }

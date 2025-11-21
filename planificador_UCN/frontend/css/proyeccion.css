@@ -8,13 +8,13 @@
 }
 
 .pagina-proyeccion nav {
-  background: #fff !important;
+  background: var(--nav-bg) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pagina-proyeccion nav a {
   text-decoration: none;
-  color: #333;
+  color: var(--nav-text);
   padding: 10px 15px;
   border-radius: 6px;
   font-weight: 500;
@@ -23,14 +23,12 @@
 
 .pagina-proyeccion nav a:hover,
 .pagina-proyeccion nav a.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: var(--nav-active-bg) !important;
   color: white !important;
 }
 
 .pagina-proyeccion header {
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: var(--ucn-primary) !important;
 }
 
 /* Layout de proyección */
@@ -52,8 +50,8 @@
 }
 
 .proyeccion-grid .curso {
-  background: #fff;
-  border: 2px solid #e9ecef;
+  background: var(--ramo-bg);
+  border: 2px solid var(--ramo-border);
   border-radius: 10px;
   padding: 15px;
   text-align: center;
@@ -79,6 +77,8 @@
   gap: 40px;
   overflow-x: auto;
   padding: 30px 40px;
+  background-color: var(--bg-body);
+  border-radius: 10px;
 }
 
 .malla-proyeccion .bloque-nivel {
@@ -91,11 +91,10 @@
 
 .malla-proyeccion .bloque-nivel h3 {
   margin-bottom: 15px;
-  color: #333;
+  color: white;
   text-align: center;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  background: var(--nav-active-bg);
   border-radius: 8px;
   padding: 6px 10px;
   width: 100%;
@@ -112,8 +111,8 @@
 .malla-proyeccion .curso {
   width: 180px;
   height: 90px;
-  background: #fff;
-  border: 2px solid #e9ecef;
+  background: var(--ramo-bg);
+  border: 2px solid var(--ramo-border);
   border-radius: 10px;
   padding: 10px;
   display: flex;
@@ -129,7 +128,7 @@
 .malla-proyeccion .curso h4 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #222;
+  color: var(--text-color);
   margin-bottom: 5px;
   line-height: 1.1;
   text-overflow: ellipsis;
@@ -140,7 +139,7 @@
 
 .malla-proyeccion .curso p {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -151,32 +150,28 @@
 
 /* Estados de cursos en proyección */
 .malla-proyeccion .curso.aprobado {
-  background-color: #d4edda !important;
-  border-color: #28a745 !important;
-  color: #0f5132 !important;
+  background-color: var(--aprobado-bg) !important;
+  border-color: var(--aprobado-border) !important;
 }
 
 .malla-proyeccion .curso.reprobado {
-  background-color: #f8d7da !important;
-  border-color: #dc3545 !important;
-  color: #842029 !important;
+  background-color: var(--reprobado-bg) !important;
+  border-color: var(--reprobado-border) !important;
 }
 
 .malla-proyeccion .curso.inscrito,
 .malla-proyeccion .curso.en-curso {
-  background-color: #fff3cd !important;
-  border-color: #ffc107 !important;
-  color: #664d03 !important;
+  background-color: var(--inscrito-bg) !important;
+  border-color: var(--inscrito-border) !important;
 }
 
 .malla-proyeccion .curso.pendiente {
-  background-color: #f9f9f9 !important;
-  border-color: #e9ecef !important;
-  color: #333 !important;
+  background-color: var(--pendiente-bg) !important;
+  border-color: var(--pendiente-border) !important;
 }
 
 .malla-proyeccion .curso.seleccionado-auto {
-  border: 3px solid #764ba2 !important;
+  border: 3px solid #1a5569  !important;
   box-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
 }
 
@@ -184,7 +179,7 @@
 #contadorCreditosProyeccion {
   position: static !important;
   display: block;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-accent);
   color: white;
   padding: 15px 20px;
   border-radius: 10px;
@@ -195,55 +190,22 @@
   max-width: 400px;
 }
 
-/* Modo oscuro */
-@media (prefers-color-scheme: dark) {
-  .pagina-proyeccion main h2 {
-    color: #e0e0e0;
-  }
+/* Modo oscuro específico */
+[data-theme="dark"] .pagina-proyeccion main h2 {
+  color: white;
+}
 
-  .pagina-proyeccion main > p,
-  #mensajeProyeccionManual {
-    color: #aaa;
-  }
+[data-theme="dark"] .pagina-proyeccion main > p,
+[data-theme="dark"] #mensajeProyeccionManual {
+  color: #e0e0e0;
+}
 
-  .malla-proyeccion {
-    background: #1a1a1a;
-  }
+[data-theme="dark"] .malla-proyeccion {
+  background: #2b2d3a;
+}
 
-  .malla-proyeccion .bloque-nivel {
-    background: #2a2a2a;
-  }
-
-  .malla-proyeccion .curso {
-    background-color: #1e1e1e;
-    border-color: #444;
-    color: #e0e0e0;
-  }
-
-  .malla-proyeccion .curso.aprobado {
-    background-color: #123d1d !important;
-    border-color: #28a745 !important;
-    color: #fff !important;
-  }
-
-  .malla-proyeccion .curso.reprobado {
-    background-color: #3d1a1a !important;
-    border-color: #dc3545 !important;
-    color: #fff !important;
-  }
-
-  .malla-proyeccion .curso.inscrito,
-  .malla-proyeccion .curso.en-curso {
-    background-color: #4d3b00 !important;
-    border-color: #ffc107 !important;
-    color: #fff !important;
-  }
-
-  .malla-proyeccion .curso.pendiente {
-    background-color: #1c1c1c !important;
-    border-color: #333 !important;
-    color: #ccc !important;
-  }
+[data-theme="dark"] .malla-proyeccion .curso:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive */

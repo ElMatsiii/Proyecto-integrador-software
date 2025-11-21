@@ -3,11 +3,19 @@
    ======================================== */
 
 header, footer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-primary);
   color: white;
   text-align: center;
-  padding: 10px 0;
+  padding: 15px 0;
   border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 footer {
@@ -15,54 +23,115 @@ footer {
   background-color: var(--footer-bg);
   color: var(--footer-text);
   padding: 15px 0;
+  font-size: 0.9rem;
 }
 
 /* Navegación */
 nav {
-  background: white;
-  border-radius: 10px;
-  padding: 5px 0;
-  margin: 10px 20px;
+  background: var(--nav-bg);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
+  transition: background 0.3s ease;
 }
 
 nav ul {
   display: flex;
   list-style: none;
-  gap: 15px;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav li {
+  margin: 0;
 }
 
 nav a {
   text-decoration: none;
-  color: #333;
-  padding: 10px 15px;
-  border-radius: 6px;
+  color: var(--nav-text);
+  padding: 15px 20px;
+  display: block;
   font-weight: 500;
   transition: all 0.3s ease;
+  background: transparent;
 }
 
-nav a:hover,
+nav a:hover {
+  background: var(--nav-hover-bg);
+  color: var(--text-color);
+}
+
 nav a.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--nav-active-bg);
+  color: white;
+}
+
+nav a.logout {
+  background: var(--ucn-accent);
+  color: white;
+  margin-left: auto;
+}
+
+nav a.logout:hover {
+  background: var(--ucn-accent-hover);
+}
+
+/* Modo oscuro específico para navegación */
+[data-theme="dark"] nav a {
+  color: var(--nav-text);
+}
+
+[data-theme="dark"] nav a:hover {
   color: white;
 }
 
 /* Main container */
 main {
-  background: white;
+  background: #3a3d4e;
   background-color: var(--card-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 30px;
   margin: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s, color 0.3s;
+}
+
+main h2 {
+  color: white;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--ucn-accent);
+  font-size: 1.8rem;
 }
 
 main p {
   margin: 10px 0;
   font-size: 1.1rem;
+  color: #e0e0e0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  nav a {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  nav a.logout {
+    margin-left: 0;
+  }
 }

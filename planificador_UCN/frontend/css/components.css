@@ -4,11 +4,9 @@
 
 /* Cursos/Ramos Cards */
 .curso, .ramo-card {
-  background: #fff;
-  background-color: var(--card-bg);
+  background: var(--card-bg);
   color: var(--text-color);
-  border: 2px solid #e9ecef;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   padding: 20px;
   transition: all 0.3s ease;
@@ -24,34 +22,35 @@
   left: 0;
   width: 5px;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-accent);
 }
 
 .curso:hover, .ramo-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  border-color: var(--ucn-primary);
 }
 
 /* Estados de cursos */
 .curso.aprobado {
-  border-color: #28a745;
-  background-color: var(--aprobado) !important;
+  border-color: var(--aprobado-border);
+  background-color: var(--aprobado-bg) !important;
 }
 
 .curso.reprobado {
-  border-color: #dc3545;
-  background-color: var(--reprobado) !important;
+  border-color: var(--reprobado-border);
+  background-color: var(--reprobado-bg) !important;
 }
 
 .curso.en-curso,
 .curso.inscrito {
-  border-color: #ffc107;
-  background-color: var(--inscrito) !important;
+  border-color: var(--inscrito-border);
+  background-color: var(--inscrito-bg) !important;
 }
 
 .curso.pendiente {
-  border-color: #df03fc;
-  background-color: #fbdeff;
+  border-color: var(--pendiente-border);
+  background-color: var(--pendiente-bg) !important;
 }
 
 /* Dashboard Cards */
@@ -67,7 +66,7 @@
 }
 
 .dashboard p {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-primary);
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -75,12 +74,19 @@
   min-width: 220px;
   text-align: center;
   font-size: 1.1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  border-bottom: 4px solid var(--ucn-accent);
+}
+
+.dashboard p:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Botones */
 button, .btn, .acciones button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -88,10 +94,17 @@ button, .btn, .acciones button {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 button:hover, .btn:hover, .acciones button:hover {
-  opacity: 0.9;
+  background: var(--ucn-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
 }
 
 .acciones {
@@ -108,24 +121,31 @@ button:hover, .btn:hover, .acciones button:hover {
 
 #selectorCarreraContainer label {
   font-weight: 500;
-  color: #333;
+  color: var(--ucn-primary);
 }
 
 #selectorCarrera {
   background: white;
-  border: 1px solid #ccc;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 0.95rem;
   transition: all 0.2s ease;
+  color: var(--text-color);
 }
 
 #selectorCarrera:hover {
-  border-color: #667eea;
-  box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
+  border-color: var(--ucn-primary);
+}
+
+#selectorCarrera:focus {
+  outline: none;
+  border-color: var(--ucn-accent);
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
 }
 
 #etiquetaCarrera {
   font-size: 0.95rem;
   font-weight: 600;
+  color: var(--ucn-primary);
 }

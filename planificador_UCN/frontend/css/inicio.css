@@ -13,13 +13,14 @@
 .carrera-actual {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #667eea;
+  color: var(--ucn-primary);
   margin-bottom: 20px;
   text-align: center;
   padding: 15px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: var(--card-bg);
   border-radius: 10px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--ucn-accent);
+  transition: all 0.3s ease;
 }
 
 /* Información del semestre actual */
@@ -31,12 +32,12 @@ main p {
 
 main p strong {
   font-weight: 600;
-  color: #667eea;
+  color: var(--ucn-primary);
 }
 
 #semestreActual {
   font-weight: 600;
-  color: #764ba2;
+  color: var(--ucn-accent);
 }
 
 /* Selectores */
@@ -66,15 +67,14 @@ main label {
 
 #selectCarrera:hover,
 #filtroSemestre:hover {
-  border-color: #667eea;
-  box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+  border-color: var(--ucn-accent);
 }
 
 #selectCarrera:focus,
 #filtroSemestre:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--ucn-accent);
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
 }
 
 /* Grid de ramos */
@@ -87,8 +87,8 @@ main label {
 
 /* Cards de ramos */
 .ramo-card {
-  background-color: var(--card-bg);
-  border: 2px solid var(--border-color);
+  background-color: var(--ramo-bg);
+  border: 2px solid var(--ramo-border);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -105,12 +105,13 @@ main label {
   left: 0;
   width: 5px;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--ucn-accent);
 }
 
 .ramo-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--ucn-accent);
 }
 
 .ramo-card h4 {
@@ -129,22 +130,25 @@ main label {
 
 .ramo-card p strong {
   font-weight: 600;
-  color: #555;
+  color: var(--text-color);
   margin-right: 5px;
 }
 
 /* Colores según estado del ramo */
-.ramo-card[style*="rgb(200, 230, 201)"] {
+.ramo-card[style*="rgb(200, 230, 201)"],
+.ramo-card[style*="#c8e6c9"] {
   background-color: var(--aprobado-bg) !important;
   border-color: var(--aprobado-border) !important;
 }
 
-.ramo-card[style*="rgb(255, 249, 196)"] {
+.ramo-card[style*="rgb(255, 249, 196)"],
+.ramo-card[style*="#fff9c4"] {
   background-color: var(--inscrito-bg) !important;
   border-color: var(--inscrito-border) !important;
 }
 
-.ramo-card[style*="rgb(255, 205, 210)"] {
+.ramo-card[style*="rgb(255, 205, 210)"],
+.ramo-card[style*="#ffcdd2"] {
   background-color: var(--reprobado-bg) !important;
   border-color: var(--reprobado-border) !important;
 }
@@ -153,31 +157,33 @@ main label {
 #totalCreditos {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  color: var(--ucn-accent);
+  background: var(--card-bg);
   padding: 8px 16px;
   border-radius: 8px;
   display: inline-block;
   margin-left: 10px;
+  border: 2px solid var(--ucn-accent);
 }
 
 /* Estado de créditos */
 #estadoCreditos {
   margin-top: 20px;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--card-bg);
   border-radius: 10px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--ucn-accent);
 }
 
 #estadoCreditos p {
   margin: 10px 0;
   font-size: 1rem;
+  color: var(--text-color);
 }
 
 #estadoCreditos strong {
   font-weight: 600;
-  color: #667eea;
+  color: var(--ucn-primary);
 }
 
 /* Mensaje cuando no hay ramos */
@@ -187,7 +193,7 @@ main label {
   padding: 40px;
   font-size: 1.1rem;
   color: #666;
-  background: rgba(102, 126, 234, 0.05);
+  background: var(--card-bg);
   border-radius: 10px;
   border: 2px dashed var(--border-color);
 }
@@ -208,39 +214,30 @@ main label {
   animation: fadeIn 0.5s ease;
 }
 
-/* Modo oscuro específico para inicio */
+/* Modo oscuro específico */
 [data-theme="dark"] .carrera-actual {
-  background: linear-gradient(135deg, rgba(90, 77, 223, 0.2) 0%, rgba(123, 104, 238, 0.2) 100%);
-  border-left-color: #7b68ee;
-  color: #a89cee;
+  color: white;
+  background: #4a5568;
 }
 
-[data-theme="dark"] #semestreActual {
-  color: #a89cee;
-}
-
-[data-theme="dark"] .ramo-card p strong {
-  color: #aaa;
-}
-
-[data-theme="dark"] #totalCreditos {
-  background: linear-gradient(135deg, rgba(90, 77, 223, 0.2) 0%, rgba(123, 104, 238, 0.2) 100%);
-  color: #a89cee;
-}
-
-[data-theme="dark"] #estadoCreditos {
-  background: linear-gradient(135deg, rgba(90, 77, 223, 0.1) 0%, rgba(123, 104, 238, 0.1) 100%);
-  border-left-color: #7b68ee;
+[data-theme="dark"] main p strong {
+  color: white;
 }
 
 [data-theme="dark"] #estadoCreditos strong {
-  color: #a89cee;
+  color: white;
 }
 
 [data-theme="dark"] #contenedorRamos p:only-child {
-  background: rgba(90, 77, 223, 0.1);
-  color: #aaa;
-  border-color: #444;
+  color: #a0a0a0;
+}
+
+[data-theme="dark"] .ramo-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .ramo-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive */

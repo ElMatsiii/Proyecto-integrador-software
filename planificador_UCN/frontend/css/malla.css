@@ -30,8 +30,13 @@
 
 .pagina-malla .bloque-nivel h3 {
   margin-bottom: 15px;
-  color: #333;
+  color: var(--ucn-primary);
   text-align: center;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 2px solid var(--ucn-accent);
+  font-weight: 600;
 }
 
 .pagina-malla .malla-grid {
@@ -43,9 +48,9 @@
 
 .pagina-malla .curso {
   width: 180px;
-  height: 90px;
-  background: #fff;
-  border: 2px solid #e9ecef;
+  min-height: 90px;
+  background: var(--ramo-bg);
+  border: 2px solid var(--ramo-border);
   border-radius: 10px;
   padding: 10px;
   display: flex;
@@ -61,7 +66,7 @@
 .pagina-malla .curso h4 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #222;
+  color: var(--text-color);
   margin-bottom: 5px;
   line-height: 1.1;
   text-overflow: ellipsis;
@@ -72,13 +77,51 @@
 
 .pagina-malla .curso p {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-color);
   margin: 0;
+  opacity: 0.9;
 }
 
 .pagina-malla .curso:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-color: var(--ucn-accent);
+}
+
+/* Estados de cursos */
+.pagina-malla .curso.aprobado {
+  background-color: var(--aprobado-bg) !important;
+  border-color: var(--aprobado-border) !important;
+}
+
+.pagina-malla .curso.reprobado {
+  background-color: var(--reprobado-bg) !important;
+  border-color: var(--reprobado-border) !important;
+}
+
+.pagina-malla .curso.en-curso,
+.pagina-malla .curso.inscrito {
+  background-color: var(--inscrito-bg) !important;
+  border-color: var(--inscrito-border) !important;
+}
+
+.pagina-malla .curso.pendiente {
+  background-color: var(--pendiente-bg) !important;
+  border-color: var(--pendiente-border) !important;
+}
+
+/* Modo oscuro específico */
+[data-theme="dark"] .pagina-malla .bloque-nivel h3 {
+  color: white;
+  background: #4a5568;
+}
+
+[data-theme="dark"] .pagina-malla .curso {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .pagina-malla .curso:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* Grid alternativo para malla */
