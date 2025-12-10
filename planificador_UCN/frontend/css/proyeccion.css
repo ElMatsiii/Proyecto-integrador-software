@@ -7,7 +7,8 @@
   padding: 30px;
 }
 
-.pagina-proyeccion nav {
+/* ELIMINAR ESTOS ESTILOS QUE SOBRESCRIBEN EL NAV */
+/* .pagina-proyeccion nav {
   background: var(--nav-bg) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -23,13 +24,9 @@
 
 .pagina-proyeccion nav a:hover,
 .pagina-proyeccion nav a.active {
-  background: var(--nav-active-bg) !important;
-  color: white !important;
-}
-
-.pagina-proyeccion header {
-  background: var(--ucn-primary) !important;
-}
+  background: var(--nav-hover-bg) !important;
+  color: var(--nav-hover-text) !important;
+} */
 
 /* Layout de proyección */
 .proyeccion-layout {
