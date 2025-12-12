@@ -30,6 +30,60 @@ export async function initProyeccion() {
   }
 }
 
+function existeEnMalla(codigoPrereq, todosLosRamos) {
+  const codNorm = normalizarCodigo(codigoPrereq);
+  return todosLosRamos.some(r => normalizarCodigo(r.codigo) === codNorm);
+}
+
+// Función mejorada que filtra prerrequisitos inexistentes
+function cumplePrereqMejorado(curso, aprobadosSimulados, todosLosRamos) {
+  if (!curso.prereq || curso.prereq.trim() === "") return true;
+  
+  const prereqs = curso.prereq
+    .split(",")
+    .map((p) => normalizarCodigo(p.trim()))
+    .filter(p => p !== ""); // Filtrar strings vacíos
+  
+  // Filtrar solo prerrequisitos que realmente existen en la malla
+  const prereqsValidos = prereqs.filter(p => existeEnMalla(p, todosLosRamos));
+  
+  // Si no hay prerrequisitos válidos, el curso está desbloqueado
+  if (prereqsValidos.length === 0) return true;
+  
+  // Verificar que todos los prerrequisitos válidos estén aprobados
+  return prereqsValidos.every(p => aprobadosSimulados.has(p));
+}
+
+// Función para analizar y reportar prerrequisitos inválidos
+function analizarPrerequisitosInvalidos(malla) {
+  const todosLosCodigos = new Set(
+    malla.map(r => normalizarCodigo(r.codigo))
+  );
+  
+  const prerequisitosInvalidos = [];
+  
+  malla.forEach(ramo => {
+    if (!ramo.prereq || ramo.prereq.trim() === "") return;
+    
+    const prereqs = ramo.prereq
+      .split(",")
+      .map(p => normalizarCodigo(p.trim()))
+      .filter(p => p !== "");
+    
+    prereqs.forEach(prereq => {
+      if (!todosLosCodigos.has(prereq)) {
+        prerequisitosInvalidos.push({
+          ramo: ramo.codigo,
+          nombreRamo: ramo.asignatura,
+          prereqInvalido: prereq
+        });
+      }
+    });
+  });
+  
+  return prerequisitosInvalidos;
+}
+
 function limpiarElementosAnteriores() {
   const selectores = [
     "#contadorCreditosProyeccion",
@@ -121,16 +175,70 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
   limpiarElementosAnteriores();
 
-  const cumplePrereq = (curso) => {
-    if (!curso.prereq || curso.prereq.trim() === "") return true;
-    const prereqs = curso.prereq.split(",").map((p) => normalizarCodigo(p));
-    return prereqs.every(p => aprobadosSimulados.has(p));
-  };
+  // USAR LA NUEVA FUNCIÓN MEJORADA
+  const cumplePrereq = (curso) => cumplePrereqMejorado(curso, aprobadosSimulados, todosLosRamos);
 
   const ramosDisponibles = todosLosRamos.filter(r => {
     const cod = normalizarCodigo(r.codigo);
     return !aprobadosSimulados.has(cod);
   });
+
+  // Analizar prerrequisitos inválidos y mostrar advertencia si hay
+  if (semestreIndex === 0) {
+    const invalidos = analizarPrerequisitosInvalidos(todosLosRamos);
+    if (invalidos.length > 0) {
+      console.warn("⚠️ Prerrequisitos inválidos encontrados:", invalidos);
+      
+      // Mostrar advertencia al usuario
+      const advertencia = document.createElement("div");
+      advertencia.style.cssText = `
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin: 0 0 20px 0;
+        color: #856404;
+      `;
+      advertencia.innerHTML = `
+        <div style="display: flex; align-items: start; gap: 10px;">
+          <span style="font-size: 1.5rem;">⚠️</span>
+          <div>
+            <strong>Advertencia:</strong> Se detectaron ${invalidos.length} prerrequisito(s) inválido(s) en la malla.
+            <br><small>Estos prerrequisitos serán ignorados automáticamente en la proyección.</small>
+            <button id="btnVerDetalles" style="
+              margin-top: 10px;
+              background: #856404;
+              color: white;
+              border: none;
+              padding: 5px 15px;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 0.85rem;
+            ">Ver detalles</button>
+          </div>
+        </div>
+      `;
+      contenedor.before(advertencia);
+      
+      // Agregar evento para mostrar detalles
+      setTimeout(() => {
+        const btnDetalles = document.getElementById("btnVerDetalles");
+        if (btnDetalles) {
+          btnDetalles.addEventListener("click", () => {
+            const detallesHTML = invalidos.map(inv => 
+              `• <strong>${inv.ramo}</strong> (${inv.nombreRamo}): requiere <code>${inv.prereqInvalido}</code> (no existe)`
+            ).join("<br>");
+            
+            alert("Prerrequisitos inválidos encontrados:\n\n" + 
+              invalidos.map(inv => 
+                `- ${inv.ramo} (${inv.nombreRamo}): requiere ${inv.prereqInvalido} (no existe)`
+              ).join("\n")
+            );
+          });
+        }
+      }, 100);
+    }
+  }
 
   const niveles = {};
   ramosDisponibles.forEach((curso) => {
@@ -141,18 +249,19 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
   contenedor.innerHTML = "";
   contenedor.classList.add("malla-proyeccion");
 
+  // Info del semestre actual
   const infoSemestre = document.createElement("div");
   infoSemestre.className = "header-semestre-actual";
-  infoSemestre.style.cssText =` 
-  background: linear-gradient(135deg, #1a5569 0%, #2a7a94 100%);
-  color: white;
-  padding: 25px 30px;
-  border-radius: 15px;
-  margin: 0 auto 30px auto;
-  max-width: 1200px;
-  box-shadow: 0 4px 15px rgba(26, 85, 105, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-`;
+  infoSemestre.style.cssText = `
+    background: linear-gradient(135deg, #1a5569 0%, #2a7a94 100%);
+    color: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    margin: 0 auto 30px auto;
+    max-width: 1200px;
+    box-shadow: 0 4px 15px rgba(26, 85, 105, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  `;
   infoSemestre.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div style="flex: 1; min-width: 250px;">
@@ -173,6 +282,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
   `;
   contenedor.before(infoSemestre);
 
+  // Contador de créditos
   const contador = document.createElement("div");
   contador.id = "contadorCreditosProyeccion";
   contador.style.cssText = `
@@ -187,6 +297,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #1a5569, #2a7a94); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+          📚
         </div>
         <div>
           <div style="font-size: 0.85rem; color: #666; margin-bottom: 2px;">Créditos seleccionados</div>
@@ -228,6 +339,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     }
   };
 
+  // Renderizar niveles
   Object.keys(niveles)
     .sort((a, b) => a - b)
     .forEach((nivel) => {
@@ -253,7 +365,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
         
         if (!desbloqueado) {
           div.style.opacity = "0.5";
-          div.title = "Prerrequisitos no cumplidos";
+          div.title = `Prerrequisitos no cumplidos: ${curso.prereq || 'N/A'}`;
         }
 
         div.innerHTML = `
@@ -264,7 +376,28 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
         div.addEventListener("click", () => {
           if (!desbloqueado) {
-            alert("Este ramo tiene prerrequisitos no cumplidos.");
+            const prereqsOriginales = curso.prereq ? curso.prereq.split(",").map(p => p.trim()) : [];
+            const prereqsNormalizados = prereqsOriginales.map(p => normalizarCodigo(p));
+            const prereqsInvalidos = prereqsNormalizados.filter(p => !existeEnMalla(p, todosLosRamos));
+            const prereqsValidos = prereqsNormalizados.filter(p => existeEnMalla(p, todosLosRamos));
+            
+            let mensaje = "Este ramo tiene prerrequisitos no cumplidos:\n\n";
+            
+            if (prereqsValidos.length > 0) {
+              mensaje += "Prerrequisitos pendientes:\n";
+              prereqsValidos.forEach((p, i) => {
+                mensaje += `  • ${prereqsOriginales[prereqsNormalizados.indexOf(p)]}\n`;
+              });
+            }
+            
+            if (prereqsInvalidos.length > 0) {
+              mensaje += "\n⚠️ Prerrequisitos inválidos (no existen en malla):\n";
+              prereqsInvalidos.forEach((p, i) => {
+                mensaje += `  • ${prereqsOriginales[prereqsNormalizados.indexOf(p)]}\n`;
+              });
+            }
+            
+            alert(mensaje);
             return;
           }
 
@@ -801,11 +934,8 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       )
     ]);
 
-    const cumplePrereq = (curso) => {
-      if (!curso.prereq || curso.prereq.trim() === "") return true;
-      const prereqs = curso.prereq.split(",").map((p) => normalizarCodigo(p));
-      return prereqs.every(p => aprobadosSimulados.has(p));
-    };
+    const cumplePrereq = (curso) => 
+      cumplePrereqMejorado(curso, aprobadosSimulados, malla);
 
     const planAutomatico = [];
     const LIMITE_CREDITOS = 30;
