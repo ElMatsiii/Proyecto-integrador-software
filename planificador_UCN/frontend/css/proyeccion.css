@@ -225,3 +225,71 @@
     min-height: 90px;
   }
 }
+.pagina-proyeccion main {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.malla-proyeccion {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  overflow-x: auto;
+  padding: 30px 20px;
+  background-color: var(--bg-body);
+  border-radius: 10px;
+  max-width: 100%;
+}
+
+.malla-proyeccion::-webkit-scrollbar {
+  height: 12px;
+}
+
+.malla-proyeccion::-webkit-scrollbar-track {
+  background: var(--bg-body);
+  border-radius: 10px;
+}
+
+.malla-proyeccion::-webkit-scrollbar-thumb {
+  background: #1a5569;
+  border-radius: 10px;
+}
+
+.malla-proyeccion::-webkit-scrollbar-thumb:hover {
+  background: #2a7a94;
+}
+
+.malla-proyeccion .bloque-nivel {
+  min-width: 200px;
+  max-width: 220px;
+}
+
+.header-semestre-actual {
+  max-width: 1200px;
+  margin: 0 auto 30px auto !important;
+}
+
+#contadorCreditosProyeccion {
+  max-width: 1200px;
+  margin: 0 auto 25px auto !important;
+}
+
+.botones-navegacion-semestre {
+  max-width: 1200px;
+  margin: 30px auto !important;
+}
+
+.resumen-progreso-semestre {
+  max-width: 1200px;
+  margin: 20px auto !important;
+}
+
+@media (max-width: 1024px) {
+  .malla-proyeccion {
+    justify-content: flex-start;
+    padding: 20px 10px;
+  }
+}

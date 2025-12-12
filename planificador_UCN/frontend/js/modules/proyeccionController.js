@@ -12,22 +12,20 @@ export async function initProyeccion() {
     return (window.location.href = "index.html");
   }
 
-  const btnManual = document.getElementById("btnIrManual");
+  // Cargar proyección manual automáticamente al entrar
+  await mostrarMallaProyeccionManual(auth, carrera, contenedor);
+
+  // Botón para proyección automática
   const btnAuto = document.getElementById("btnIrAutomatica");
-
-  const accionesContainer = document.querySelector(".acciones");
-  
-  if (btnManual) {
-    btnManual.addEventListener("click", async () => {
-      if (accionesContainer) accionesContainer.style.display = "none";
-      await mostrarMallaProyeccionManual(auth, carrera, contenedor);
-    });
-  }
-
   if (btnAuto) {
     btnAuto.addEventListener("click", async () => {
-      if (accionesContainer) accionesContainer.style.display = "none";
-      await generarProyeccionAutomatica(auth, carrera, contenedor);
+      // Confirmar si quiere cambiar a automática
+      const confirmar = confirm(
+        "¿Deseas cambiar a proyección automática? Se perderá el progreso actual de la proyección manual."
+      );
+      if (confirmar) {
+        await generarProyeccionAutomatica(auth, carrera, contenedor);
+      }
     });
   }
 }
@@ -145,15 +143,16 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
   const infoSemestre = document.createElement("div");
   infoSemestre.className = "header-semestre-actual";
-  infoSemestre.style.cssText = `
-    background: linear-gradient(135deg, #1a5569 0%, #2a7a94 100%);
-    color: white;
-    padding: 25px 30px;
-    border-radius: 15px;
-    margin: 0 0 30px 0;
-    box-shadow: 0 4px 15px rgba(26, 85, 105, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  `;
+  infoSemestre.style.cssText =` 
+  background: linear-gradient(135deg, #1a5569 0%, #2a7a94 100%);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 15px;
+  margin: 0 auto 30px auto;
+  max-width: 1200px;
+  box-shadow: 0 4px 15px rgba(26, 85, 105, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+`;
   infoSemestre.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div style="flex: 1; min-width: 250px;">

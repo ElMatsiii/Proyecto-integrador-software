@@ -27,14 +27,30 @@
   </nav>
 
   <main>
-    <h2>Proyecciones</h2>
-    <p>Visualiza tu progreso académico en la malla curricular y genera una proyección manual o automática.</p>
-    <div class="acciones">
-      <button id="btnIrManual">Proyeccion Manual</button>
-      <button id="btnIrAutomatica">Proyección Automática</button>
+  <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+    <!-- Header mejorado -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h2 style="margin-bottom: 10px; font-size: 2rem;">Proyección Manual</h2>
+      <p style="color: #888; margin-bottom: 20px;">
+        Visualiza tu progreso académico y planifica tu carrera semestre por semestre
+      </p>
+
+      <!-- Botón de proyección automática centrado -->
+      <button id="btnIrAutomatica" style="
+        background: linear-gradient(135deg, #2a7a94 0%, #1a5569 100%);
+        padding: 12px 30px;
+        font-size: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(42, 122, 148, 0.3);
+      ">
+        Cambiar a Proyección Automática
+      </button>
     </div>
+
+    <!-- Contenedor de la malla centrado -->
     <div id="mallaProyeccionContainer" class="malla-proyeccion"></div>
-  </main>
+  </div>
+</main>
   <footer>
     © 2025 Universidad Católica del Norte
   </footer>
