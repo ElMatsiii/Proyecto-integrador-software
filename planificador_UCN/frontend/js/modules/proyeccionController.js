@@ -183,63 +183,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     return !aprobadosSimulados.has(cod);
   });
 
-  // Analizar prerrequisitos inválidos y mostrar advertencia si hay
-  if (semestreIndex === 0) {
-    const invalidos = analizarPrerequisitosInvalidos(todosLosRamos);
-    if (invalidos.length > 0) {
-      console.warn("⚠️ Prerrequisitos inválidos encontrados:", invalidos);
-      
-      // Mostrar advertencia al usuario
-      const advertencia = document.createElement("div");
-      advertencia.style.cssText = `
-        background: #fff3cd;
-        border: 2px solid #ffc107;
-        border-radius: 10px;
-        padding: 15px 20px;
-        margin: 0 0 20px 0;
-        color: #856404;
-      `;
-      advertencia.innerHTML = `
-        <div style="display: flex; align-items: start; gap: 10px;">
-          <span style="font-size: 1.5rem;">⚠️</span>
-          <div>
-            <strong>Advertencia:</strong> Se detectaron ${invalidos.length} prerrequisito(s) inválido(s) en la malla.
-            <br><small>Estos prerrequisitos serán ignorados automáticamente en la proyección.</small>
-            <button id="btnVerDetalles" style="
-              margin-top: 10px;
-              background: #856404;
-              color: white;
-              border: none;
-              padding: 5px 15px;
-              border-radius: 5px;
-              cursor: pointer;
-              font-size: 0.85rem;
-            ">Ver detalles</button>
-          </div>
-        </div>
-      `;
-      contenedor.before(advertencia);
-      
-      // Agregar evento para mostrar detalles
-      setTimeout(() => {
-        const btnDetalles = document.getElementById("btnVerDetalles");
-        if (btnDetalles) {
-          btnDetalles.addEventListener("click", () => {
-            const detallesHTML = invalidos.map(inv => 
-              `• <strong>${inv.ramo}</strong> (${inv.nombreRamo}): requiere <code>${inv.prereqInvalido}</code> (no existe)`
-            ).join("<br>");
-            
-            alert("Prerrequisitos inválidos encontrados:\n\n" + 
-              invalidos.map(inv => 
-                `- ${inv.ramo} (${inv.nombreRamo}): requiere ${inv.prereqInvalido} (no existe)`
-              ).join("\n")
-            );
-          });
-        }
-      }, 100);
-    }
-  }
-
   const niveles = {};
   ramosDisponibles.forEach((curso) => {
     if (!niveles[curso.nivel]) niveles[curso.nivel] = [];
