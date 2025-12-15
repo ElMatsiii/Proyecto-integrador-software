@@ -9,24 +9,39 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
   const { usuario, password } = req.body;
 
+  console.log("=== DEBUG LOGIN ADMIN ===");
+  console.log("Usuario recibido:", usuario);
+  console.log("Password recibido:", password ? "***" : "vacío");
+
   if (!usuario || !password) {
+    console.log("Error: Faltan credenciales");
     return res.status(400).json({ error: "Faltan usuario o contraseña" });
   }
 
   try {
+    console.log("Buscando admin con email:", usuario);
+    
     const result = await pool.query(
       "SELECT * FROM administradores WHERE email = $1",
       [usuario]
     );
 
+    console.log("Admins encontrados:", result.rows.length);
+
     if (result.rows.length === 0) {
+      console.log("Error: No se encontró admin con ese email");
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
     const admin = result.rows[0];
+    console.log("Admin encontrado:", admin.email);
+    console.log("Hash en BD:", admin.password_hash.substring(0, 20) + "...");
+    
     const passwordValido = await bcrypt.compare(password, admin.password_hash);
+    console.log("Password válido:", passwordValido);
 
     if (!passwordValido) {
+      console.log("Error: Password incorrecto");
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
@@ -40,6 +55,9 @@ router.post("/login", async (req, res) => {
       email: admin.email, 
       rol: "admin" 
     });
+
+    console.log("Login exitoso, enviando token");
+    console.log("=== FIN DEBUG ===");
 
     res.json({
       token,

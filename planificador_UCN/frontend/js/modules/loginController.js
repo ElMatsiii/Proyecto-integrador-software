@@ -17,18 +17,37 @@ export function initLogin() {
       const usuario = document.getElementById("usuario").value.trim();
       const password = document.getElementById("password").value.trim();
 
+      console.log("=== LOGIN ATTEMPT ===");
+      console.log("Usuario:", usuario);
+      console.log("Tiene @:", usuario.includes("@"));
+
       const esEmail = usuario.includes("@");
 
       if (esEmail) {
-        await intentarLoginEstudiante(usuario, password, mensaje);
+        console.log("Detectado como EMAIL - intentando login estudiante/admin");
+        
+        const esEmailAdmin = usuario.toLowerCase().includes("admin");
+        
+        if (esEmailAdmin) {
+          console.log("Email contiene 'admin' - intentando login admin");
+          await intentarLoginAdmin(usuario, password, mensaje);
+        } else {
+          console.log("Email sin 'admin' - intentando login estudiante");
+          await intentarLoginEstudiante(usuario, password, mensaje);
+        }
       } else {
-        await intentarLoginAdmin(usuario, password, mensaje);
+        console.log("NO es email - mostrando error");
+        mensaje.textContent = "Por favor ingresa un correo electrónico válido";
+        mensaje.style.color = "#e74c3c";
       }
     });
   });
 }
 
 async function intentarLoginEstudiante(email, password, mensaje) {
+  console.log("→ Intentando login estudiante");
+  console.log("  URL:", `${CONFIG.API_URL}/login`);
+  
   try {
     const response = await fetch(`${CONFIG.API_URL}/login`, {
       method: "POST",
@@ -36,11 +55,15 @@ async function intentarLoginEstudiante(email, password, mensaje) {
       body: JSON.stringify({ email, password })
     });
 
+    console.log("  Status:", response.status);
     const data = await response.json();
+    console.log("  Response:", data);
 
     if (!response.ok) {
       throw new Error(data.error || "Credenciales incorrectas");
     }
+
+    console.log("✓ Login estudiante exitoso");
 
     storage.setAuth({ 
       token: data.token, 
@@ -55,13 +78,18 @@ async function intentarLoginEstudiante(email, password, mensaje) {
 
     window.location.href = "../html/inicio.html";
   } catch (err) {
-    console.error(err);
-    mensaje.textContent = err.message || "Error al iniciar sesión";
-    mensaje.style.color = "#e74c3c";
+    console.error("✗ Error login estudiante:", err);
+    
+    console.log("→ Intentando login admin como fallback");
+    await intentarLoginAdmin(email, password, mensaje);
   }
 }
 
 async function intentarLoginAdmin(usuario, password, mensaje) {
+  console.log("→ Intentando login admin");
+  console.log("  URL:", `${CONFIG.API_URL}/admin/login`);
+  console.log("  Usuario:", usuario);
+  
   try {
     const response = await fetch(`${CONFIG.API_URL}/admin/login`, {
       method: "POST",
@@ -69,11 +97,15 @@ async function intentarLoginAdmin(usuario, password, mensaje) {
       body: JSON.stringify({ usuario, password })
     });
 
+    console.log("  Status:", response.status);
     const data = await response.json();
+    console.log("  Response:", data);
 
     if (!response.ok) {
       throw new Error(data.error || "Credenciales incorrectas");
     }
+
+    console.log("✓ Login admin exitoso");
 
     sessionStorage.setItem("adminAuth", JSON.stringify({
       token: data.token,
@@ -82,8 +114,8 @@ async function intentarLoginAdmin(usuario, password, mensaje) {
 
     window.location.href = "../html/admin-dashboard.html";
   } catch (error) {
-    console.error(error);
-    mensaje.textContent = error.message || "Error al iniciar sesión";
+    console.error("✗ Error login admin:", error);
+    mensaje.textContent = "Credenciales incorrectas. Verifica tu email y contraseña.";
     mensaje.style.color = "#e74c3c";
   }
 }
