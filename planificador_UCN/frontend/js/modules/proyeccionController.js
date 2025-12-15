@@ -745,6 +745,7 @@ async function guardarProyeccionManualFinal(plan, carrera) {
 
   const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
   const fechaEgreso = calcularFechaEgreso(plan[0]?.semestre, plan.length);
+  const periodoProyectado = calcularPeriodoProyectado(plan[0]?.semestre, plan.length);
   
   const nombreProyeccion = prompt(
     "Ingresa un nombre para esta proyección:", 
@@ -764,6 +765,7 @@ async function guardarProyeccionManualFinal(plan, carrera) {
     total_ramos: ramosSeleccionados.length,
     semestres_proyectados: plan.length,
     fecha_egreso_estimada: fechaEgreso,
+    periodo_proyectado: periodoProyectado,
     datos_completos: {
       plan: plan,
       ramos: ramosSeleccionados,
@@ -777,7 +779,8 @@ async function guardarProyeccionManualFinal(plan, carrera) {
       `${resultado.mensaje}\n\n` +
       `Total: ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n` +
       `Créditos: ${totalCreditos}\n` +
-      `Egreso estimado: ${fechaEgreso}\n\n` +
+      `Egreso estimado: ${fechaEgreso}\n` +
+      `Período proyectado: ${periodoProyectado}\n\n` +
       `Puedes ver tus proyecciones guardadas en la sección "Versiones"`
     );
     
@@ -1095,6 +1098,7 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
   });
 
   const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
+  const periodoProyectado = plan.length > 0 ? `${plan[plan.length - 1].semestre}` : null;
   
   const nombreProyeccion = prompt(
     "Ingresa un nombre para esta proyección:", 
@@ -1114,6 +1118,7 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
     total_ramos: ramosSeleccionados.length,
     semestres_proyectados: plan.length,
     fecha_egreso_estimada: null,
+    periodo_proyectado: periodoProyectado,
     datos_completos: {
       plan: plan,
       ramos: ramosSeleccionados,
@@ -1126,7 +1131,8 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
     alert(
       `${resultado.mensaje}\n\n` +
       `Total: ${ramosSeleccionados.length} ramos en ${plan.length} semestres\n` +
-      `Créditos: ${totalCreditos}\n\n` +
+      `Créditos: ${totalCreditos}\n` +
+      `Período proyectado: ${periodoProyectado}\n\n` +
       `Puedes ver tus proyecciones guardadas en la sección "Versiones"`
     );
     
@@ -1137,4 +1143,23 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
     console.error("Error al guardar proyección:", error);
     alert("Error al guardar la proyección. Intenta nuevamente.");
   }
+}
+
+function calcularPeriodoProyectado(semestreInicio, cantidadSemestres) {
+  const añoInicio = Math.floor(semestreInicio / 100);
+  const tipoSemestre = semestreInicio % 100;
+  
+  let añoFinal = añoInicio;
+  let tipoFinal = tipoSemestre;
+  
+  for (let i = 1; i < cantidadSemestres; i++) {
+    if (tipoFinal === 10) {
+      tipoFinal = 20;
+    } else {
+      tipoFinal = 10;
+      añoFinal++;
+    }
+  }
+  
+  return `${añoFinal}${tipoFinal}`;
 }

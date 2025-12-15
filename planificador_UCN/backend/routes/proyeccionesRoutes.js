@@ -4,10 +4,19 @@ import { autenticarToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Guardar nueva proyección
 router.post("/", autenticarToken, async (req, res) => {
   const { rut } = req.usuario;
-  const { codigo_carrera, tipo, nombre, total_creditos, total_ramos, semestres_proyectados, fecha_egreso_estimada, datos_completos } = req.body;
+  const { 
+    codigo_carrera, 
+    tipo, 
+    nombre, 
+    total_creditos, 
+    total_ramos, 
+    semestres_proyectados, 
+    fecha_egreso_estimada, 
+    datos_completos,
+    periodo_proyectado
+  } = req.body;
 
   if (!codigo_carrera || !tipo || !nombre || !datos_completos) {
     return res.status(400).json({ error: "Faltan parámetros requeridos" });
@@ -16,10 +25,22 @@ router.post("/", autenticarToken, async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO proyecciones 
-       (rut_usuario, codigo_carrera, tipo, nombre, total_creditos, total_ramos, semestres_proyectados, fecha_egreso_estimada, datos_completos) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+       (rut_usuario, codigo_carrera, tipo, nombre, total_creditos, total_ramos, 
+        semestres_proyectados, fecha_egreso_estimada, datos_completos, periodo_proyectado) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
        RETURNING *`,
-      [rut, codigo_carrera, tipo, nombre, total_creditos, total_ramos, semestres_proyectados, fecha_egreso_estimada, JSON.stringify(datos_completos)]
+      [
+        rut, 
+        codigo_carrera, 
+        tipo, 
+        nombre, 
+        total_creditos, 
+        total_ramos, 
+        semestres_proyectados, 
+        fecha_egreso_estimada, 
+        JSON.stringify(datos_completos),
+        periodo_proyectado
+      ]
     );
 
     res.json({ 
@@ -33,7 +54,6 @@ router.post("/", autenticarToken, async (req, res) => {
   }
 });
 
-// Obtener todas las proyecciones del usuario
 router.get("/", autenticarToken, async (req, res) => {
   const { rut } = req.usuario;
   const { codigo_carrera } = req.query;
@@ -41,7 +61,7 @@ router.get("/", autenticarToken, async (req, res) => {
   try {
     let query = `
       SELECT id, tipo, nombre, fecha_creacion, total_creditos, total_ramos, 
-             semestres_proyectados, fecha_egreso_estimada, datos_completos 
+             semestres_proyectados, fecha_egreso_estimada, datos_completos, periodo_proyectado
       FROM proyecciones 
       WHERE rut_usuario = $1
     `;
@@ -62,7 +82,6 @@ router.get("/", autenticarToken, async (req, res) => {
   }
 });
 
-// Obtener una proyección específica
 router.get("/:id", autenticarToken, async (req, res) => {
   const { rut } = req.usuario;
   const { id } = req.params;
@@ -84,7 +103,6 @@ router.get("/:id", autenticarToken, async (req, res) => {
   }
 });
 
-// Eliminar proyección
 router.delete("/:id", autenticarToken, async (req, res) => {
   const { rut } = req.usuario;
   const { id } = req.params;

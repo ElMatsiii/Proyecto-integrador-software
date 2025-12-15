@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin | Planificador UCN</title>
+  <script src="../js/core/theme-initializer.js"></script>
+  <link rel="stylesheet" href="../css/critical-theme.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/tables.css">
+  <style>
+    .admin-header {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      color: white;
+    }
+    .admin-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 10px;
+      border-left: 4px solid #f39c12;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .stat-card h3 {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #f39c12;
+      margin: 0;
+    }
+    .filters {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    .filter-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    .filter-group select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    .btn-filtrar {
+      padding: 10px 25px;
+      background: #f39c12;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-filtrar:hover {
+      background: #e67e22;
+      transform: translateY(-2px);
+    }
+    .tabla-demanda {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .tabla-demanda th {
+      background: #f39c12;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .tabla-demanda td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+    .tabla-demanda tr:hover {
+      background: rgba(243, 156, 18, 0.1);
+    }
+    .badge-demanda {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .badge-alta { background: #e74c3c; color: white; }
+    .badge-media { background: #f39c12; color: white; }
+    .badge-baja { background: #3498db; color: white; }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state svg {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="../html/admin-dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="../html/admin-login.html" class="logout">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="admin-header">
+      <span class="admin-badge">ADMINISTRADOR</span>
+      <h2 style="margin: 10px 0 5px 0;">Panel de Control</h2>
+      <p id="adminName" style="margin: 0; opacity: 0.9;"></p>
+    </div>
+
+    <div class="stats-grid" id="statsContainer">
+      <div class="stat-card">
+        <h3>Total Proyecciones</h3>
+        <p class="stat-value" id="statProyecciones">-</p>
+      </div>
+      <div class="stat-card">
+        <h3>Estudiantes Activos</h3>
+        <p class="stat-value" id="statEstudiantes">-</p>
+      </div>
+      <div class="stat-card">
+        <h3>Ramos Proyectados</h3>
+        <p class="stat-value" id="statRamos">-</p>
+      </div>
+      <div class="stat-card">
+        <h3>Carreras</h3>
+        <p class="stat-value" id="statCarreras">-</p>
+      </div>
+    </div>
+
+    <h3>Análisis de Demanda de Ramos</h3>
+    
+    <div class="filters">
+      <div class="filter-group">
+        <label for="filtroPeriodo">Período Proyectado</label>
+        <select id="filtroPeriodo">
+          <option value="">Todos los períodos</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filtroCarrera">Carrera</label>
+        <select id="filtroCarrera">
+          <option value="">Todas las carreras</option>
+        </select>
+      </div>
+      <button class="btn-filtrar" id="btnFiltrar">Aplicar Filtros</button>
+    </div>
+
+    <div id="tablaContainer">
+      <p style="text-align: center; padding: 40px;">Cargando datos...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Universidad Católica del Norte - Panel Administrativo</p>
+  </footer>
+
+  <script type="module">
+    import { CONFIG } from "../config/config.js";
+
+    const authData = JSON.parse(sessionStorage.getItem("adminAuth") || "null");
+    
+    if (!authData || !authData.token) {
+      window.location.href = "../html/admin-login.html";
+    }
+
+    const headers = {
+      "Authorization": `Bearer ${authData.token}`,
+      "Content-Type": "application/json"
+    };
+
+    document.getElementById("adminName").textContent = 
+      `Bienvenido, ${authData.admin.nombre}`;
+
+    document.querySelector(".logout").addEventListener("click", (e) => {
+      e.preventDefault();
+      sessionStorage.removeItem("adminAuth");
+      window.location.href = "../html/admin-login.html";
+    });
+
+    async function cargarEstadisticas() {
+      try {
+        const response = await fetch(`${CONFIG.API_URL}/admin/estadisticas`, { headers });
+        const data = await response.json();
+
+        document.getElementById("statProyecciones").textContent = 
+          data.total_proyecciones;
+        document.getElementById("statEstudiantes").textContent = 
+          data.total_estudiantes;
+        document.getElementById("statRamos").textContent = 
+          data.ramos_mas_demandados?.length || 0;
+        document.getElementById("statCarreras").textContent = 
+          data.proyecciones_por_carrera?.length || 0;
+
+        const carreras = data.proyecciones_por_carrera || [];
+        const selectCarrera = document.getElementById("filtroCarrera");
+        carreras.forEach(c => {
+          const option = document.createElement("option");
+          option.value = c.codigo_carrera;
+          option.textContent = c.codigo_carrera;
+          selectCarrera.appendChild(option);
+        });
+
+      } catch (error) {
+        console.error("Error al cargar estadísticas:", error);
+      }
+    }
+
+    async function cargarPeriodos() {
+      try {
+        const response = await fetch(`${CONFIG.API_URL}/admin/periodos-disponibles`, { headers });
+        const periodos = await response.json();
+
+        const select = document.getElementById("filtroPeriodo");
+        periodos.forEach(p => {
+          const option = document.createElement("option");
+          option.value = p;
+          option.textContent = formatearPeriodo(p);
+          select.appendChild(option);
+        });
+
+        if (periodos.length > 0) {
+          select.value = periodos[0];
+        }
+      } catch (error) {
+        console.error("Error al cargar períodos:", error);
+      }
+    }
+
+    async function cargarDemanda() {
+      const periodo = document.getElementById("filtroPeriodo").value;
+      const carrera = document.getElementById("filtroCarrera").value;
+
+      const params = new URLSearchParams();
+      if (periodo) params.append("periodo", periodo);
+      if (carrera) params.append("codigo_carrera", carrera);
+
+      try {
+        const response = await fetch(
+          `${CONFIG.API_URL}/admin/demanda-ramos?${params}`,
+          { headers }
+        );
+        const data = await response.json();
+
+        renderTablaDemanda(data);
+      } catch (error) {
+        console.error("Error al cargar demanda:", error);
+        document.getElementById("tablaContainer").innerHTML = 
+          '<p style="color: red; text-align: center;">Error al cargar datos de demanda</p>';
+      }
+    }
+
+    function renderTablaDemanda(datos) {
+      const container = document.getElementById("tablaContainer");
+
+      if (!datos || datos.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>No hay datos de demanda para los filtros seleccionados</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <table class="tabla-demanda">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre del Ramo</th>
+              <th>Carrera</th>
+              <th>Período</th>
+              <th>Estudiantes</th>
+              <th>Demanda</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      datos.forEach(ramo => {
+        const demanda = parseInt(ramo.cantidad_estudiantes);
+        let badgeClass = "badge-baja";
+        let badgeText = "Baja";
+
+        if (demanda >= 30) {
+          badgeClass = "badge-alta";
+          badgeText = "Alta";
+        } else if (demanda >= 15) {
+          badgeClass = "badge-media";
+          badgeText = "Media";
+        }
+
+        html += `
+          <tr>
+            <td><strong>${ramo.codigo_ramo}</strong></td>
+            <td>${ramo.nombre_ramo}</td>
+            <td>${ramo.codigo_carrera}</td>
+            <td>${formatearPeriodo(ramo.periodo_proyectado)}</td>
+            <td><strong>${demanda}</strong></td>
+            <td><span class="badge-demanda ${badgeClass}">${badgeText}</span></td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function formatearPeriodo(periodo) {
+      if (!periodo) return "Sin período";
+      const año = Math.floor(periodo / 100);
+      const semestre = periodo % 100;
+      return `${año}-${semestre === 10 ? '1' : '2'}`;
+    }
+
+    document.getElementById("btnFiltrar").addEventListener("click", cargarDemanda);
+
+    cargarEstadisticas();
+    cargarPeriodos();
+    
+    setTimeout(cargarDemanda, 500);
+  </script>
+</body>
+</html>

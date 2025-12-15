@@ -2,6 +2,7 @@ import loginRoutes from "./routes/loginRoutes.js";
 import mallaRoutes from "./routes/mallaRoutes.js";
 import avanceRoutes from "./routes/avanceRoutes.js";
 import proyeccionesRoutes from "./routes/proyeccionesRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { autenticarToken } from "./middleware/authMiddleware.js";
 import express from "express";
 import axios from "axios";
@@ -57,11 +58,11 @@ app.get("/api/malla", autenticarToken, async (req, res) => {
   }
 });
 
-// Rutas
 app.use("/api/login", loginRoutes);
 app.use("/api/malla", mallaRoutes);
 app.use("/api/avance", avanceRoutes);
 app.use("/api/proyecciones", proyeccionesRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((req, res) => {
   res.status(404).send(`
@@ -77,5 +78,7 @@ app.listen(PORT, () => {
   console.log("Frontend disponible en: /html/index.html");
   console.log("Endpoint API disponible en: /api/malla");
   console.log("Endpoint proyecciones: /api/proyecciones");
+  console.log("Endpoint admin: /api/admin");
+  console.log("Login admin: /html/admin-login.html");
   console.log("========================================\n");
 });

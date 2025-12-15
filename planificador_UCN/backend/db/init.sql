@@ -48,3 +48,56 @@ CREATE TABLE IF NOT EXISTS proyecciones (
 CREATE INDEX IF NOT EXISTS idx_proyecciones_usuario ON proyecciones(rut_usuario);
 CREATE INDEX IF NOT EXISTS idx_proyecciones_carrera ON proyecciones(rut_usuario, codigo_carrera);
 CREATE INDEX IF NOT EXISTS idx_proyecciones_favoritas ON proyecciones(rut_usuario, es_favorita);
+
+-- Actualización del schema: agregar tabla de administradores
+
+CREATE TABLE IF NOT EXISTS administradores (
+  id SERIAL PRIMARY KEY,
+  usuario TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  nombre TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  fecha_creacion TIMESTAMP NOT NULL DEFAULT NOW(),
+  ultimo_acceso TIMESTAMP
+);
+
+-- Insertar administrador por defecto
+-- Usuario: admin
+-- Contraseña: admin123 (hash bcrypt)
+INSERT INTO administradores (usuario, password_hash, nombre, email) 
+VALUES (
+  'admin',
+  '$2a$10$YJZvXqF5xGZYH7K1L5qY9eF8OQx4K2d5R8QX2qL5hK7K8R9Y2qL5h',
+  'Administrador UCN',
+  'admin@ucn.cl'
+) ON CONFLICT (usuario) DO NOTHING;
+
+-- Actualizar tabla de proyecciones para incluir período proyectado
+ALTER TABLE proyecciones 
+ADD COLUMN IF NOT EXISTS periodo_proyectado TEXT;
+
+-- Índice para consultas de demanda
+CREATE INDEX IF NOT EXISTS idx_proyecciones_periodo 
+ON proyecciones(periodo_proyectado, codigo_carrera);
+
+-- Vista para análisis de demanda
+CREATE OR REPLACE VIEW demanda_ramos AS
+SELECT 
+  p.codigo_carrera,
+  p.periodo_proyectado,
+  r.codigo_ramo,
+  r.nombre_ramo,
+  COUNT(DISTINCT p.rut_usuario) as cantidad_estudiantes,
+  SUM(r.creditos) as creditos_totales,
+  AVG(r.creditos) as creditos_promedio
+FROM proyecciones p
+CROSS JOIN LATERAL (
+  SELECT 
+    (ramo->>'codigo')::TEXT as codigo_ramo,
+    (ramo->>'nombre')::TEXT as nombre_ramo,
+    COALESCE((ramo->>'creditos')::INT, 0) as creditos
+  FROM jsonb_array_elements(p.datos_completos->'ramos') as ramo
+) r
+WHERE p.periodo_proyectado IS NOT NULL
+GROUP BY p.codigo_carrera, p.periodo_proyectado, r.codigo_ramo, r.nombre_ramo
+ORDER BY p.periodo_proyectado DESC, cantidad_estudiantes DESC;
