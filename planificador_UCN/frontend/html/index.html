@@ -6,24 +6,91 @@
   <title>Login | Planificador de Malla</title>
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/login.css">
+  <style>
+    .tab-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab:hover {
+      color: #1a5569;
+      background: rgba(26, 85, 105, 0.05);
+    }
+
+    .tab.active {
+      color: #808080;
+      border-bottom-color: #707070;
+      background: rgba(26, 85, 105, 0.05);
+    }
+
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    .admin-badge {
+      background: #f39c12;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+  </style>
 </head>
-<body class = "pagina-login">
+<body class="pagina-login">
   <header>
     <h1>Bienvenido al planificador UCN</h1>
   </header>
 
   <main class="auth-container" id="loginContainer">
     <h2>Iniciar sesión</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="Correo electrónico" required>
-      <input type="password" id="password" placeholder="Contraseña" required>
-      <button type="submit">Ingresar</button>
-      <div id="mensaje"></div>
-    </form>
+    
+    <div class="tab-container">
+      <button class="tab" data-tab="estudiante">Estudiante</button>
+      <button class="tab active" data-tab="admin">Administrador <span class="admin-badge">ADMIN</span></button>
+    </div>
+
+    <div id="form-estudiante" class="form-container active">
+      <form id="loginFormEstudiante">
+        <input type="email" id="emailEstudiante" placeholder="Correo electrónico" required autocomplete="username">
+        <input type="password" id="passwordEstudiante" placeholder="Contraseña" required autocomplete="current-password">
+        <button type="submit">Ingresar como Estudiante</button>
+        <div id="mensajeEstudiante"></div>
+      </form>
+    </div>
+
+    <div id="form-admin" class="form-container">
+      <form id="loginFormAdmin">
+        <input type="text" id="usuarioAdmin" placeholder="Usuario administrativo" required autocomplete="username">
+        <input type="password" id="passwordAdmin" placeholder="Contraseña" required autocomplete="current-password">
+        <button type="submit" style="background: #f39c12;">Ingresar como Administrador</button>
+        <div id="mensajeAdmin"></div>
+      </form>
+    </div>
   </main>
 
   <footer>
-    <p>© 2025 Universidad Católica del Norte</p>
+    <p>&copy; 2025 Universidad Católica del Norte</p>
   </footer>
 
   <script type="module" src="../js/main.js"></script>

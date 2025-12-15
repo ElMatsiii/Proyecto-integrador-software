@@ -38,7 +38,7 @@ header h1 {
   padding: 2.5rem;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  width: 380px;
+  width: 420px;
   text-align: center;
   margin-top: 100px;
   border-top: 5px solid #1a5569;
@@ -50,6 +50,68 @@ header h1 {
   font-size: 26px;
   color: #1a5569;
   font-weight: 600;
+}
+
+.tab-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab {
+  flex: 1;
+  padding: 15px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.tab:hover {
+  color: #1a5569;
+  background: rgba(26, 85, 105, 0.05);
+}
+
+.tab.active {
+  color: #1a5569;
+  border-bottom-color: #1a5569;
+  background: rgba(26, 85, 105, 0.05);
+}
+
+.admin-badge {
+  background: #f39c12;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 8px;
+  display: inline-block;
+}
+
+.form-container {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-container.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .auth-container input,
@@ -116,13 +178,18 @@ header h1 {
   text-decoration: underline;
 }
 
+#mensajeEstudiante,
+#mensajeAdmin,
 #mensaje {
   margin-top: 15px;
   padding: 10px;
   border-radius: 6px;
   font-size: 14px;
+  min-height: 20px;
 }
 
+#mensajeEstudiante:not(:empty),
+#mensajeAdmin:not(:empty),
 #mensaje:not(:empty) {
   background: #fdebd0;
   color: #856404;
@@ -136,7 +203,6 @@ footer {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .auth-container,
   .login-container {
@@ -149,4 +215,62 @@ footer {
     font-size: 1.2rem;
     padding: 15px 0;
   }
+
+  .tab {
+    font-size: 14px;
+    padding: 12px 8px;
+  }
+
+  .admin-badge {
+    display: block;
+    margin: 5px auto 0;
+  }
 }
+.tab-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a5569;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab:hover {
+      color: #1a5569;
+      background: rgba(26, 85, 105, 0.05);
+    }
+
+    .tab.active {
+      color: #7e7e7e;
+      border-bottom-color: #1a5569;
+      background: rgba(26, 85, 105, 0.05);
+    }
+
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    .admin-badge {
+      background: #f39c12;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
