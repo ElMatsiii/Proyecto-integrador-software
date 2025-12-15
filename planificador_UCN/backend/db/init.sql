@@ -1,4 +1,3 @@
--- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
   rut TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
@@ -6,7 +5,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
   fecha_login TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Tabla de carreras
 CREATE TABLE IF NOT EXISTS carreras (
   id SERIAL PRIMARY KEY,
   codigo TEXT NOT NULL,
@@ -17,7 +15,6 @@ CREATE TABLE IF NOT EXISTS carreras (
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_carreras_usuario_codigo ON carreras(rut_usuario, codigo);
 
--- Tabla de mallas
 CREATE TABLE IF NOT EXISTS mallas (
   id SERIAL PRIMARY KEY,
   codigo_asignatura TEXT,
@@ -28,7 +25,6 @@ CREATE TABLE IF NOT EXISTS mallas (
   codigo_carrera TEXT
 );
 
--- Tabla de proyecciones con campo de favoritos
 CREATE TABLE IF NOT EXISTS proyecciones (
   id SERIAL PRIMARY KEY,
   rut_usuario TEXT NOT NULL REFERENCES usuarios(rut) ON DELETE CASCADE,
@@ -41,46 +37,31 @@ CREATE TABLE IF NOT EXISTS proyecciones (
   semestres_proyectados INT,
   fecha_egreso_estimada TEXT,
   datos_completos JSONB NOT NULL,
-  es_favorita BOOLEAN DEFAULT FALSE
+  es_favorita BOOLEAN DEFAULT FALSE,
+  periodo_proyectado TEXT
 );
 
--- Índices para proyecciones
 CREATE INDEX IF NOT EXISTS idx_proyecciones_usuario ON proyecciones(rut_usuario);
 CREATE INDEX IF NOT EXISTS idx_proyecciones_carrera ON proyecciones(rut_usuario, codigo_carrera);
 CREATE INDEX IF NOT EXISTS idx_proyecciones_favoritas ON proyecciones(rut_usuario, es_favorita);
-
--- Actualización del schema: agregar tabla de administradores
+CREATE INDEX IF NOT EXISTS idx_proyecciones_periodo ON proyecciones(periodo_proyectado, codigo_carrera);
 
 CREATE TABLE IF NOT EXISTS administradores (
   id SERIAL PRIMARY KEY,
-  usuario TEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   nombre TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
   fecha_creacion TIMESTAMP NOT NULL DEFAULT NOW(),
   ultimo_acceso TIMESTAMP
 );
 
--- Insertar administrador por defecto
--- Usuario: admin
--- Contraseña: admin123 (hash bcrypt)
-INSERT INTO administradores (usuario, password_hash, nombre, email) 
+INSERT INTO administradores (email, password_hash, nombre) 
 VALUES (
-  'admin',
+  'admin@ucn.cl',
   '$2a$10$YJZvXqF5xGZYH7K1L5qY9eF8OQx4K2d5R8QX2qL5hK7K8R9Y2qL5h',
-  'Administrador UCN',
-  'admin@ucn.cl'
-) ON CONFLICT (usuario) DO NOTHING;
+  'Administrador UCN'
+) ON CONFLICT (email) DO NOTHING;
 
--- Actualizar tabla de proyecciones para incluir período proyectado
-ALTER TABLE proyecciones 
-ADD COLUMN IF NOT EXISTS periodo_proyectado TEXT;
-
--- Índice para consultas de demanda
-CREATE INDEX IF NOT EXISTS idx_proyecciones_periodo 
-ON proyecciones(periodo_proyectado, codigo_carrera);
-
--- Vista para análisis de demanda
 CREATE OR REPLACE VIEW demanda_ramos AS
 SELECT 
   p.codigo_carrera,

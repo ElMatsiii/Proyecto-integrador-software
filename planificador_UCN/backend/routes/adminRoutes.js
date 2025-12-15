@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM administradores WHERE usuario = $1",
+      "SELECT * FROM administradores WHERE email = $1",
       [usuario]
     );
 
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
 
     const token = generarToken({ 
       id: admin.id, 
-      usuario: admin.usuario, 
+      email: admin.email, 
       rol: "admin" 
     });
 
@@ -45,9 +45,8 @@ router.post("/login", async (req, res) => {
       token,
       admin: {
         id: admin.id,
-        usuario: admin.usuario,
-        nombre: admin.nombre,
-        email: admin.email
+        email: admin.email,
+        nombre: admin.nombre
       }
     });
   } catch (error) {
