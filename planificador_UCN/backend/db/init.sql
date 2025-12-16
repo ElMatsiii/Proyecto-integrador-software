@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS administradores (
 INSERT INTO administradores (email, password_hash, nombre) 
 VALUES (
   'admin@ucn.cl',
-  '$2a$10$YJZvXqF5xGZYH7K1L5qY9eF8OQx4K2d5R8QX2qL5hK7K8R9Y2qL5h',
+  '$2b$10$uLH/JZm4UAED6njIGP8jcea5eXUb4pCQvJxWDx94C4fqGRoaLClBa',
   'Administrador UCN'
 ) ON CONFLICT (email) DO NOTHING;
 

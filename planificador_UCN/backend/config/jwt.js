@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const SECRET = "clave-super-segura-ucn";
+dotenv.config();
+
+const SECRET = process.env.JWT_SECRET || "clave-super-segura-ucn";
 
 export function generarToken(datosUsuario) {
   return jwt.sign(datosUsuario, SECRET, { expiresIn: "2h" });
