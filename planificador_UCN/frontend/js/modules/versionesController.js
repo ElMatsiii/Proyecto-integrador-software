@@ -129,7 +129,6 @@ async function mostrarDetalleProyeccion(id) {
                     <th>Código</th>
                     <th>Nombre</th>
                     <th>Créditos</th>
-                    <th>Semestre</th>
                     <th>Período</th>
                   </tr>
                 </thead>
@@ -143,7 +142,6 @@ async function mostrarDetalleProyeccion(id) {
             <td>${ramo.codigo}</td>
             <td>${ramo.nombre}</td>
             <td>${ramo.creditos}</td>
-            <td>Semestre ${ramo.semestre || '—'}</td>
             <td>${ramo.periodo || '—'}</td>
           </tr>
         `;
