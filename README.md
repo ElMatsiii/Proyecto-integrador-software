@@ -14,7 +14,6 @@ Sistema web para la planificación y visualización de mallas curriculares de la
 - [Testing](#testing)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [API Endpoints](#api-endpoints)
-- [Contribución](#contribución)
 
 ## Descripción
 
