@@ -207,9 +207,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
   contador.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #1a5569, #2a7a94); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-          📚
-        </div>
         <div>
           <div style="font-size: 0.85rem; color: #666; margin-bottom: 2px;">Créditos seleccionados</div>
           <div style="font-size: 1.5rem; font-weight: 700; color: #1a5569;">
@@ -366,7 +363,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
       gap: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     `;
-    btnVolver.innerHTML = `<span>◀ Semestre Anterior</span>`;
+    btnVolver.innerHTML = `<span>Semestre Anterior</span>`;
     btnVolver.onmouseover = () => {
       btnVolver.style.background = "#f8f9fa";
       btnVolver.style.borderColor = "#95a5a6";
@@ -410,7 +407,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(26, 85, 105, 0.3);
   `;
-  btnSiguiente.innerHTML = `<span>Siguiente Semestre ▶</span>`;
+  btnSiguiente.innerHTML = `<span>Siguiente Semestre</span>`;
   btnSiguiente.onmouseover = () => {
     btnSiguiente.style.transform = "translateY(-2px)";
     btnSiguiente.style.boxShadow = "0 6px 16px rgba(26, 85, 105, 0.4)";
@@ -476,7 +473,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
   `;
-  btnFinalizar.innerHTML = `<span>✓ Finalizar y Guardar</span>`;
+  btnFinalizar.innerHTML = `<span>Finalizar y Guardar</span>`;
   btnFinalizar.onmouseover = () => {
     btnFinalizar.style.transform = "translateY(-2px)";
     btnFinalizar.style.boxShadow = "0 6px 16px rgba(39, 174, 96, 0.4)";
@@ -562,7 +559,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
   `;
   headerResumen.innerHTML = `
-    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">✓ Proyección Completada</h2>
+    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">Proyección Completada</h2>
     <p style="margin: 0; font-size: 1.1rem; opacity: 0.95;">
       Revisa tu plan de estudios y guárdalo cuando estés listo
     </p>
@@ -929,7 +926,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
   `;
   headerResumen.innerHTML = `
-    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">✓ Proyección Automática Generada</h2>
+    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">Proyección Automática Generada</h2>
     <p style="margin: 0; font-size: 1.1rem; opacity: 0.95;">
       Se ha generado una proyección óptima basada en prerrequisitos y límite de créditos
     </p>
