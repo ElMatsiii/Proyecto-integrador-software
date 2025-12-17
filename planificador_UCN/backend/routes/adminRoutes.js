@@ -74,13 +74,13 @@ router.post("/login", async (req, res) => {
 });
 
 // ============================================================================
-// CAMBIO PRINCIPAL: Query corregida que lee periodo de cada ramo individual
+// CORRECCIÓN PRINCIPAL: Query que lee correctamente el periodo de cada ramo
 // ============================================================================
 router.get("/demanda-ramos", autenticarToken, async (req, res) => {
   const { periodo, codigo_carrera } = req.query;
 
   try {
-    console.log("=== QUERY DEMANDA RAMOS ===");
+    console.log("=== QUERY DEMANDA RAMOS (CORREGIDA) ===");
     console.log("Periodo solicitado:", periodo);
     console.log("Carrera solicitada:", codigo_carrera);
 
@@ -97,17 +97,21 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
       FROM proyecciones p
       CROSS JOIN LATERAL jsonb_array_elements(p.datos_completos->'ramos') as ramo
       WHERE (ramo->>'periodo') IS NOT NULL
+        AND (ramo->>'periodo')::TEXT != ''
+        AND (ramo->>'periodo')::TEXT != 'null'
     `;
     
     const params = [];
     let paramIndex = 1;
 
+    // Filtro por periodo
     if (periodo) {
       query += ` AND (ramo->>'periodo')::TEXT = $${paramIndex}`;
       params.push(periodo);
       paramIndex++;
     }
 
+    // Filtro por carrera
     if (codigo_carrera) {
       query += ` AND p.codigo_carrera = $${paramIndex}`;
       params.push(codigo_carrera);
@@ -116,7 +120,7 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
 
     query += `
       GROUP BY p.codigo_carrera, (ramo->>'periodo')::TEXT, (ramo->>'codigo')::TEXT, (ramo->>'nombre')::TEXT
-      ORDER BY cantidad_estudiantes DESC, codigo_ramo
+      ORDER BY (ramo->>'periodo')::TEXT DESC, cantidad_estudiantes DESC, codigo_ramo
     `;
 
     console.log("Query ejecutada:", query);
@@ -127,17 +131,43 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
     console.log("Resultados encontrados:", result.rows.length);
     if (result.rows.length > 0) {
       console.log("Ejemplo de resultado:", result.rows[0]);
+      console.log("Periodos únicos encontrados:", [...new Set(result.rows.map(r => r.periodo_ramo))]);
+    } else {
+      console.log("⚠️ No se encontraron resultados");
+      
+      // Debug: verificar qué hay en la base de datos
+      const debugQuery = `
+        SELECT 
+          COUNT(*) as total_proyecciones,
+          COUNT(DISTINCT rut_usuario) as usuarios_unicos
+        FROM proyecciones
+      `;
+      const debugResult = await pool.query(debugQuery);
+      console.log("Debug - Proyecciones en BD:", debugResult.rows[0]);
+      
+      // Verificar estructura de datos_completos
+      const sampleQuery = `
+        SELECT 
+          datos_completos->'ramos' as ramos_sample
+        FROM proyecciones
+        LIMIT 1
+      `;
+      const sampleResult = await pool.query(sampleQuery);
+      if (sampleResult.rows.length > 0) {
+        console.log("Debug - Sample de ramos:", JSON.stringify(sampleResult.rows[0].ramos_sample, null, 2));
+      }
     }
 
     res.json(result.rows);
   } catch (error) {
-    console.error("Error al obtener demanda:", error);
+    console.error("❌ Error al obtener demanda:", error);
+    console.error("Stack:", error.stack);
     res.status(500).json({ error: "Error al obtener demanda de ramos" });
   }
 });
 
 // ============================================================================
-// CAMBIO SECUNDARIO: Estadísticas también usan periodo individual
+// Estadísticas generales
 // ============================================================================
 router.get("/estadisticas", autenticarToken, async (req, res) => {
   try {
@@ -159,7 +189,6 @@ router.get("/estadisticas", autenticarToken, async (req, res) => {
       ORDER BY cantidad_proyecciones DESC
     `);
 
-    // Query CORREGIDA: Lee periodo individual de cada ramo
     const ramosMasDemandados = await pool.query(`
       SELECT 
         (ramo->>'codigo')::TEXT as codigo_ramo,
@@ -187,18 +216,24 @@ router.get("/estadisticas", autenticarToken, async (req, res) => {
 });
 
 // ============================================================================
-// CAMBIO TERCIARIO: Periodos disponibles lee de periodos individuales
+// Periodos disponibles - Lee de los ramos individuales
 // ============================================================================
 router.get("/periodos-disponibles", autenticarToken, async (req, res) => {
   try {
-    // Query CORREGIDA: Lee periodos únicos de los ramos individuales
+    console.log("=== OBTENIENDO PERIODOS DISPONIBLES ===");
+    
     const result = await pool.query(`
       SELECT DISTINCT (ramo->>'periodo')::TEXT as periodo_proyectado
       FROM proyecciones p
       CROSS JOIN LATERAL jsonb_array_elements(p.datos_completos->'ramos') as ramo
       WHERE (ramo->>'periodo') IS NOT NULL
+        AND (ramo->>'periodo')::TEXT != ''
+        AND (ramo->>'periodo')::TEXT != 'null'
       ORDER BY periodo_proyectado DESC
     `);
+
+    console.log("Periodos encontrados:", result.rows.length);
+    console.log("Periodos:", result.rows.map(r => r.periodo_proyectado));
 
     res.json(result.rows.map(r => r.periodo_proyectado));
   } catch (error) {

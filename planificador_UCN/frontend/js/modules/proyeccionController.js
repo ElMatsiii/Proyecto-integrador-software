@@ -912,6 +912,7 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       const ramosSemestre = [];
       let creditosSemestre = 0;
 
+
       for (const ramo of disponibles) {
         if (creditosSemestre + ramo.creditos <= LIMITE_CREDITOS) {
           ramosSemestre.push({

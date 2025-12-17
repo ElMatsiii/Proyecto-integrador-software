@@ -129,11 +129,13 @@
         const response = await fetch(`${CONFIG.API_URL}/admin/periodos-disponibles`, { headers });
         const periodos = await response.json();
 
+        console.log("📅 Periodos recibidos del backend:", periodos);
+
         const select = document.getElementById("filtroPeriodo");
         periodos.forEach(p => {
           const option = document.createElement("option");
           option.value = p;
-          option.textContent = formatearPeriodo(p);
+          option.textContent = p; // Ya viene formateado como "2026-1"
           select.appendChild(option);
         });
 
@@ -149,6 +151,10 @@
       const periodo = document.getElementById("filtroPeriodo").value;
       const carrera = document.getElementById("filtroCarrera").value;
 
+      console.log("🔍 Cargando demanda con filtros:");
+      console.log("   Periodo:", periodo || "Todos");
+      console.log("   Carrera:", carrera || "Todas");
+
       const params = new URLSearchParams();
       if (periodo) params.append("periodo", periodo);
       if (carrera) params.append("codigo_carrera", carrera);
@@ -159,6 +165,11 @@
           { headers }
         );
         const data = await response.json();
+
+        console.log("📊 Datos recibidos:", data.length, "ramos");
+        if (data.length > 0) {
+          console.log("   Primer resultado:", data[0]);
+        }
 
         renderTablaDemanda(data);
       } catch (error) {
@@ -184,6 +195,8 @@
         `;
         return;
       }
+
+      console.log("🎨 Renderizando tabla con", datos.length, "filas");
 
       let html = `
         <table class="tabla-demanda">
@@ -213,12 +226,17 @@
           badgeText = "Media";
         }
 
+        // 🔧 CORRECCIÓN: Usar periodo_ramo en lugar de periodo_proyectado
+        const periodoMostrar = ramo.periodo_ramo || ramo.periodo_proyectado || "Sin período";
+
+        console.log(`   Ramo: ${ramo.codigo_ramo}, Periodo: ${periodoMostrar}`);
+
         html += `
           <tr>
-            <td><strong>${ramo.codigo_ramo}</strong></td>
-            <td>${ramo.nombre_ramo}</td>
-            <td>${ramo.codigo_carrera}</td>
-            <td>${formatearPeriodo(ramo.periodo_proyectado)}</td>
+            <td><strong>${ramo.codigo_ramo || "N/A"}</strong></td>
+            <td>${ramo.nombre_ramo || "Sin nombre"}</td>
+            <td>${ramo.codigo_carrera || "N/A"}</td>
+            <td><strong>${periodoMostrar}</strong></td>
             <td><strong>${demanda}</strong></td>
             <td><span class="badge-demanda ${badgeClass}">${badgeText}</span></td>
           </tr>
@@ -231,21 +249,20 @@
       `;
 
       container.innerHTML = html;
-    }
-
-    function formatearPeriodo(periodo) {
-      if (!periodo) return "Sin período";
-      const año = Math.floor(periodo / 100);
-      const semestre = periodo % 100;
-      return `${año}-${semestre === 10 ? '1' : '2'}`;
+      console.log("✅ Tabla renderizada exitosamente");
     }
 
     document.getElementById("btnFiltrar").addEventListener("click", cargarDemanda);
 
+    // Inicializar
+    console.log("🚀 Inicializando dashboard admin...");
     cargarEstadisticas();
     cargarPeriodos();
     
-    setTimeout(cargarDemanda, 500);
+    setTimeout(() => {
+      console.log("⏱️ Cargando demanda inicial...");
+      cargarDemanda();
+    }, 500);
   </script>
 </body>
 </html>
