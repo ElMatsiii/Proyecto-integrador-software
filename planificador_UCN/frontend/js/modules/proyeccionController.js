@@ -19,7 +19,6 @@ export async function initProyeccion() {
   const btnAuto = document.getElementById("btnIrAutomatica");
   if (btnAuto) {
     btnAuto.addEventListener("click", async () => {
-      // Confirmar si quiere cambiar a automática
       const confirmar = confirm(
         "¿Deseas cambiar a proyección automática? Se perderá el progreso actual de la proyección manual."
       );
@@ -35,53 +34,19 @@ function existeEnMalla(codigoPrereq, todosLosRamos) {
   return todosLosRamos.some(r => normalizarCodigo(r.codigo) === codNorm);
 }
 
-// Función mejorada que filtra prerrequisitos inexistentes
 function cumplePrereqMejorado(curso, aprobadosSimulados, todosLosRamos) {
   if (!curso.prereq || curso.prereq.trim() === "") return true;
   
   const prereqs = curso.prereq
     .split(",")
     .map((p) => normalizarCodigo(p.trim()))
-    .filter(p => p !== ""); // Filtrar strings vacíos
+    .filter(p => p !== "");
   
-  // Filtrar solo prerrequisitos que realmente existen en la malla
   const prereqsValidos = prereqs.filter(p => existeEnMalla(p, todosLosRamos));
   
-  // Si no hay prerrequisitos válidos, el curso está desbloqueado
   if (prereqsValidos.length === 0) return true;
   
-  // Verificar que todos los prerrequisitos válidos estén aprobados
   return prereqsValidos.every(p => aprobadosSimulados.has(p));
-}
-
-// Función para analizar y reportar prerrequisitos inválidos
-function analizarPrerequisitosInvalidos(malla) {
-  const todosLosCodigos = new Set(
-    malla.map(r => normalizarCodigo(r.codigo))
-  );
-  
-  const prerequisitosInvalidos = [];
-  
-  malla.forEach(ramo => {
-    if (!ramo.prereq || ramo.prereq.trim() === "") return;
-    
-    const prereqs = ramo.prereq
-      .split(",")
-      .map(p => normalizarCodigo(p.trim()))
-      .filter(p => p !== "");
-    
-    prereqs.forEach(prereq => {
-      if (!todosLosCodigos.has(prereq)) {
-        prerequisitosInvalidos.push({
-          ramo: ramo.codigo,
-          nombreRamo: ramo.asignatura,
-          prereqInvalido: prereq
-        });
-      }
-    });
-  });
-  
-  return prerequisitosInvalidos;
 }
 
 function limpiarElementosAnteriores() {
@@ -174,7 +139,7 @@ async function mostrarMallaProyeccionManual(auth, carrera, contenedor) {
 
   } catch (err) {
     console.error("Error al cargar malla de proyección:", err);
-    contenedor.innerHTML = `<p style="color:red;">Error al cargar malla curricular.</p>`;
+    contenedor.innerHTML = <p style="color:red;">Error al cargar malla curricular.</p>;
   }
 }
 
@@ -183,7 +148,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
   limpiarElementosAnteriores();
 
-  // USAR LA NUEVA FUNCIÓN MEJORADA
   const cumplePrereq = (curso) => cumplePrereqMejorado(curso, aprobadosSimulados, todosLosRamos);
 
   const ramosDisponibles = todosLosRamos.filter(r => {
@@ -200,7 +164,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
   contenedor.innerHTML = "";
   contenedor.classList.add("malla-proyeccion");
 
-  // Info del semestre actual
   const infoSemestre = document.createElement("div");
   infoSemestre.className = "header-semestre-actual";
   infoSemestre.style.cssText = `
@@ -233,7 +196,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
   `;
   contenedor.before(infoSemestre);
 
-  // Contador de créditos
   const contador = document.createElement("div");
   contador.id = "contadorCreditosProyeccion";
   contador.style.cssText = `
@@ -290,7 +252,6 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     }
   };
 
-  // Renderizar niveles
   Object.keys(niveles)
     .sort((a, b) => a - b)
     .forEach((nivel) => {
@@ -407,7 +368,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
       gap: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     `;
-    btnVolver.innerHTML = `<span>Semestre Anterior</span>`;
+    btnVolver.innerHTML = <span>◀ Semestre Anterior</span>;
     btnVolver.onmouseover = () => {
       btnVolver.style.background = "#f8f9fa";
       btnVolver.style.borderColor = "#95a5a6";
@@ -451,7 +412,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(26, 85, 105, 0.3);
   `;
-  btnSiguiente.innerHTML = `<span>Siguiente Semestre</span>`;
+  btnSiguiente.innerHTML = <span>Siguiente Semestre ▶</span>;
   btnSiguiente.onmouseover = () => {
     btnSiguiente.style.transform = "translateY(-2px)";
     btnSiguiente.style.boxShadow = "0 6px 16px rgba(26, 85, 105, 0.4)";
@@ -467,13 +428,13 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     }
 
     const ramosSeleccionados = Array.from(seleccionados).map(codigo => {
-    const ramo = todosLosRamos.find(r => r.codigo === codigo);
-    return {
+      const ramo = todosLosRamos.find(r => r.codigo === codigo);
+      return {
         codigo: codigo,
         nombre: obtenerNombreRamo(codigo, ramo?.asignatura),
         creditos: ramo?.creditos || 6,
         nivel: ramo?.nivel || 0,
-        periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
+        periodo: formatearPeriodoCorto(semestreActual)
       };
     });
 
@@ -517,7 +478,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
   `;
-  btnFinalizar.innerHTML = `<span>Finalizar y Guardar</span>`;
+  btnFinalizar.innerHTML = <span>✓ Finalizar y Guardar</span>;
   btnFinalizar.onmouseover = () => {
     btnFinalizar.style.transform = "translateY(-2px)";
     btnFinalizar.style.boxShadow = "0 6px 16px rgba(39, 174, 96, 0.4)";
@@ -534,13 +495,13 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
     if (seleccionados.size > 0) {
       const ramosSeleccionados = Array.from(seleccionados).map(codigo => {
-      const ramo = todosLosRamos.find(r => r.codigo === codigo);
-      return {
+        const ramo = todosLosRamos.find(r => r.codigo === codigo);
+        return {
           codigo: codigo,
           nombre: obtenerNombreRamo(codigo, ramo?.asignatura),
           creditos: ramo?.creditos || 6,
           nivel: ramo?.nivel || 0,
-          periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
+          periodo: formatearPeriodoCorto(semestreActual)
         };
       });
 
@@ -603,7 +564,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
   `;
   headerResumen.innerHTML = `
-    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">Proyección Completada</h2>
+    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">✓ Proyección Completada</h2>
     <p style="margin: 0; font-size: 1.1rem; opacity: 0.95;">
       Revisa tu plan de estudios y guárdalo cuando estés listo
     </p>
@@ -694,7 +655,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = `<span>Guardar Proyección</span>`;
+  btnGuardar.innerHTML = <span>💾 Guardar Proyección</span>;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -723,7 +684,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = `<span>Reiniciar Proyección</span>`;
+  btnReiniciar.innerHTML = <span>🔄 Reiniciar Proyección</span>;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
@@ -751,7 +712,7 @@ async function guardarProyeccionManualFinal(plan, carrera) {
         nombre: ramo.nombre,
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
-        periodo: ramo.periodo // <-- YA VIENE EN EL RAMO, no del bloque
+        periodo: ramo.periodo
       });
     });
   });
@@ -859,6 +820,11 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       return;
     }
 
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const semestreTipo = ahora.getMonth() < 6 ? "10" : "20";
+    let semestreActual = parseInt(`${año}${semestreTipo}`);
+
     const estadoRamos = {};
     avance.forEach((r) => {
       const cod = normalizarCodigo(r.course);
@@ -898,7 +864,6 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
 
     const planAutomatico = [];
     const LIMITE_CREDITOS = 30;
-    let semestreNum = 1;
 
     while (ramosPendientes.length > 0) {
       const disponibles = ramosPendientes.filter(r => 
@@ -912,6 +877,7 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       const ramosSemestre = [];
       let creditosSemestre = 0;
 
+      const periodoSemestre = formatearPeriodoCorto(semestreActual);
 
       for (const ramo of disponibles) {
         if (creditosSemestre + ramo.creditos <= LIMITE_CREDITOS) {
@@ -920,7 +886,7 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
             nombre: obtenerNombreRamo(ramo.codigo, ramo.asignatura),
             creditos: ramo.creditos,
             nivel: ramo.nivel,
-            periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
+            periodo: periodoSemestre
           });
           creditosSemestre += ramo.creditos;
           aprobadosSimulados.add(normalizarCodigo(ramo.codigo));
@@ -933,12 +899,12 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
       if (ramosSemestre.length === 0) break;
 
       planAutomatico.push({
-        semestre: semestreNum,
+        semestre: semestreActual,
         ramos: ramosSemestre,
         creditos: creditosSemestre
       });
 
-      semestreNum++;
+      semestreActual = calcularSiguienteSemestre(semestreActual);
     }
 
     mostrarResumenAutomatico(planAutomatico, contenedor, carrera);
@@ -964,7 +930,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
   `;
   headerResumen.innerHTML = `
-    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">Proyección Automática Generada</h2>
+    <h2 style="margin: 0 0 10px 0; font-size: 2rem;">✓ Proyección Automática Generada</h2>
     <p style="margin: 0; font-size: 1.1rem; opacity: 0.95;">
       Se ha generado una proyección óptima basada en prerrequisitos y límite de créditos
     </p>
@@ -975,11 +941,11 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
   const mallaDiv = document.createElement("div");
   mallaDiv.classList.add("malla-proyeccion");
 
-  plan.forEach((bloque) => {
+  plan.forEach((bloque, index) => {
     const bloqueDiv = document.createElement("div");
     bloqueDiv.classList.add("bloque-nivel");
     bloqueDiv.innerHTML = `
-      <h3>Semestre ${bloque.semestre}</h3>
+      <h3>Periodo ${index + 1}: ${formatearSemestre(bloque.semestre)}</h3>
       <p style="font-size:0.9rem; color:#666;">${bloque.creditos} créditos | ${bloque.ramos.length} ramos</p>
     `;
     const grid = document.createElement("div");
@@ -1053,7 +1019,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = `<span>Guardar Proyección</span>`;
+  btnGuardar.innerHTML = <span>💾 Guardar Proyección</span>;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -1082,7 +1048,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = `<span>Reiniciar Proyección</span>`;
+  btnReiniciar.innerHTML = <span>🔄 Reiniciar Proyección</span>;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
@@ -1110,13 +1076,15 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
         nombre: ramo.nombre,
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
-        periodo: ramo.periodo // <-- YA VIENE EN EL RAMO
+        periodo: ramo.periodo
       });
     });
-  })
+  });
 
   const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
-  const periodoProyectado = plan.length > 0 ? `${plan[plan.length - 1].semestre}` : null;
+  const periodoProyectado = plan.length > 0 
+    ? formatearPeriodoCorto(plan[plan.length - 1].semestre) 
+    : null;
   
   const nombreProyeccion = prompt(
     "Ingresa un nombre para esta proyección:", 
@@ -1178,6 +1146,6 @@ function calcularPeriodoProyectado(semestreInicio, cantidadSemestres) {
       añoFinal++;
     }
   }
-  
+
   return `${añoFinal}${tipoFinal}`;
 }
