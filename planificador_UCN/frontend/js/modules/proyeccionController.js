@@ -98,6 +98,14 @@ function limpiarElementosAnteriores() {
   });
 }
 
+function formatearPeriodoCorto(semestre) {
+  if (!semestre) return null;
+  const año = Math.floor(semestre / 100);
+  const tipo = semestre % 100;
+  const semestreNum = tipo === 10 ? "1" : "2";
+  return `${año}-${semestreNum}`;
+}
+
 async function mostrarMallaProyeccionManual(auth, carrera, contenedor) {
   try {
     limpiarElementosAnteriores();
@@ -459,12 +467,13 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     }
 
     const ramosSeleccionados = Array.from(seleccionados).map(codigo => {
-      const ramo = todosLosRamos.find(r => r.codigo === codigo);
-      return {
+    const ramo = todosLosRamos.find(r => r.codigo === codigo);
+    return {
         codigo: codigo,
         nombre: obtenerNombreRamo(codigo, ramo?.asignatura),
         creditos: ramo?.creditos || 6,
-        nivel: ramo?.nivel || 0
+        nivel: ramo?.nivel || 0,
+        periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
       };
     });
 
@@ -525,12 +534,13 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
 
     if (seleccionados.size > 0) {
       const ramosSeleccionados = Array.from(seleccionados).map(codigo => {
-        const ramo = todosLosRamos.find(r => r.codigo === codigo);
-        return {
+      const ramo = todosLosRamos.find(r => r.codigo === codigo);
+      return {
           codigo: codigo,
           nombre: obtenerNombreRamo(codigo, ramo?.asignatura),
           creditos: ramo?.creditos || 6,
-          nivel: ramo?.nivel || 0
+          nivel: ramo?.nivel || 0,
+          periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
         };
       });
 
@@ -737,8 +747,11 @@ async function guardarProyeccionManualFinal(plan, carrera) {
   plan.forEach(bloque => {
     bloque.ramos.forEach(ramo => {
       ramosSeleccionados.push({
-        ...ramo,
-        semestre: bloque.semestre
+        codigo: ramo.codigo,
+        nombre: ramo.nombre,
+        creditos: ramo.creditos,
+        nivel: ramo.nivel || 0,
+        periodo: ramo.periodo // <-- YA VIENE EN EL RAMO, no del bloque
       });
     });
   });
@@ -905,7 +918,8 @@ async function generarProyeccionAutomatica(auth, carrera, contenedor) {
             codigo: ramo.codigo,
             nombre: obtenerNombreRamo(ramo.codigo, ramo.asignatura),
             creditos: ramo.creditos,
-            nivel: ramo.nivel
+            nivel: ramo.nivel,
+            periodo: formatearPeriodoCorto(semestreActual) // <-- LÍNEA AGREGADA
           });
           creditosSemestre += ramo.creditos;
           aprobadosSimulados.add(normalizarCodigo(ramo.codigo));
@@ -1091,11 +1105,14 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
   plan.forEach(bloque => {
     bloque.ramos.forEach(ramo => {
       ramosSeleccionados.push({
-        ...ramo,
-        semestre: bloque.semestre
+        codigo: ramo.codigo,
+        nombre: ramo.nombre,
+        creditos: ramo.creditos,
+        nivel: ramo.nivel || 0,
+        periodo: ramo.periodo // <-- YA VIENE EN EL RAMO
       });
     });
-  });
+  })
 
   const totalCreditos = ramosSeleccionados.reduce((sum, r) => sum + Number(r.creditos), 0);
   const periodoProyectado = plan.length > 0 ? `${plan[plan.length - 1].semestre}` : null;
