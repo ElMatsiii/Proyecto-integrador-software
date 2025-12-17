@@ -139,7 +139,7 @@ async function mostrarMallaProyeccionManual(auth, carrera, contenedor) {
 
   } catch (err) {
     console.error("Error al cargar malla de proyección:", err);
-    contenedor.innerHTML = <p style="color:red;">Error al cargar malla curricular.</p>;
+    contenedor.innerHTML = `<p style="color:red;">Error al cargar malla curricular.</p>`;
   }
 }
 
@@ -368,7 +368,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
       gap: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     `;
-    btnVolver.innerHTML = <span>◀ Semestre Anterior</span>;
+    btnVolver.innerHTML = `<span>◀ Semestre Anterior</span>`;
     btnVolver.onmouseover = () => {
       btnVolver.style.background = "#f8f9fa";
       btnVolver.style.borderColor = "#95a5a6";
@@ -412,7 +412,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(26, 85, 105, 0.3);
   `;
-  btnSiguiente.innerHTML = <span>Siguiente Semestre ▶</span>;
+  btnSiguiente.innerHTML = `<span>Siguiente Semestre ▶</span>`;
   btnSiguiente.onmouseover = () => {
     btnSiguiente.style.transform = "translateY(-2px)";
     btnSiguiente.style.boxShadow = "0 6px 16px rgba(26, 85, 105, 0.4)";
@@ -478,7 +478,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
     gap: 8px;
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
   `;
-  btnFinalizar.innerHTML = <span>✓ Finalizar y Guardar</span>;
+  btnFinalizar.innerHTML = `<span>✓ Finalizar y Guardar</span>`;
   btnFinalizar.onmouseover = () => {
     btnFinalizar.style.transform = "translateY(-2px)";
     btnFinalizar.style.boxShadow = "0 6px 16px rgba(39, 174, 96, 0.4)";
@@ -655,7 +655,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = <span>💾 Guardar Proyección</span>;
+  btnGuardar.innerHTML = `<span>💾 Guardar Proyección</span>`;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -684,7 +684,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = <span>🔄 Reiniciar Proyección</span>;
+  btnReiniciar.innerHTML = `<span>🔄 Reiniciar Proyección</span>`;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
@@ -1019,7 +1019,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = <span>💾 Guardar Proyección</span>;
+  btnGuardar.innerHTML = `<span>💾 Guardar Proyección</span>`;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -1048,7 +1048,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = <span>🔄 Reiniciar Proyección</span>;
+  btnReiniciar.innerHTML = `<span>🔄 Reiniciar Proyección</span>`;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
