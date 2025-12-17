@@ -97,7 +97,7 @@ export async function initVersiones() {
 }
 
 async function mostrarDetalleProyeccion(id) {
-    try {
+  try {
     const proyeccion = await obtenerProyeccion(id);
     
     if (!proyeccion) {
