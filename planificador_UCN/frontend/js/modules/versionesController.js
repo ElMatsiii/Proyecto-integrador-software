@@ -97,7 +97,7 @@ export async function initVersiones() {
 }
 
 async function mostrarDetalleProyeccion(id) {
-  try {
+    try {
     const proyeccion = await obtenerProyeccion(id);
     
     if (!proyeccion) {
@@ -129,7 +129,8 @@ async function mostrarDetalleProyeccion(id) {
                     <th>Código</th>
                     <th>Nombre</th>
                     <th>Créditos</th>
-                    ${proyeccion.tipo === 'automatica' ? '<th>Semestre</th>' : ''}
+                    <th>Semestre</th>
+                    <th>Período</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -142,7 +143,8 @@ async function mostrarDetalleProyeccion(id) {
             <td>${ramo.codigo}</td>
             <td>${ramo.nombre}</td>
             <td>${ramo.creditos}</td>
-            ${proyeccion.tipo === 'automatica' ? `<td>${ramo.semestre || '—'}</td>` : ''}
+            <td>Semestre ${ramo.semestre || '—'}</td>
+            <td>${ramo.periodo || '—'}</td>
           </tr>
         `;
       });

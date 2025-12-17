@@ -705,14 +705,15 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
 
 async function guardarProyeccionManualFinal(plan, carrera) {
   const ramosSeleccionados = [];
-  plan.forEach(bloque => {
+  plan.forEach((bloque, index) => {
     bloque.ramos.forEach(ramo => {
       ramosSeleccionados.push({
         codigo: ramo.codigo,
         nombre: ramo.nombre,
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
-        periodo: ramo.periodo
+        periodo: ramo.periodo,
+        semestre: index + 1  // ← AGREGAR ESTA LÍNEA
       });
     });
   });
@@ -1069,14 +1070,15 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
 
 async function guardarProyeccionAutomaticaFinal(plan, carrera) {
   const ramosSeleccionados = [];
-  plan.forEach(bloque => {
+  plan.forEach((bloque, index) => {
     bloque.ramos.forEach(ramo => {
       ramosSeleccionados.push({
         codigo: ramo.codigo,
         nombre: ramo.nombre,
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
-        periodo: ramo.periodo
+        periodo: ramo.periodo,
+        semestre: index + 1  // ← AGREGAR ESTA LÍNEA
       });
     });
   });
