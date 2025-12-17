@@ -1,4 +1,3 @@
-// planificador_UCN/backend/tests/integration/proyecciones.test.js
 import request from 'supertest';
 import express from 'express';
 import { pool } from '../../db/conexion.js';
@@ -16,13 +15,11 @@ describe('API Proyecciones - Integration Tests', () => {
   let testProyeccionId;
 
   beforeAll(async () => {
-    // Configurar usuario de prueba
     testUser = {
       rut: '12345678-9',
       email: 'test@ucn.cl'
     };
 
-    // Insertar usuario en BD de prueba
     await pool.query(
       'INSERT INTO usuarios (rut, email) VALUES ($1, $2) ON CONFLICT (rut) DO NOTHING',
       [testUser.rut, testUser.email]
@@ -32,12 +29,10 @@ describe('API Proyecciones - Integration Tests', () => {
   });
 
   beforeEach(async () => {
-    // Limpiar proyecciones de prueba antes de cada test
     await pool.query('DELETE FROM proyecciones WHERE rut_usuario = $1', [testUser.rut]);
   });
 
   afterAll(async () => {
-    // Limpiar datos de prueba
     await pool.query('DELETE FROM proyecciones WHERE rut_usuario = $1', [testUser.rut]);
     await pool.query('DELETE FROM usuarios WHERE rut = $1', [testUser.rut]);
     await pool.end();
@@ -90,7 +85,6 @@ describe('API Proyecciones - Integration Tests', () => {
     it('debe rechazar con datos incompletos (400)', async () => {
       const proyeccionIncompleta = {
         codigo_carrera: 'ICI',
-        // Falta tipo, nombre y datos_completos
       };
 
       const response = await request(app)
@@ -103,9 +97,8 @@ describe('API Proyecciones - Integration Tests', () => {
     });
 
     it('debe manejar errores de validación', async () => {
-      // Intentar insertar con un campo que causará error de validación
       const proyeccionInvalida = {
-        codigo_carrera: null, // Esto causará error de validación (400)
+        codigo_carrera: null,
         tipo: 'manual',
         nombre: 'Test',
         datos_completos: {}
@@ -116,14 +109,12 @@ describe('API Proyecciones - Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send(proyeccionInvalida);
 
-      // Debería ser 400 por validación o 500 por error de BD
       expect([400, 500]).toContain(response.status);
     });
   });
 
   describe('GET /api/proyecciones', () => {
     beforeEach(async () => {
-      // Insertar proyecciones de prueba
       await pool.query(
         `INSERT INTO proyecciones 
          (rut_usuario, codigo_carrera, tipo, nombre, datos_completos) 
@@ -156,14 +147,11 @@ describe('API Proyecciones - Integration Tests', () => {
 
       expect(Array.isArray(response.body)).toBe(true);
       
-      // Verificar que todas las proyecciones retornadas son de ICI
-      // Si codigo_carrera no está en el SELECT, el test debería pasar igual
       if (response.body.length > 0 && response.body[0].codigo_carrera) {
         response.body.forEach(proy => {
           expect(proy.codigo_carrera).toBe('ICI');
         });
       } else {
-        // Solo verificar que se retornó algo
         expect(response.body.length).toBeGreaterThan(0);
       }
     });
@@ -232,7 +220,6 @@ describe('API Proyecciones - Integration Tests', () => {
 
       expect(response.body.success).toBe(true);
 
-      // Verificar que fue eliminada
       const check = await pool.query(
         'SELECT * FROM proyecciones WHERE id = $1',
         [proyeccionId]
@@ -250,7 +237,6 @@ describe('API Proyecciones - Integration Tests', () => {
 
   describe('Flujo completo E2E', () => {
     it('debe completar flujo: crear → listar → obtener → eliminar', async () => {
-      // 1. Crear
       const createRes = await request(app)
         .post('/api/proyecciones')
         .set('Authorization', `Bearer ${authToken}`)
@@ -264,7 +250,6 @@ describe('API Proyecciones - Integration Tests', () => {
 
       const proyId = createRes.body.proyeccion.id;
 
-      // 2. Listar
       const listRes = await request(app)
         .get('/api/proyecciones')
         .set('Authorization', `Bearer ${authToken}`)
@@ -272,7 +257,6 @@ describe('API Proyecciones - Integration Tests', () => {
 
       expect(listRes.body.find(p => p.id === proyId)).toBeDefined();
 
-      // 3. Obtener específica
       const getRes = await request(app)
         .get(`/api/proyecciones/${proyId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -280,13 +264,11 @@ describe('API Proyecciones - Integration Tests', () => {
 
       expect(getRes.body.nombre).toBe('Flujo E2E');
 
-      // 4. Eliminar
       await request(app)
         .delete(`/api/proyecciones/${proyId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      // 5. Verificar eliminación
       await request(app)
         .get(`/api/proyecciones/${proyId}`)
         .set('Authorization', `Bearer ${authToken}`)

@@ -1,7 +1,3 @@
-/* ========================================
-   BASE.CSS - Estilos globales y reset
-   ======================================== */
-
 * {
   margin: 0;
   padding: 0;
@@ -22,25 +18,20 @@ body {
   padding: 20px;
 }
 
-/* Variables CSS para temas - Colores UCN */
 :root {
-  /* Modo Claro */
   --bg-body: #e8eef1;
   --text-color: #2c3e50;
   --card-bg: #ffffff;
   --border-color: #c5d3dc;
   
-  /* Colores UCN */
   --ucn-primary: #1a5569;
   --ucn-secondary: #4a5568;
   --ucn-accent: #1a5569;
   --ucn-accent-hover: #134152;
-  
-  /* Color de tarjetas de ramos */
+
   --ramo-bg: #f8f9fa;
   --ramo-border: #dee2e6;
-  
-  /* Estados de ramos - Modo Claro */
+
   --aprobado: #4caf50;
   --aprobado-bg: #e8f5e9;
   --aprobado-border: #4caf50;
@@ -56,39 +47,34 @@ body {
   --pendiente: #95a5a6;
   --pendiente-bg: #ecf0f1;
   --pendiente-border: #bdc3c7;
-  
-  /* Otros elementos */
+
   --table-header: #1a5569;
   --table-header-text: white;
   --footer-bg: #4a5568;
   --footer-text: white;
-  
-  /* Navegación */
+
   --nav-bg: #ffffff;
   --nav-text: #2c3e50;
   --nav-hover-bg: #f8f9fa;
   --nav-active-bg: #1a5569;
 }
 
-/* Modo Oscuro */
+
 [data-theme="dark"] {
-  /* Fondo principal oscuro */
+
   --bg-body: #2b2d3a;
   --text-color: #ffffff;
   --card-bg: #3a3d4e;
   --border-color: #4a4d5e;
   
-  /* Colores UCN en oscuro */
   --ucn-primary: #2a7a94;
   --ucn-secondary: #5a6578;
   --ucn-accent: #2a7a94;
   --ucn-accent-hover: #1a5569;
-  
-  /* Color de tarjetas de ramos */
+
   --ramo-bg: #3a3d4e;
   --ramo-border: #4a4d5e;
-  
-  /* Estados de ramos - Modo Oscuro */
+
   --aprobado-bg: #2d5a2f;
   --aprobado-border: #4caf50;
   
@@ -100,26 +86,19 @@ body {
   
   --pendiente-bg: #3a3d4e;
   --pendiente-border: #5a5d6e;
-  
-  /* Otros elementos oscuros */
+
   --table-header: #1a5569;
   --footer-bg: #1a1d2a;
-  
-  /* Navegación oscura */
+
   --nav-bg: #2b2d3a;
   --nav-text: #a0a0a0;
   --nav-hover-bg: #3a3d4e;
   --nav-active-bg: #1a5569;
 }
 
-/* ========================================
-   ESTILOS CRÍTICOS PARA NAV (Anti-flash)
-   ======================================== */
-
-/* Aplicar inmediatamente los estilos del nav según el tema */
 nav {
   background-color: var(--nav-bg);
-  transition: none !important; /* Sin transición en carga inicial */
+  transition: none !important;
 }
 
 nav a {
@@ -132,15 +111,10 @@ nav a.active {
   color: white;
 }
 
-/* Restaurar transiciones después de la carga */
 body.loaded nav,
 body.loaded nav a {
   transition: background-color 0.3s ease, color 0.3s ease !important;
 }
-
-/* ========================================
-   FIN ESTILOS CRÍTICOS
-   ======================================== */
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {

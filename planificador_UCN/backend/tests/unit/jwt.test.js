@@ -1,4 +1,3 @@
-// planificador_UCN/backend/tests/unit/jwt.test.js
 import { generarToken, verificarToken } from '../../config/jwt.js';
 import { describe, it, expect, beforeEach } from '@jest/globals';
 
@@ -18,7 +17,7 @@ describe('JWT Service - Unit Tests', () => {
       
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
-      expect(token.split('.').length).toBe(3); // JWT tiene 3 partes
+      expect(token.split('.').length).toBe(3);
     });
 
     it('debe incluir los datos del usuario en el token', () => {
@@ -32,12 +31,10 @@ describe('JWT Service - Unit Tests', () => {
     it('debe generar tokens diferentes para llamadas diferentes', async () => {
       const token1 = generarToken(testUser);
       
-      // Esperar 1 segundo para asegurar timestamp diferente
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const token2 = generarToken(testUser);
       
-      // Los tokens deberían ser diferentes debido al timestamp
       expect(token1).not.toBe(token2);
     });
   });
@@ -59,7 +56,6 @@ describe('JWT Service - Unit Tests', () => {
     });
 
     it('debe retornar null para un token expirado', () => {
-      // Nota: Este test requeriría manipular el tiempo o usar tokens pre-generados
       const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTYyMzkwMjJ9.invalid';
       const result = verificarToken(expiredToken);
       

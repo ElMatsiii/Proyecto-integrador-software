@@ -14,11 +14,9 @@ async function testProyecciones() {
   try {
     console.log("Probando conexión...");
     
-    // Verificar base de datos actual
     const dbInfo = await client.query("SELECT current_database(), current_user, version();");
     console.log("Base de datos actual:", dbInfo.rows[0]);
     
-    // Listar todas las tablas
     const tables = await client.query(`
       SELECT schemaname, tablename 
       FROM pg_tables 
@@ -27,7 +25,6 @@ async function testProyecciones() {
     `);
     console.log("Tablas en public:", tables.rows);
     
-    // Buscar proyecciones en todos los esquemas
     const proyecciones = await client.query(`
       SELECT schemaname, tablename 
       FROM pg_tables 
@@ -36,7 +33,7 @@ async function testProyecciones() {
     console.log("Tablas con 'proyec':", proyecciones.rows);
     
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error("Error:", error.message);
   } finally {
     client.release();
     await pool.end();

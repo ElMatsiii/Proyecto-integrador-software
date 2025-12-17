@@ -40,7 +40,6 @@ export async function obtenerAvance(rut, codCarrera) {
   return res.json();
 }
 
-// Nuevas funciones para proyecciones
 export async function guardarProyeccion(proyeccionData) {
   const res = await fetch(API.PROYECCIONES, {
     method: "POST",

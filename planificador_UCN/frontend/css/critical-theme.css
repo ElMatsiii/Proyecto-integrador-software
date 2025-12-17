@@ -1,9 +1,3 @@
-/* ========================================
-   CRITICAL-THEME.CSS - Estilos críticos para prevenir flash
-   Este archivo debe cargarse PRIMERO
-   ======================================== */
-
-/* Aplicar tema inmediatamente basado en el atributo data-theme */
 :root {
   --bg-body: #e8eef1;
   --text-color: #2c3e50;
@@ -24,7 +18,6 @@
   --nav-active-bg: #1a5569;
 }
 
-/* Aplicar fondo inmediatamente */
 html {
   background-color: var(--bg-body);
 }
@@ -37,7 +30,6 @@ body {
   transition: none;
 }
 
-/* Nav sin transición en carga inicial - FONDO OSCURO UNIFORME */
 nav {
   background-color: #1e2127 !important;
   transition: none !important;
@@ -59,14 +51,12 @@ nav a.active {
   color: white;
 }
 
-/* Main sin transición en carga inicial */
 main {
   background-color: var(--card-bg);
   color: var(--text-color);
   transition: none;
 }
 
-/* Activar transiciones después de la carga */
 body.loaded,
 body.loaded nav,
 body.loaded nav a,

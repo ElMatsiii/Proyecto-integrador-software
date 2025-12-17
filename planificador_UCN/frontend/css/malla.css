@@ -1,7 +1,3 @@
-/* ========================================
-   MALLA.CSS - Página de Malla Curricular
-   ======================================== */
-
 .pagina-malla main {
   max-width: 100%;
   margin: 0;
@@ -88,7 +84,6 @@
   border-color: var(--ucn-accent);
 }
 
-/* Estados de cursos */
 .pagina-malla .curso.aprobado {
   background-color: var(--aprobado-bg) !important;
   border-color: var(--aprobado-border) !important;
@@ -110,7 +105,6 @@
   border-color: var(--pendiente-border) !important;
 }
 
-/* Modo oscuro específico */
 [data-theme="dark"] .pagina-malla .bloque-nivel h3 {
   color: white;
   background: #4a5568;
@@ -124,14 +118,12 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
-/* Grid alternativo para malla */
 .malla-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .pagina-malla main {
     padding: 20px 15px;

@@ -1,7 +1,3 @@
-/* ========================================
-   LAYOUT.CSS - Header, Navegación, Footer
-   ======================================== */
-
 header, footer {
   background: var(--ucn-primary);
   color: white;
@@ -26,7 +22,6 @@ footer {
   font-size: 0.9rem;
 }
 
-/* Navegación - FONDO OSCURO UNIFORME */
 nav {
   background: #1e2127 !important;
   border-radius: 0;
@@ -84,7 +79,6 @@ nav a.logout:hover {
   background: #134152;
 }
 
-/* Botones especiales en el nav (Salir, Modo Oscuro) */
 .dark-mode-toggle-nav {
   background: #1a5569 !important;
   color: white !important;
@@ -111,7 +105,6 @@ body.loaded .dark-mode-toggle-nav {
   background: #134152 !important;
 }
 
-/* Modo claro: nav con fondo oscuro consistente */
 [data-theme="light"] nav {
   background: #1e2127 !important;
 }
@@ -126,7 +119,6 @@ body.loaded .dark-mode-toggle-nav {
   color: white;
 }
 
-/* Modo oscuro: mismo fondo oscuro */
 [data-theme="dark"] nav {
   background: #1e2127 !important;
 }
@@ -149,7 +141,6 @@ body.loaded .dark-mode-toggle-nav {
   background: #1a5569 !important;
 }
 
-/* Main container */
 main {
   background-color: var(--card-bg);
   color: var(--text-color);
@@ -178,7 +169,6 @@ main p {
   color: var(--text-color);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;

@@ -12,10 +12,8 @@ export async function initProyeccion() {
     return (window.location.href = "index.html");
   }
 
-  // Cargar proyección manual automáticamente al entrar
   await mostrarMallaProyeccionManual(auth, carrera, contenedor);
 
-  // Botón para proyección automática
   const btnAuto = document.getElementById("btnIrAutomatica");
   if (btnAuto) {
     btnAuto.addEventListener("click", async () => {
@@ -303,7 +301,7 @@ function mostrarSemestreManual(estadoProyeccion, contenedor, LIMITE_CREDITOS, ca
             }
             
             if (prereqsInvalidos.length > 0) {
-              mensaje += "\n⚠️ Prerrequisitos inválidos (no existen en malla):\n";
+              mensaje += "\Prerrequisitos inválidos (no existen en malla):\n";
               prereqsInvalidos.forEach((p, i) => {
                 mensaje += `  • ${prereqsOriginales[prereqsNormalizados.indexOf(p)]}\n`;
               });
@@ -655,7 +653,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = `<span>💾 Guardar Proyección</span>`;
+  btnGuardar.innerHTML = `<span>Guardar Proyección</span>`;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -684,7 +682,7 @@ function mostrarResumenFinalManual(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = `<span>🔄 Reiniciar Proyección</span>`;
+  btnReiniciar.innerHTML = `<span>Reiniciar Proyección</span>`;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
@@ -713,7 +711,7 @@ async function guardarProyeccionManualFinal(plan, carrera) {
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
         periodo: ramo.periodo,
-        semestre: index + 1  // ← AGREGAR ESTA LÍNEA
+        semestre: index + 1
       });
     });
   });
@@ -1020,7 +1018,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
   `;
-  btnGuardar.innerHTML = `<span>💾 Guardar Proyección</span>`;
+  btnGuardar.innerHTML = `<span>Guardar Proyección</span>`;
   btnGuardar.onmouseover = () => {
     btnGuardar.style.transform = "translateY(-3px)";
     btnGuardar.style.boxShadow = "0 6px 20px rgba(39, 174, 96, 0.4)";
@@ -1049,7 +1047,7 @@ function mostrarResumenAutomatico(plan, contenedor, carrera) {
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   `;
-  btnReiniciar.innerHTML = `<span>🔄 Reiniciar Proyección</span>`;
+  btnReiniciar.innerHTML = `<span>Reiniciar Proyección</span>`;
   btnReiniciar.onmouseover = () => {
     btnReiniciar.style.background = "#e67e22";
     btnReiniciar.style.color = "white";
@@ -1078,7 +1076,7 @@ async function guardarProyeccionAutomaticaFinal(plan, carrera) {
         creditos: ramo.creditos,
         nivel: ramo.nivel || 0,
         periodo: ramo.periodo,
-        semestre: index + 1  // ← AGREGAR ESTA LÍNEA
+        semestre: index + 1
       });
     });
   });

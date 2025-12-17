@@ -1,8 +1,3 @@
-/* ========================================
-   TABLES.CSS - Estilos de tablas
-   ======================================== */
-
-/* Tabla básica */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -22,7 +17,6 @@ table th {
   text-align: left;
 }
 
-/* Tabla de avance */
 .tabla-avance {
   width: 100%;
   border-collapse: collapse;
@@ -69,7 +63,6 @@ table th {
   background-color: #eef2ff;
 }
 
-/* Tabla de resumen */
 #tablaResumen {
   width: 100%;
   border-collapse: collapse;

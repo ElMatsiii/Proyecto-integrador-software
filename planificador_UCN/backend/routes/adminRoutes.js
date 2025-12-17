@@ -73,9 +73,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ============================================================================
-// CORRECCIÓN PRINCIPAL: Query que lee correctamente el periodo de cada ramo
-// ============================================================================
 router.get("/demanda-ramos", autenticarToken, async (req, res) => {
   const { periodo, codigo_carrera } = req.query;
 
@@ -84,7 +81,6 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
     console.log("Periodo solicitado:", periodo);
     console.log("Carrera solicitada:", codigo_carrera);
 
-    // Query CORREGIDA: Lee el periodo individual de cada ramo desde el JSON
     let query = `
       SELECT 
         p.codigo_carrera,
@@ -104,14 +100,12 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
     const params = [];
     let paramIndex = 1;
 
-    // Filtro por periodo
     if (periodo) {
       query += ` AND (ramo->>'periodo')::TEXT = $${paramIndex}`;
       params.push(periodo);
       paramIndex++;
     }
 
-    // Filtro por carrera
     if (codigo_carrera) {
       query += ` AND p.codigo_carrera = $${paramIndex}`;
       params.push(codigo_carrera);
@@ -133,9 +127,8 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
       console.log("Ejemplo de resultado:", result.rows[0]);
       console.log("Periodos únicos encontrados:", [...new Set(result.rows.map(r => r.periodo_ramo))]);
     } else {
-      console.log("⚠️ No se encontraron resultados");
+      console.log("No se encontraron resultados");
       
-      // Debug: verificar qué hay en la base de datos
       const debugQuery = `
         SELECT 
           COUNT(*) as total_proyecciones,
@@ -145,7 +138,6 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
       const debugResult = await pool.query(debugQuery);
       console.log("Debug - Proyecciones en BD:", debugResult.rows[0]);
       
-      // Verificar estructura de datos_completos
       const sampleQuery = `
         SELECT 
           datos_completos->'ramos' as ramos_sample
@@ -160,15 +152,12 @@ router.get("/demanda-ramos", autenticarToken, async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error("❌ Error al obtener demanda:", error);
+    console.error("Error al obtener demanda:", error);
     console.error("Stack:", error.stack);
     res.status(500).json({ error: "Error al obtener demanda de ramos" });
   }
 });
 
-// ============================================================================
-// Estadísticas generales
-// ============================================================================
 router.get("/estadisticas", autenticarToken, async (req, res) => {
   try {
     const totalProyecciones = await pool.query(
@@ -215,9 +204,6 @@ router.get("/estadisticas", autenticarToken, async (req, res) => {
   }
 });
 
-// ============================================================================
-// Periodos disponibles - Lee de los ramos individuales
-// ============================================================================
 router.get("/periodos-disponibles", autenticarToken, async (req, res) => {
   try {
     console.log("=== OBTENIENDO PERIODOS DISPONIBLES ===");

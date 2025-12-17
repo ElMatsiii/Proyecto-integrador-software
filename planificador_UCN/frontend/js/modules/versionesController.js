@@ -75,7 +75,6 @@ export async function initVersiones() {
       lista.appendChild(li);
     });
 
-    // Event listeners para los botones
     document.querySelectorAll(".btn-ver").forEach(btn => {
       btn.addEventListener("click", async (e) => {
         const id = e.target.dataset.id;
@@ -157,7 +156,6 @@ async function mostrarDetalleProyeccion(id) {
       </div>
     `;
 
-    // Agregar estilos del modal si no existen
     if (!document.getElementById('modal-styles')) {
       const style = document.createElement('style');
       style.id = 'modal-styles';
@@ -305,7 +303,6 @@ async function mostrarDetalleProyeccion(id) {
       document.head.appendChild(style);
     }
 
-    // Insertar el modal en el DOM
     document.body.insertAdjacentHTML('beforeend', detalleHTML);
 
   } catch (error) {
@@ -322,7 +319,6 @@ async function eliminarProyeccionConfirmada(id) {
   try {
     await eliminarProyeccion(id);
     alert("Proyección eliminada correctamente");
-    // Recargar la página para actualizar la lista
     window.location.reload();
   } catch (error) {
     console.error("Error al eliminar proyección:", error);

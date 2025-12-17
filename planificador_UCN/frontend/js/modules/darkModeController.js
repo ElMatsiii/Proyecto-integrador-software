@@ -20,8 +20,7 @@ export function initDarkMode() {
     darkModeButton.className = 'dark-mode-toggle-nav';
     darkModeButton.setAttribute('aria-label', 'Cambiar modo oscuro');
     darkModeButton.type = 'button';
-    
-    // Actualizar texto del botón según el tema actual
+
     const currentTheme = document.documentElement.getAttribute('data-theme');
     darkModeButton.innerHTML = currentTheme === 'dark' ? '☀️ Claro' : '🌙 Oscuro';
     
@@ -44,8 +43,7 @@ export function initDarkMode() {
       }
     });
   };
-  
-  // Ejecutar inmediatamente si el DOM ya está listo
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

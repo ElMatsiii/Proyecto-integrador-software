@@ -1,8 +1,3 @@
-/* ========================================
-   COMPONENTS.CSS - Componentes reutilizables
-   ======================================== */
-
-/* Cursos/Ramos Cards */
 .curso, .ramo-card {
   background: var(--card-bg);
   color: var(--text-color);
@@ -31,7 +26,6 @@
   border-color: var(--ucn-primary);
 }
 
-/* Estados de cursos */
 .curso.aprobado {
   border-color: var(--aprobado-border);
   background-color: var(--aprobado-bg) !important;
@@ -53,7 +47,6 @@
   background-color: var(--pendiente-bg) !important;
 }
 
-/* Dashboard Cards */
 .dashboard {
   display: flex;
   justify-content: space-around;
@@ -84,7 +77,6 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Botones */
 button, .btn, .acciones button {
   background: var(--ucn-accent);
   color: white;
@@ -114,7 +106,6 @@ button:active, .btn:active {
   margin-top: 30px;
 }
 
-/* Selector de carrera */
 #selectorCarreraContainer {
   text-align: center;
 }

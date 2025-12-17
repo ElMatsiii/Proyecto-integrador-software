@@ -1,7 +1,3 @@
-/* ========================================
-   VERSIONES.CSS - Estilos para versiones guardadas
-   ======================================== */
-
 .lista-versiones {
   list-style: none;
   padding: 0;
@@ -107,7 +103,6 @@
   transform: translateY(-2px);
 }
 
-/* Modo oscuro */
 [data-theme="dark"] .proyeccion-item {
   background: #1c1c1c;
   border-color: #333;

@@ -1,4 +1,3 @@
-// planificador_UCN/backend/tests/unit/authMiddleware.test.js
 import { autenticarToken } from '../../middleware/authMiddleware.js';
 import { generarToken } from '../../config/jwt.js';
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
@@ -51,11 +50,10 @@ describe('Auth Middleware - Unit Tests', () => {
 
     it('debe manejar header sin Bearer', () => {
       const validToken = generarToken({ rut: '12345678-9' });
-      mockReq.headers.authorization = validToken; // Sin "Bearer "
+      mockReq.headers.authorization = validToken;
       
       autenticarToken(mockReq, mockRes, nextFunction);
 
-      // Retorna 401 porque no encuentra el token después del split
       expect(mockRes.status).toHaveBeenCalledWith(401);
     });
 
@@ -72,13 +70,12 @@ describe('Auth Middleware - Unit Tests', () => {
       
       autenticarToken(mockReq, mockRes, nextFunction);
 
-      // Retorna 401 porque el token después del split está vacío
       expect(mockRes.status).toHaveBeenCalledWith(401);
     });
 
     it('debe ser case-sensitive con el header', () => {
       const validToken = generarToken({ rut: '12345678-9' });
-      mockReq.headers.Authorization = `Bearer ${validToken}`; // Capital A
+      mockReq.headers.Authorization = `Bearer ${validToken}`;
       
       autenticarToken(mockReq, mockRes, nextFunction);
 
@@ -90,8 +87,7 @@ describe('Auth Middleware - Unit Tests', () => {
     it('no debe realizar llamadas a base de datos', () => {
       const validToken = generarToken({ rut: '12345678-9' });
       mockReq.headers.authorization = `Bearer ${validToken}`;
-      
-      // Si el middleware estuviera haciendo llamadas DB, esto fallaría
+
       expect(() => {
         autenticarToken(mockReq, mockRes, nextFunction);
       }).not.toThrow();
@@ -105,7 +101,7 @@ describe('Auth Middleware - Unit Tests', () => {
       autenticarToken(mockReq, mockRes, nextFunction);
       const duration = Date.now() - start;
       
-      expect(duration).toBeLessThan(10); // Menos de 10ms
+      expect(duration).toBeLessThan(10);
     });
   });
 });

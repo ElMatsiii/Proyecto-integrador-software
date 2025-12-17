@@ -1,4 +1,3 @@
-// planificador_UCN/frontend/tests/utils.test.js
 import { normalizarCodigo, obtenerNombreRamo } from '../js/services/utils.js';
 import { describe, it, expect } from '@jest/globals';
 
@@ -81,7 +80,6 @@ describe('Utils - Frontend Unit Tests', () => {
     });
 
     it('debe manejar nombres que son iguales al código', () => {
-      // Si el nombre es igual al código, debería usar el genérico
       const resultado = obtenerNombreRamo('DCTE123', 'DCTE123');
       expect(resultado).toBe('DCTE123');
     });
@@ -98,7 +96,7 @@ describe('Utils - Frontend Unit Tests', () => {
 
     it('debe trimear espacios en nombre original', () => {
       const resultado = obtenerNombreRamo('MAT001', '  Cálculo I  ');
-      expect(resultado).toBe('  Cálculo I  '); // Preserva el nombre tal cual
+      expect(resultado).toBe('  Cálculo I  ');
     });
 
     it('debe ser case-insensitive para prefijos', () => {
@@ -124,7 +122,6 @@ describe('Utils - Frontend Unit Tests', () => {
     });
 
     it('debe procesar correctamente pipeline completo', () => {
-      // Simular datos reales de la API
       const datosAPI = {
         codigo: 'DCTE-123',
         nombre: '  Ética Profesional  '
@@ -163,7 +160,7 @@ describe('Utils - Frontend Unit Tests', () => {
         normalizarCodigo('MAT-001');
       }
       const duration = Date.now() - start;
-      expect(duration).toBeLessThan(100); // Menos de 100ms para 10k operaciones
+      expect(duration).toBeLessThan(100);
     });
   });
 });

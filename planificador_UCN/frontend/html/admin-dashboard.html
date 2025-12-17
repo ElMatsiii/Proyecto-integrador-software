@@ -129,13 +129,13 @@
         const response = await fetch(`${CONFIG.API_URL}/admin/periodos-disponibles`, { headers });
         const periodos = await response.json();
 
-        console.log("📅 Periodos recibidos del backend:", periodos);
+        console.log("Periodos recibidos del backend:", periodos);
 
         const select = document.getElementById("filtroPeriodo");
         periodos.forEach(p => {
           const option = document.createElement("option");
           option.value = p;
-          option.textContent = p; // Ya viene formateado como "2026-1"
+          option.textContent = p;
           select.appendChild(option);
         });
 
@@ -151,7 +151,7 @@
       const periodo = document.getElementById("filtroPeriodo").value;
       const carrera = document.getElementById("filtroCarrera").value;
 
-      console.log("🔍 Cargando demanda con filtros:");
+      console.log("Cargando demanda con filtros:");
       console.log("   Periodo:", periodo || "Todos");
       console.log("   Carrera:", carrera || "Todas");
 
@@ -166,7 +166,7 @@
         );
         const data = await response.json();
 
-        console.log("📊 Datos recibidos:", data.length, "ramos");
+        console.log("Datos recibidos:", data.length, "ramos");
         if (data.length > 0) {
           console.log("   Primer resultado:", data[0]);
         }
@@ -196,7 +196,7 @@
         return;
       }
 
-      console.log("🎨 Renderizando tabla con", datos.length, "filas");
+      console.log("Renderizando tabla con", datos.length, "filas");
 
       let html = `
         <table class="tabla-demanda">
@@ -226,7 +226,6 @@
           badgeText = "Media";
         }
 
-        // 🔧 CORRECCIÓN: Usar periodo_ramo en lugar de periodo_proyectado
         const periodoMostrar = ramo.periodo_ramo || ramo.periodo_proyectado || "Sin período";
 
         console.log(`   Ramo: ${ramo.codigo_ramo}, Periodo: ${periodoMostrar}`);
@@ -249,18 +248,18 @@
       `;
 
       container.innerHTML = html;
-      console.log("✅ Tabla renderizada exitosamente");
+      console.log("Tabla renderizada exitosamente");
     }
 
     document.getElementById("btnFiltrar").addEventListener("click", cargarDemanda);
 
     // Inicializar
-    console.log("🚀 Inicializando dashboard admin...");
+    console.log("Inicializando dashboard admin...");
     cargarEstadisticas();
     cargarPeriodos();
     
     setTimeout(() => {
-      console.log("⏱️ Cargando demanda inicial...");
+      console.log("Cargando demanda inicial...");
       cargarDemanda();
     }, 500);
   </script>
